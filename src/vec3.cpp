@@ -1,0 +1,256 @@
+#include "pch.h"
+#include "vec3.h"
+#include "Helpers.h"
+
+namespace game
+{
+  vec3 const vec3::zero = { 0, 0, 0 };
+
+  vec3 const vec3::forward = { 0, 0, 1 };
+
+  vec3 const vec3::up = { 0, 1, 0 };
+
+  vec3 const vec3::left = { 1, 0, 0 };
+
+  vec3 vec3::randomInSphere(float radius)
+  {
+    vec3 v;
+    const float RAND_MAX_2 = RAND_MAX / 2.0f;
+
+    do
+    {
+      v.x = randf(-radius, radius);
+      v.y = randf(-radius, radius);
+      v.z = randf(-radius, radius);
+    } while (v.sqLength() >= radius * radius);
+
+    return v;
+  }
+
+  vec3 vec3::randomInCube(float size)
+  {
+    return
+    {
+      randf(-size, size),
+      randf(-size, size),
+      randf(-size, size),
+    };
+  }
+
+  vec3::vec3(Vector3 v) : Vector3{ v }
+  {}
+
+  vec3::vec3(float x, float y, float z) : Vector3{ x, y, z }
+  {}
+
+  vec3 vec3::operator+(vec3 v) const
+  {
+    return { x + v.x, y + v.y, z + v.z };
+  }
+
+  vec3 vec3::operator-(vec3 v) const
+  {
+    return { x - v.x, y - v.y, z - v.z };
+  }
+
+  float vec3::operator*(vec3 v) const
+  {
+    return x * v.x + y * v.y + z * v.z;
+  }
+
+  vec3 vec3::operator%(vec3 v) const
+  {
+    return
+    {
+      y * v.z - z * v.y,
+      z * v.x - x * v.z,
+      x * v.y - y * v.x,
+    };
+  }
+
+  vec3 vec3::operator*(float f) const
+  {
+    return { x * f, y * f, z * f };
+  }
+
+  vec3 vec3::operator/(float f) const
+  {
+    if (f == 0)
+      return { 0, 0, 0 };
+
+    return { x / f, y / f, z / f };
+  }
+
+  vec3& vec3::operator+=(vec3 v)
+  {
+    *this = *this + v;
+
+    return *this;
+  }
+
+  vec3& vec3::operator-=(vec3 v)
+  {
+    *this = *this - v;
+
+    return *this;
+  }
+
+  vec3& vec3::operator*=(float f)
+  {
+    *this = *this * f;
+
+    return *this;
+  }
+
+  vec3& vec3::operator/=(float f)
+  {
+    *this = *this / f;
+
+    return *this;
+  }
+
+  vec3 vec3::operator-() const
+  {
+    return { -x, -y, -z };
+  }
+
+  bool vec3::operator==(vec3 v) const
+  {
+    return x == v.x && y == v.y && z == v.z;
+  }
+
+  bool vec3::operator!=(vec3 v) const
+  {
+    return !(*this == v);
+  }
+
+  vec3::operator Vector3() const
+  {
+    return { x, y, z };
+  }
+
+  float vec3::sqLength() const
+  {
+    return x * x + y * y + z * z;
+  }
+
+  float vec3::length() const
+  {
+    float sqLen = sqLength();
+
+    if (sqLen == 0)
+      return 0;
+
+    return sqrtf(sqLen);
+  }
+
+  vec3 vec3::normalized() const
+  {
+    float len = length();
+
+    if (len == 0)
+      return *this;
+
+    return *this / len;
+  }
+
+  void vec3::normalize()
+  {
+    *this = normalized();
+  }
+
+  bool vec3::isZero() const
+  {
+    return x == 0 && y == 0 && z == 0;
+  }
+
+  bool vec3::isAlmostZero(float delta) const
+  {
+    return
+      fabsf(x) < delta &&
+      fabsf(y) < delta &&
+      fabsf(z) < delta;
+  }
+
+  vec3 vec3::reflected(vec3 normal) const
+  {
+    return *this - 2 * (*this * normal) * normal;
+  }
+
+  void vec3::reflect(vec3 normal)
+  {
+    *this = reflected(normal);
+  }
+
+  vec3 vec3::projectedOnVector(vec3 v) const
+  {
+    return *this * v * v;
+  }
+
+  void vec3::projectOnVector(vec3 v)
+  {
+    *this = projectedOnVector(v);
+  }
+
+  vec3 vec3::projectedOnPlane(vec3 normal) const
+  {
+    //return *this % normal % -normal;
+    return *this - this->projectedOnVector(normal);
+  }
+
+  void vec3::projectOnPlane(vec3 normal)
+  {
+    *this = projectedOnPlane(normal);
+  }
+
+  vec3 vec3::rotatedBy(const quat& q) const
+  {
+    return Vector3RotateByQuaternion(*this, q);
+  }
+
+  void vec3::rotateBy(const quat& q)
+  {
+    *this = rotatedBy(q);
+  }
+
+  vec3 vec3::rotatedBy(vec3 axis, float angle) const
+  {
+    return Vector3RotateByAxisAngle(*this, axis, angle);
+  }
+
+  void vec3::rotateBy(vec3 axis, float angle)
+  {
+    *this = rotatedBy(axis, angle);
+  }
+
+  vec3 vec3::rotatedOnPlane(vec3 normal) const
+  {
+    return projectedOnPlane(normal).normalized() * length();
+  }
+
+  void vec3::rotateOnPlane(vec3 normal)
+  {
+    *this = rotatedOnPlane(normal);
+  }
+
+  vec3 operator*(float f, const vec3& v)
+  {
+    return v * f;
+  }
+
+  vec3 vec3::logarithmic() const
+  {
+    float len = length();
+
+    if (len == 0)
+      return { 0, 0, 0 };
+
+    return normalized() * logf(len + 1);
+  }
+
+  void vec3::zeroIfLessThen(float delta)
+  {
+    if(sqLength() < sqr(delta))
+      *this = vec3::zero;
+  }
+}

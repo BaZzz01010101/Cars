@@ -15,6 +15,7 @@ namespace game
     vec3 update(float dt, const Terrain& terrain, vec3 parentPosition, quat parentRotation, vec3 parentVelocity, float enginePower, float brakePower);
     void draw(bool drawWires);
     void reset();
+    vec3 carForward{};
 
   private:
     Config::Physics::Wheels config{};

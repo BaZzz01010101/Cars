@@ -12,7 +12,7 @@ namespace game
 			Debug1,
 			Debug2
 		};
-		inline static const int HEIGHT_MAP_SIZE = 31;
+		inline static const int HEIGHT_MAP_SIZE = 91;
 		inline static const float TERRAIN_SIZE = 300.0f;
 		inline static const float TERRAIN_HEIGHT = 40.0f;
 

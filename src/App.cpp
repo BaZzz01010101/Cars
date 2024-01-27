@@ -15,14 +15,14 @@ namespace game
         .maxDt = 0.02f,
         .car = {
           .mass = 1000,
-          .enginePower = 10000,
+          .enginePower = 3000,
           .brakePower = 10000,
           .handBrakePower = 100000,
           .maxSpeed = 30,
           .maxSteeringAngle = PI / 4,
           .maxSteeringSpeed = PI / 2,
-          .carAligningForce = 20,
-          .bodyFriction = 0.01f,
+          .carAligningForce = 15,
+          .bodyFriction = 0.05f,
         },
         .frontWheels = {
           .mass = 20,
@@ -40,11 +40,12 @@ namespace game
           .suspensionDamping = 2000,
           .maxSuspensionOffset = 0.25f,
           .tireFriction = 0.8f,
-          .rollingFriction = 0.1f,
+          .rollingFriction = 0.01f,
         }
       },
       .graphics = {
         .resources = {
+          .fontPath = "resources/fonts/JetBrainsMono-Bold.ttf",
           .terrainTexturePath = "resources/textures/terrain.png",
           .carModelPath = "resources/models/jeep.gltf",
           .wheelModelPath = "resources/models/wheel.gltf",
@@ -113,7 +114,7 @@ namespace game
     //if (player.isSliding)
     //  DrawText("Sliding", 10, 60, 20, YELLOW);
 
-    DrawText(TextFormat("Wheel XYZ: %.3f, %.3f, %.3f", scene.player.position.x, scene.player.position.y, scene.player.position.z), 10, 80, 20, WHITE);
+    //DrawText(TextFormat("Wheel XYZ: %.3f, %.3f, %.3f", scene.player.position.x, scene.player.position.y, scene.player.position.z), 10, 80, 20, WHITE);
 
     DrawFPS(10, 10);
   }

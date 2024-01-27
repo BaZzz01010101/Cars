@@ -34,6 +34,7 @@ struct Config
   {
     struct Resources
     {
+      const char* fontPath;
       const char* terrainTexturePath;
       const char* carModelPath;
       const char* wheelModelPath;

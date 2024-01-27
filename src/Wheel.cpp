@@ -21,9 +21,9 @@ namespace game
     {
       float springForce = -suspensionOffset * config.suspensionStiffness;
       suspensionSpeed += springForce / config.mass * dt;
-      float dampingForce = -suspensionSpeed * config.suspensionDamping;
-      float maxDampingForce = fabsf(suspensionSpeed) * config.mass / dt;
-      dampingForce = clamp(dampingForce, -maxDampingForce, maxDampingForce);
+      float dampingForce = -suspensionSpeed * config.mass / dt * 0.3f;
+      //float maxDampingForce = fabsf(suspensionSpeed) * config.mass / dt;
+      //dampingForce = clamp(dampingForce, -maxDampingForce, maxDampingForce);
       suspensionSpeed += dampingForce / config.mass * dt;
       //suspensionSpeed = moveTo(suspensionSpeed, 0, 0.1f * suspensionSpeed);
 
@@ -55,38 +55,46 @@ namespace game
     {
       wheelAngularVelocity = parentVelocity.rotatedBy(rotation.inverted()).projectedOnVector(vec3::forward).z / config.radius;
 
+      vec3 suspensionUp = vec3::up.rotatedBy(rotation);
+      vec3 suspensionForward = vec3::forward.rotatedBy(rotation);
+      vec3 suspensionLeft = vec3::left.rotatedBy(rotation);
+
       float nForceScalar = sqr(suspensionOffset) * config.suspensionStiffness;
       nForce = nForceScalar * normal;
       force += nForce;
 
-      vec3 dampingForce = vec3{ 0, -parentVelocity.y, 0 } * config.suspensionDamping;
-      force += dampingForce;
+      if (parentVelocity * suspensionUp < 0)
+      {
+        vec3 dampingForce = -parentVelocity.projectedOnVector(suspensionUp) * 500 / dt * 0.2f;
+        force += dampingForce;
+      }
 
-      vec3 wheelForward = vec3::forward.rotatedBy(rotation);
-      vec3 wheelLeft = vec3::left.rotatedBy(rotation);
       vec3 velocityNormalized = parentVelocity;// .logarithmic();
 
-      frictionVelocity = parentVelocity.projectedOnVector(wheelLeft).projectedOnPlane(normal);
+      frictionVelocity = parentVelocity.projectedOnVector(suspensionLeft).projectedOnPlane(normal);
 
-      vec3 wheelSideVelocityFactor = parentVelocity.logarithmic().projectedOnVector(wheelLeft).projectedOnPlane(normal);
-      vec3 wheelForwardVelocityFactor = parentVelocity.projectedOnVector(wheelForward).projectedOnPlane(normal);
+      vec3 wheelSideVelocityFactor = parentVelocity.projectedOnVector(suspensionLeft).projectedOnPlane(normal);
+      vec3 wheelForwardVelocityFactor = parentVelocity.projectedOnVector(suspensionForward).projectedOnPlane(normal);
+      vec3 prevFrictionForce = frictionForce;
+
       frictionForce = vec3::zero;
-      frictionForce = -wheelSideVelocityFactor * 1000.0f / dt;
-      //frictionForce += -wheelForwardVelocityFactor * nForceScalar * config.rollingFriction;
-      frictionForce += (wheelLeft % normal) * enginePower;
-      frictionForce += -parentVelocity.logarithmic().projectedOnVector(wheelLeft % normal) * brakePower;
+      frictionForce = -wheelSideVelocityFactor * 50.0f / dt;
+      frictionForce -= frictionForce.projectedOnVector(carForward) * mapRangeClamped(fabsf(wheelAngularVelocity), 0, 6, 0, 0.5f);
+      frictionForce += -wheelForwardVelocityFactor * nForceScalar * config.rollingFriction;
+      frictionForce += (suspensionLeft % normal) * enginePower;
+      frictionForce += -parentVelocity.projectedOnVector(suspensionLeft % normal) * brakePower;
 
       float maxFrictionForce = std::min(nForceScalar, 2000.0f) * config.tireFriction * 10;
 
       if (frictionForce.sqLength() > sqr(maxFrictionForce))
         frictionForce = frictionForce.normalized() * maxFrictionForce;
 
-      force += frictionForce;
+      force += frictionForce; //prevFrictionForce * 0.8f + frictionForce * 0.2f;
 
-      //vec3 engineForce = (wheelLeft % normal).normalized() * enginePower;
+      //vec3 engineForce = (suspensionLeft % normal).normalized() * enginePower;
       //force += engineForce;
 
-      //vec3 brakeForce = -parentVelocity.logarithmic().projectedOnVector(wheelLeft % normal) * brakePower;
+      //vec3 brakeForce = -parentVelocity.logarithmic().projectedOnVector(suspensionLeft % normal) * brakePower;
       //force += brakeForce;
 
       if (debugName == "FrontLeftWheel")
@@ -102,7 +110,7 @@ namespace game
 
   void Wheel::draw(bool drawWires)
   {
-    //if (isGrounded)
+    if (isGrounded)
     {
       vec3 bottom = position + vec3{ 0, -config.radius + 0.2f, 0 };
       DrawSphere(bottom, 0.3f, ORANGE);

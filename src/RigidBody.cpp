@@ -10,8 +10,8 @@ namespace game
 
   void RigidBody::updateBody(float dt)
   {
-    velocity += 0.5 * force / mass * dt;
-    angularVelocity += 0.5 * moment / momentOfInertia * dt;
+    velocity += force / mass * dt;
+    angularVelocity += moment / momentOfInertia * dt;
 
     //const float DELTA = 0.001f;
     //velocity.zeroIfLessThen(DELTA);
@@ -34,7 +34,7 @@ namespace game
 
   void RigidBody::applyForceLocal(vec3 force, vec3 point)
   {
-    point.y += 0.3;
+    point.y += 0.27;
     this->force += force.rotatedBy(rotation);
     this->moment += point % force;
   }

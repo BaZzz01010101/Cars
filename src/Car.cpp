@@ -60,6 +60,7 @@ namespace game
     vec3 axis;
     float angle;
     quat::fromVectorToVector(up(), vec3::up).toAxisAngle(&axis, &angle);
+
     angle -= clamp(angle, 0.0f, PI / 8);
     angle = mapRangeClamped(angle, 0, PI, 0, 1);
     applyMoment(axis.rotatedBy(rotation.inverted()) * sqr(angle) * sign(angle) * momentOfInertia * config.carAligningForce);
@@ -104,6 +105,7 @@ namespace game
   {
     vec3 positionGlobal = position + connectionPoint.rotatedBy(rotation);
     vec3 velocityGlobal = velocity + (angularVelocity % connectionPoint).rotatedBy(rotation);
+    wheel.carForward = forward();
 
     return wheel.update(dt, terrain, positionGlobal, wheelRotation, velocityGlobal, enginePower, brakePower).rotatedBy(rotation.inverted());
   }
@@ -159,7 +161,8 @@ namespace game
 
         vec3 frictionForce = -ptVelocity.projectedOnPlane(normal) / dt / (pt.sqLength() / momentOfInertia + 1 / mass);
         float frictionForceScalar = frictionForce.length();
-        float maxFrictionForce = std::min(nForceScalar, 2000.0f) * config.bodyFriction;
+        float maxFrictionForce = std::min(nForceScalar, 10000.0f) * config.bodyFriction;
+        velocity -= velocity.projectedOnVector(normal) * clamp(penetration * dt * 10, 0.0f, 1.0f);
 
         if (frictionForceScalar > 0 && frictionForceScalar > maxFrictionForce * maxFrictionForce)
           frictionForce = frictionForce / frictionForceScalar * maxFrictionForce;
@@ -190,6 +193,7 @@ namespace game
     applyForceGlobal(thrust);
 
     float steeringDirection = float(IsKeyDown(KEY_DELETE) - IsKeyDown(KEY_PAGE_DOWN));
+    float maxSteeringAngle = mapRangeClamped(velocity.length(), 0, config.maxSpeed, config.maxSteeringAngle, 0.1f * config.maxSteeringAngle);
     float steeringTarget;
 
     if (steeringDirection == 0.0f)
@@ -198,11 +202,11 @@ namespace game
       steeringTarget = 0.0f;
     }
     else
-      steeringTarget = config.maxSteeringAngle * steeringDirection;
+      steeringTarget = maxSteeringAngle * steeringDirection;
 
-    float maxSteeringSpeed = mapRangeClamped(velocity.length(), 0, config.maxSpeed, config.maxSteeringSpeed, config.maxSteeringSpeed * 0.5f);
+    //float maxSteeringSpeed = mapRangeClamped(velocity.length(), 0, config.maxSpeed, config.maxSteeringSpeed, config.maxSteeringSpeed * 0.5f);
 
-    steeringAngle = moveTo(steeringAngle, steeringTarget, maxSteeringSpeed * steeringDirection * dt);
+    steeringAngle = moveTo(steeringAngle, steeringTarget, config.maxSteeringSpeed * steeringDirection * dt);
   }
 
   void Car::draw(bool drawWires)

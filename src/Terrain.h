@@ -16,7 +16,7 @@ namespace game
 		inline static const float TERRAIN_SIZE = 300.0f;
 		inline static const float TERRAIN_HEIGHT = 40.0f;
 
-		Terrain();
+		Terrain() = default;
 		Terrain(Terrain&) = delete;
 		~Terrain();
 		Terrain& operator=(Terrain&) = delete;

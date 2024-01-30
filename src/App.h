@@ -1,5 +1,6 @@
 #pragma once
 #include <Scene.h>
+#include <Hud.h>
 
 namespace game
 {
@@ -13,6 +14,7 @@ namespace game
 
     Config config;
     Scene scene;
+    Hud hud;
 
     void initialize();
     void run();

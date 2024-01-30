@@ -26,7 +26,7 @@ namespace game
     wheelModel = LoadModel(config.graphics.resources.wheelModelPath);
     wheelModelLoaded = true;
 
-    //turretModel = LoadModel(config.graphics.turretModelPath);
+    //turretModel = LoadModel(carConfig.graphics.turretModelPath);
     //turretModelLoaded = true;
 
 

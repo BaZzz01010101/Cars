@@ -44,6 +44,10 @@ namespace game
         }
       },
       .graphics = {
+        .hud = {
+          .fontSize = 20,
+          .screenMargins = 10,
+        },
         .resources = {
           .fontPath = "resources/fonts/JetBrainsMono-Bold.ttf",
           .terrainTexturePath = "resources/textures/terrain.png",
@@ -55,6 +59,7 @@ namespace game
     };
 
     scene.init(config);
+    hud.init(config);
   }
 
   void App::run()
@@ -90,6 +95,7 @@ namespace game
     }
 
     scene.update(dt);
+    hud.update();
   }
 
   void App::draw()
@@ -101,6 +107,8 @@ namespace game
     BeginDrawing();
 
     scene.draw();
+    hud.draw(scene);
+
     drawDebug();
 
     EndDrawing();
@@ -108,15 +116,6 @@ namespace game
 
   void App::drawDebug()
   {
-    //if (player.isGrounded)
-    //  DrawText("Grounded", 10, 40, 20, GREEN);
-
-    //if (player.isSliding)
-    //  DrawText("Sliding", 10, 60, 20, YELLOW);
-
-    //DrawText(TextFormat("Wheel XYZ: %.3f, %.3f, %.3f", scene.player.position.x, scene.player.position.y, scene.player.position.z), 10, 80, 20, WHITE);
-
-    DrawFPS(10, 10);
   }
 
   void App::updateShortcuts()

@@ -32,6 +32,12 @@ struct Config
 
   struct Graphics
   {
+    struct Hud
+    {
+      float fontSize;
+      float screenMargins;
+    } hud;
+
     struct Resources
     {
       const char* fontPath;

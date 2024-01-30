@@ -6,8 +6,8 @@ namespace game
 {
   void Wheel::init(const Config::Physics::Wheels& config, const Model& model, const char* debugName)
   {
-    this->config = config;
     this->debugName = debugName;
+    wheelConfig = config;
     Renderable::init(model);
   }
 
@@ -19,12 +19,12 @@ namespace game
     float MAX_PENETRATION = 0.1f;
 
     {
-      float springForce = -suspensionOffset * config.suspensionStiffness;
-      suspensionSpeed += springForce / config.mass * dt;
-      float dampingForce = -suspensionSpeed * config.mass / dt * 0.3f;
-      //float maxDampingForce = fabsf(suspensionSpeed) * config.mass / dt;
+      float springForce = -suspensionOffset * wheelConfig.suspensionStiffness;
+      suspensionSpeed += springForce / wheelConfig.mass * dt;
+      float dampingForce = -suspensionSpeed * wheelConfig.mass / dt * 0.3f;
+      //float maxDampingForce = fabsf(suspensionSpeed) * carConfig.mass / dt;
       //dampingForce = clamp(dampingForce, -maxDampingForce, maxDampingForce);
-      suspensionSpeed += dampingForce / config.mass * dt;
+      suspensionSpeed += dampingForce / wheelConfig.mass * dt;
       //suspensionSpeed = moveTo(suspensionSpeed, 0, 0.1f * suspensionSpeed);
 
       suspensionOffset += suspensionSpeed * dt;
@@ -32,7 +32,7 @@ namespace game
 
     vec3 normal;
     float terrainY = terrain.getHeight2(position.x, position.z, &normal);
-    float bottomY = position.y + suspensionOffset - config.radius;
+    float bottomY = position.y + suspensionOffset - wheelConfig.radius;
     float penetration = std::max(terrainY - bottomY, 0.0f) / MAX_PENETRATION;
 
     if (penetration > 0)
@@ -53,13 +53,13 @@ namespace game
 
     if (penetration > 0)
     {
-      wheelAngularVelocity = parentVelocity.rotatedBy(rotation.inverted()).projectedOnVector(vec3::forward).z / config.radius;
+      wheelAngularVelocity = parentVelocity.rotatedBy(rotation.inverted()).projectedOnVector(vec3::forward).z / wheelConfig.radius;
 
       vec3 suspensionUp = vec3::up.rotatedBy(rotation);
       vec3 suspensionForward = vec3::forward.rotatedBy(rotation);
       vec3 suspensionLeft = vec3::left.rotatedBy(rotation);
 
-      float nForceScalar = sqr(suspensionOffset) * config.suspensionStiffness;
+      float nForceScalar = sqr(suspensionOffset) * wheelConfig.suspensionStiffness;
       nForce = nForceScalar * normal;
       force += nForce;
 
@@ -80,11 +80,11 @@ namespace game
       frictionForce = vec3::zero;
       frictionForce = -wheelSideVelocityFactor * 50.0f / dt;
       frictionForce -= frictionForce.projectedOnVector(carForward) * mapRangeClamped(fabsf(wheelAngularVelocity), 0, 6, 0, 0.5f);
-      frictionForce += -wheelForwardVelocityFactor * nForceScalar * config.rollingFriction;
+      frictionForce += -wheelForwardVelocityFactor * nForceScalar * wheelConfig.rollingFriction;
       frictionForce += (suspensionLeft % normal) * enginePower;
       frictionForce += -parentVelocity.projectedOnVector(suspensionLeft % normal) * brakePower;
 
-      float maxFrictionForce = std::min(nForceScalar, 2000.0f) * config.tireFriction * 10;
+      float maxFrictionForce = std::min(nForceScalar, 2000.0f) * wheelConfig.tireFriction * 10;
 
       if (frictionForce.sqLength() > sqr(maxFrictionForce))
         frictionForce = frictionForce.normalized() * maxFrictionForce;
@@ -103,7 +103,7 @@ namespace game
       }
     }
 
-    suspensionOffset = clamp(suspensionOffset, -config.maxSuspensionOffset, config.maxSuspensionOffset);
+    suspensionOffset = clamp(suspensionOffset, -wheelConfig.maxSuspensionOffset, wheelConfig.maxSuspensionOffset);
 
     return force;
   }
@@ -112,7 +112,7 @@ namespace game
   {
     if (isGrounded)
     {
-      vec3 bottom = position + vec3{ 0, -config.radius + 0.2f, 0 };
+      vec3 bottom = position + vec3{ 0, -wheelConfig.radius + 0.2f, 0 };
       DrawSphere(bottom, 0.3f, ORANGE);
       drawVector(bottom, frictionVelocity, GREEN);
       drawVector(bottom, frictionForce.logarithmic(), ORANGE);

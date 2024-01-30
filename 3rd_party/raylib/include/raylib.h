@@ -523,7 +523,7 @@ typedef struct AutomationEventList {
 //----------------------------------------------------------------------------------
 // Enumerators Definition
 //----------------------------------------------------------------------------------
-// System/Window config flags
+// System/Window carConfig flags
 // NOTE: Every bit registers one state (use it with bit masks)
 // By default all flags are set to 0
 typedef enum {
@@ -1027,9 +1027,9 @@ RLAPI void EndScissorMode(void);                                  // End scissor
 RLAPI void BeginVrStereoMode(VrStereoConfig config);              // Begin stereo rendering (requires VR simulator)
 RLAPI void EndVrStereoMode(void);                                 // End stereo rendering (requires VR simulator)
 
-// VR stereo config functions for VR simulator
-RLAPI VrStereoConfig LoadVrStereoConfig(VrDeviceInfo device);     // Load VR stereo config for VR simulator device parameters
-RLAPI void UnloadVrStereoConfig(VrStereoConfig config);           // Unload VR stereo config
+// VR stereo carConfig functions for VR simulator
+RLAPI VrStereoConfig LoadVrStereoConfig(VrDeviceInfo device);     // Load VR stereo carConfig for VR simulator device parameters
+RLAPI void UnloadVrStereoConfig(VrStereoConfig config);           // Unload VR stereo carConfig
 
 // Shader management functions
 // NOTE: Shader functionality is not available on OpenGL 1.1
@@ -1062,7 +1062,7 @@ RLAPI int GetFPS(void);                                           // Get current
 // Custom frame control functions
 // NOTE: Those functions are intended for advance users that want full control over the frame processing
 // By default EndDrawing() does this job: draws everything + SwapScreenBuffer() + manage frame timing + PollInputEvents()
-// To avoid that behaviour and control frame processes manually, enable in config.h: SUPPORT_CUSTOM_FRAME_CONTROL
+// To avoid that behaviour and control frame processes manually, enable in carConfig.h: SUPPORT_CUSTOM_FRAME_CONTROL
 RLAPI void SwapScreenBuffer(void);                                // Swap back buffer with front buffer (screen drawing)
 RLAPI void PollInputEvents(void);                                 // Register all input events
 RLAPI void WaitTime(double seconds);                              // Wait for some time (halt program execution)

@@ -4,9 +4,6 @@
 
 namespace game
 {
-  Terrain::Terrain()
-  {}
-
   Terrain::~Terrain()
   {
     unloadResources();

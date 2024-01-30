@@ -100,6 +100,7 @@
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\DebugGraphs.cpp" />
     <ClCompile Include="src\Helpers.cpp" />
+    <ClCompile Include="src\Hud.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Car.cpp" />
     <ClCompile Include="src\quat.cpp" />
@@ -115,6 +116,7 @@
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\DebugGraphs.h" />
     <ClInclude Include="src\Helpers.h" />
+    <ClInclude Include="src\Hud.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Car.h" />
     <ClInclude Include="src\quat.h" />

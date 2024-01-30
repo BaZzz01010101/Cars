@@ -19,7 +19,7 @@ namespace game
   void Car::init(Config config, Model carModel, Model wheelModel, Model turretModel)
   {
     mass = config.physics.car.mass;
-    this->config = config.physics.car;
+    carConfig = config.physics.car;
 
     frontLeftWheel.init(config.physics.frontWheels, wheelModel, "FrontLeftWheel");
     frontRightWheel.init(config.physics.frontWheels, wheelModel, "FrontRightWheel");
@@ -63,9 +63,9 @@ namespace game
 
     angle -= clamp(angle, 0.0f, PI / 8);
     angle = mapRangeClamped(angle, 0, PI, 0, 1);
-    applyMoment(axis.rotatedBy(rotation.inverted()) * sqr(angle) * sign(angle) * momentOfInertia * config.carAligningForce);
+    applyMoment(axis.rotatedBy(rotation.inverted()) * sqr(angle) * sign(angle) * momentOfInertia * carConfig.carAligningForce);
 
-    vec3 m = -angularVelocity / dt * momentOfInertia * 0.001f * config.carAligningForce;
+    vec3 m = -angularVelocity / dt * momentOfInertia * 0.001f * carConfig.carAligningForce;
     m.y = 0;
 
     applyMoment(m);
@@ -161,7 +161,7 @@ namespace game
 
         vec3 frictionForce = -ptVelocity.projectedOnPlane(normal) / dt / (pt.sqLength() / momentOfInertia + 1 / mass);
         float frictionForceScalar = frictionForce.length();
-        float maxFrictionForce = std::min(nForceScalar, 10000.0f) * config.bodyFriction;
+        float maxFrictionForce = std::min(nForceScalar, 10000.0f) * carConfig.bodyFriction;
         velocity -= velocity.projectedOnVector(normal) * clamp(penetration * dt * 10, 0.0f, 1.0f);
 
         if (frictionForceScalar > 0 && frictionForceScalar > maxFrictionForce * maxFrictionForce)
@@ -187,13 +187,13 @@ namespace game
       0
     };
 
-    enginePower = config.enginePower * float(IsKeyDown(KEY_HOME) - IsKeyDown(KEY_END));
-    //brakePower = config.brakePower * float(IsKeyDown(KEY_END));
+    enginePower = carConfig.enginePower * float(IsKeyDown(KEY_HOME) - IsKeyDown(KEY_END));
+    //brakePower = carConfig.brakePower * float(IsKeyDown(KEY_END));
 
     applyForceGlobal(thrust);
 
     float steeringDirection = float(IsKeyDown(KEY_DELETE) - IsKeyDown(KEY_PAGE_DOWN));
-    float maxSteeringAngle = mapRangeClamped(velocity.length(), 0, config.maxSpeed, config.maxSteeringAngle, 0.1f * config.maxSteeringAngle);
+    float maxSteeringAngle = mapRangeClamped(velocity.length(), 0, carConfig.maxSpeed, carConfig.maxSteeringAngle, 0.1f * carConfig.maxSteeringAngle);
     float steeringTarget;
 
     if (steeringDirection == 0.0f)
@@ -204,9 +204,9 @@ namespace game
     else
       steeringTarget = maxSteeringAngle * steeringDirection;
 
-    //float maxSteeringSpeed = mapRangeClamped(velocity.length(), 0, config.maxSpeed, config.maxSteeringSpeed, config.maxSteeringSpeed * 0.5f);
+    //float maxSteeringSpeed = mapRangeClamped(velocity.length(), 0, carConfig.maxSpeed, carConfig.maxSteeringSpeed, carConfig.maxSteeringSpeed * 0.5f);
 
-    steeringAngle = moveTo(steeringAngle, steeringTarget, config.maxSteeringSpeed * steeringDirection * dt);
+    steeringAngle = moveTo(steeringAngle, steeringTarget, carConfig.maxSteeringSpeed * steeringDirection * dt);
   }
 
   void Car::draw(bool drawWires)

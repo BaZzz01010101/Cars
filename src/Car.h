@@ -28,7 +28,7 @@ namespace game
     vec3 rearLeftWheelConnectionPoint{};
     vec3 rearRightWheelConnectionPoint{};
 
-    Config::Physics::Car config{};
+    Config::Physics::Car carConfig{};
 
     float enginePower{};
     float brakePower{};

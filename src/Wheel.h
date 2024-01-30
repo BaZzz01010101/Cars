@@ -18,7 +18,7 @@ namespace game
     vec3 carForward{};
 
   private:
-    Config::Physics::Wheels config{};
+    Config::Physics::Wheels wheelConfig{};
 
     float suspensionOffset{};
     float suspensionSpeed{};

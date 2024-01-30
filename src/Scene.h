@@ -13,7 +13,10 @@ namespace game
     Terrain terrain;
     Car player;
 
+    Scene() = default;
+    Scene(Scene&) = delete;
     ~Scene();
+    Scene& operator=(Scene&) = delete;
 
     void init(const Config& config);
     void update(float dt);

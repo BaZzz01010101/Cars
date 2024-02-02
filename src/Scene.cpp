@@ -114,11 +114,6 @@ namespace game
     reset(player.position, player.rotation);
   }
 
-  void Scene::togglePause()
-  {
-    paused = !paused;
-  }
-
   void Scene::toggleDrawWires()
   {
     drawWires = !drawWires;
@@ -148,6 +143,17 @@ namespace game
 
   void Scene::followPlayer(Camera& camera, Car& player)
   {
+    if (firstPersonMode)
+    {
+      vec3 offs = 1.2f * player.forward() + 1.1f * player.up();
+      vec3 pos = player.position + offs - 0.2f * player.up();
+      camera.position = pos;
+      camera.target = pos + player.forward();
+      camera.up = player.up();
+
+      return;
+    }
+
     vec3 toPlayer = player.position - camera.position;
     float range = toPlayer.length();
 
@@ -163,6 +169,7 @@ namespace game
 
     camera.position = position;
     camera.target = target;
+    camera.up = vec3{ 0, 1, 0 };
   }
 
 }

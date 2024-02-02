@@ -4,10 +4,6 @@
 
 namespace game
 {
-  void RigidBody::init()
-  {
-  }
-
   void RigidBody::updateBody(float dt)
   {
     velocity += force / mass * dt;
@@ -24,6 +20,7 @@ namespace game
     vec3 dr = angularVelocity * dt;
     rotation = rotation * quat::fromEuler(dr.y, dr.z, dr.x);
     rotation.normalize();
+    rotation.toEuler(&eulerRotation.y, &eulerRotation.z, &eulerRotation.x);
   }
 
   void RigidBody::resetForces()
@@ -32,19 +29,18 @@ namespace game
     moment = vec3::zero;
   }
 
-  void RigidBody::applyForceLocal(vec3 force, vec3 point)
+  void RigidBody::applyLocalForceAtLocalPoint(vec3 force, vec3 point)
   {
-    point.y += 0.27;
     this->force += force.rotatedBy(rotation);
     this->moment += point % force;
   }
 
-  void RigidBody::applyForceLocal(vec3 force)
+  void RigidBody::applyLocalForceAtCenterOfMass(vec3 force)
   {
     this->force += force.rotatedBy(rotation);
   }
 
-  void RigidBody::applyForceGlobal(vec3 force, vec3 point)
+  void RigidBody::applyGlobalForceAtGlobalPoint(vec3 force, vec3 point)
   {
     this->force += force;
     vec3 localForce = force.rotatedBy(rotation.inverted());
@@ -55,11 +51,12 @@ namespace game
   void RigidBody::applyGlobalForceAtLocalPoint(vec3 globalForce, vec3 localPoint)
   {
     this->force += globalForce;
+    localPoint.y += 0.44;
     vec3 localForce = globalForce.rotatedBy(rotation.inverted());
     this->moment += localPoint % localForce;
   }
 
-  void RigidBody::applyForceGlobal(vec3 force)
+  void RigidBody::applyGlobalForceAtCenterOfMass(vec3 force)
   {
     this->force += force;
   }
@@ -85,7 +82,7 @@ namespace game
 
   void RigidBody::applyGravity()
   {
-    applyForceGlobal(mass * vec3{ 0, GRAVITY , 0 });
+    applyGlobalForceAtCenterOfMass(mass * vec3{ 0, -gravity, 0 });
   }
 
   vec3 RigidBody::forward() const

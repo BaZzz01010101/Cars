@@ -462,14 +462,14 @@ namespace game
       return 1.0f;
 
     if (mode == Debug1)
-      return fabsf(y - HEIGHT_MAP_SIZE / 2) < 1 ? fabsf(y - HEIGHT_MAP_SIZE / 2) : 0.0f;
-    else if (mode == Debug2)
       return
       y == HEIGHT_MAP_SIZE - 2 ? 0.3f :
       y == HEIGHT_MAP_SIZE - 3 ? 0.0f :
       y == HEIGHT_MAP_SIZE - 4 ? 0.1f :
       y == HEIGHT_MAP_SIZE - 5 ? 0.0f :
       0.1f;
+    else if (mode == Debug2)
+      return fabsf(y - HEIGHT_MAP_SIZE / 2) < HEIGHT_MAP_SIZE / 4 ? 1 - fabsf(y - HEIGHT_MAP_SIZE / 2) : 0.0f;
 
     x = x / HEIGHT_MAP_SIZE;
     y = (y + HEIGHT_MAP_SIZE / 2) / HEIGHT_MAP_SIZE;

@@ -9,25 +9,32 @@ namespace game
   class Wheel : public Renderable
   {
   public:
+    bool isGrounded{};
+    vec3 normal{};
     vec3 nForce{};
-
-    void init(const Config::Physics::Wheels& config, const Model& model, const char* debugName);
-    vec3 update(float dt, const Terrain& terrain, vec3 parentPosition, quat parentRotation, vec3 parentVelocity, float enginePower, float brakePower);
-    void draw(bool drawWires);
-    void reset();
     vec3 carForward{};
+    vec3 carDampingForce{};
+    float wheelRotationSpeed{};
+
+    void init(const Config::Physics::Wheels& config, const Model& model, const char* debugName, float gravity);
+    vec3 getForce(float dt, float sharedMass, float aerodinamicForce, float enginePower, float brakePower, bool handBreaked);
+    void update(float dt, const Terrain& terrain, const RigidBody& parent, vec3 parentConnectionPoint, float steeringAngle);
+    void draw(bool drawWires);
+    void drawDebug();
+    void reset();
 
   private:
+    float gravity{};
     Config::Physics::Wheels wheelConfig{};
 
     float suspensionOffset{};
     float suspensionSpeed{};
     vec3 position{};
     quat rotation{};
-    float wheelAngularVelocity{};
+    vec3 velocity{};
+    vec3 angularVelocity{};
     quat wheelRotation = quat::identity;
     vec3 frictionForce{};
-    bool isGrounded{};
     vec3 frictionVelocity{};
     const char* debugName = "UNKNOWN";
   };

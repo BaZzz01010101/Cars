@@ -32,17 +32,22 @@ namespace game
 
     float enginePower{};
     float brakePower{};
+    bool handBreaked{};
     float steeringSpeed{};
     float steeringAngle{};
 
-    vec3 frontLeftWheelForce;
-    vec3 frontRightWheelForce;
-    vec3 rearLeftWheelForce;
-    vec3 rearRightWheelForce;
+    vec3 frontLeftWheelForce{};
+    vec3 frontRightWheelForce{};
+    vec3 rearLeftWheelForce{};
+    vec3 rearRightWheelForce{};
+
+    vec3 lastForce{};
 
     void drawDebug();
     void updateControl(float dt);
-    vec3 updateWheelForces(float dt, Wheel& wheel, const Terrain& terrain, vec3 connectionPoint, quat wheelRotation, float enginePower, float brakePower);
+    vec3 getWheelForce(float dt, Wheel& wheel, const Terrain& terrain, vec3 connectionPoint, quat wheelRotation, float enginePower, float brakePower);
+    void updateWheels(float dt, const Terrain& terrain);
+    vec3 getAutoAlignmentMoment(float dt);
     void updateCollisions(float dt, const Terrain& terrain);
   };
 

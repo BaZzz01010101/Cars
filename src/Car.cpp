@@ -19,17 +19,17 @@ namespace game
   void Car::init(Config config, Model carModel, Model wheelModel, Model turretModel)
   {
     mass = config.physics.car.mass;
+    gravity = config.physics.gravity;
     carConfig = config.physics.car;
 
-    frontLeftWheel.init(config.physics.frontWheels, wheelModel, "FrontLeftWheel");
-    frontRightWheel.init(config.physics.frontWheels, wheelModel, "FrontRightWheel");
-    rearLeftWheel.init(config.physics.rearWheels, wheelModel, "RearLeftWheel");
-    rearRightWheel.init(config.physics.rearWheels, wheelModel, "RearRightWheel");
+    frontLeftWheel.init(config.physics.frontWheels, wheelModel, "FrontLeftWheel", gravity);
+    frontRightWheel.init(config.physics.frontWheels, wheelModel, "FrontRightWheel", gravity);
+    rearLeftWheel.init(config.physics.rearWheels, wheelModel, "RearLeftWheel", gravity);
+    rearRightWheel.init(config.physics.rearWheels, wheelModel, "RearRightWheel", gravity);
 
     float radius = (size.x + size.y + size.z) / 6;
     momentOfInertia = 0.5f * mass * sqr(radius);
 
-    RigidBody::init();
     Renderable::init(carModel);
   }
 
@@ -54,60 +54,85 @@ namespace game
 
   void Car::update(float dt, const Terrain& terrain)
   {
+    lastForce = force;
     resetForces();
     applyGravity();
 
-    vec3 axis;
-    float angle;
-    quat::fromVectorToVector(up(), vec3::up).toAxisAngle(&axis, &angle);
+    float aerodinamicForce = 5.7f * velocity.sqLength();
+    applyGlobalForceAtCenterOfMass(-aerodinamicForce * up());
 
-    angle -= clamp(angle, 0.0f, PI / 8);
-    angle = mapRangeClamped(angle, 0, PI, 0, 1);
-    applyMoment(axis.rotatedBy(rotation.inverted()) * sqr(angle) * sign(angle) * momentOfInertia * carConfig.carAligningForce);
-
-    vec3 m = -angularVelocity / dt * momentOfInertia * 0.001f * carConfig.carAligningForce;
-    m.y = 0;
-
-    applyMoment(m);
+    vec3 alignmentMoment = getAutoAlignmentMoment(dt);
+    applyMoment(alignmentMoment);
 
     vec3 airFrictionMoment = -angularVelocity / dt * momentOfInertia * 0.001f;
     applyMoment(airFrictionMoment);
 
     updateControl(dt);
 
-    if (IsKeyPressed(KEY_R))
-    {
-      rotation = quat::fromEuler(PI / 2, 0, 0);
-      position.y += 0.5;
-    }
+    quat wheelRotation = rotation * quat::fromEuler(steeringAngle, 0, 0);
 
-    applyForceLocal(frontLeftWheelForce, frontLeftWheelConnectionPoint);
-    applyForceLocal(frontRightWheelForce, frontRightWheelConnectionPoint);
-    applyForceLocal(rearLeftWheelForce, rearLeftWheelConnectionPoint);
-    applyForceLocal(rearRightWheelForce, rearRightWheelConnectionPoint);
+    frontLeftWheelForce = getWheelForce(dt, frontLeftWheel, terrain, frontLeftWheelConnectionPoint, wheelRotation, 2 * enginePower, brakePower);
+    frontRightWheelForce = getWheelForce(dt, frontRightWheel, terrain, frontRightWheelConnectionPoint, wheelRotation, 2 * enginePower, brakePower);
+    rearLeftWheelForce = getWheelForce(dt, rearLeftWheel, terrain, rearLeftWheelConnectionPoint, rotation, 1 * enginePower, brakePower);
+    rearRightWheelForce = getWheelForce(dt, rearRightWheel, terrain, rearRightWheelConnectionPoint, rotation, 1 * enginePower, brakePower);
+
+    vec3 nForce = frontLeftWheel.nForce + frontRightWheel.nForce + rearLeftWheel.nForce + rearRightWheel.nForce;
+    vec3 gravityForce = mass * vec3{ 0, -gravity, 0 };
+
+    applyGlobalForceAtLocalPoint(frontLeftWheelForce, frontLeftWheelConnectionPoint);
+    applyGlobalForceAtLocalPoint(frontRightWheelForce, frontRightWheelConnectionPoint);
+    applyGlobalForceAtLocalPoint(rearLeftWheelForce, rearLeftWheelConnectionPoint);
+    applyGlobalForceAtLocalPoint(rearRightWheelForce, rearRightWheelConnectionPoint);
 
     updateCollisions(dt, terrain);
 
-    RigidBody::updateBody(dt);
-
-    quat wheelRotation = rotation * quat::fromEuler(steeringAngle, 0, 0);
-
-    frontLeftWheelForce = updateWheelForces(dt, frontLeftWheel, terrain, frontLeftWheelConnectionPoint, wheelRotation, enginePower, brakePower);
-    frontRightWheelForce = updateWheelForces(dt, frontRightWheel, terrain, frontRightWheelConnectionPoint, wheelRotation, enginePower, brakePower);
-    rearLeftWheelForce = updateWheelForces(dt, rearLeftWheel, terrain, rearLeftWheelConnectionPoint, rotation, enginePower, brakePower);
-    rearRightWheelForce = updateWheelForces(dt, rearRightWheel, terrain, rearRightWheelConnectionPoint, rotation, enginePower, brakePower);
-
-    vec3 nForce = frontLeftWheel.nForce + frontRightWheel.nForce + rearLeftWheel.nForce + rearRightWheel.nForce;
-    vec3 gravityForce = mass * vec3{ 0, GRAVITY, 0 };
+    updateBody(dt);
+    updateWheels(dt, terrain);
   }
 
-  vec3 Car::updateWheelForces(float dt, Wheel& wheel, const Terrain& terrain, vec3 connectionPoint, quat wheelRotation, float enginePower, float brakePower)
+  vec3 Car::getWheelForce(float dt, Wheel& wheel, const Terrain& terrain, vec3 connectionPoint, quat wheelRotation, float enginePower, float brakePower)
   {
-    vec3 positionGlobal = position + connectionPoint.rotatedBy(rotation);
-    vec3 velocityGlobal = velocity + (angularVelocity % connectionPoint).rotatedBy(rotation);
+    //vec3 positionGlobal = position + connectionPoint.rotatedBy(rotation);
+    //vec3 normal = 0.25f * (frontLeftWheel.normal + frontRightWheel.normal + rearLeftWheel.normal + rearRightWheel.normal);
+    //vec3 dv = vec3{ 0, -9.8f * dt, 0 }.projectedOnPlane(normal);
+    //vec3 velocityGlobal = (velocity + dv) + (angularVelocity % connectionPoint).rotatedBy(rotation);
     wheel.carForward = forward();
 
-    return wheel.update(dt, terrain, positionGlobal, wheelRotation, velocityGlobal, enginePower, brakePower).rotatedBy(rotation.inverted());
+    return wheel.getForce(dt, mass / 4, 0, enginePower, brakePower, handBreaked);
+  }
+
+  void Car::updateWheels(float dt, const Terrain& terrain)
+  {
+    float maxCorrectionAngle = (frontLeftWheelConnectionPoint - 0.5f * (rearLeftWheelConnectionPoint + rearRightWheelConnectionPoint)).getYAngle();
+    float correctionAngle = fabs(mapRangeClamped(steeringAngle, -PI / 2, PI / 2, -maxCorrectionAngle, maxCorrectionAngle));
+
+    frontLeftWheel.update(dt, terrain, *this, frontLeftWheelConnectionPoint, steeringAngle + correctionAngle);
+    frontRightWheel.update(dt, terrain, *this, frontRightWheelConnectionPoint, steeringAngle - correctionAngle);
+    rearLeftWheel.update(dt, terrain, *this, rearLeftWheelConnectionPoint, 0);
+    rearRightWheel.update(dt, terrain, *this, rearRightWheelConnectionPoint, 0);
+  }
+
+  vec3 Car::getAutoAlignmentMoment(float dt)
+  {
+    vec3 moment = vec3::zero;
+
+    vec3 axis;
+    float angle;
+    quat::fromVectorToVector(up(), vec3::up).toAxisAngle(&axis, &angle);
+
+    angle -= clamp(angle, 0.0f, PI / 8);
+    float k = mapRangeClamped(angle, 0, PI, 0, 1);
+    k = sqr(k) * sign(k);
+
+    vec3 rotationMoment = axis.rotatedBy(rotation.inverted()) * k * momentOfInertia * carConfig.carAligningForce;
+    moment += rotationMoment;
+
+    vec3 angularVelocityMoment = -angularVelocity / dt * momentOfInertia * 0.001f * carConfig.carAligningForce;
+    angularVelocityMoment.y = 0;
+
+    moment += angularVelocityMoment;
+
+    return moment;
   }
 
   void Car::updateCollisions(float dt, const Terrain& terrain)
@@ -156,15 +181,12 @@ namespace game
         nForceScalar = std::min(nForceScalar, 100000.0f);
         vec3 nForce = normal * nForceScalar;
 
-        // suppressing oscillations
-        //nForce -= (ptVelocity + nForce / mass * dt).logarithmic() * mass / dt;
-
         vec3 frictionForce = -ptVelocity.projectedOnPlane(normal) / dt / (pt.sqLength() / momentOfInertia + 1 / mass);
         float frictionForceScalar = frictionForce.length();
         float maxFrictionForce = std::min(nForceScalar, 10000.0f) * carConfig.bodyFriction;
         velocity -= velocity.projectedOnVector(normal) * clamp(penetration * dt * 10, 0.0f, 1.0f);
 
-        if (frictionForceScalar > 0 && frictionForceScalar > maxFrictionForce * maxFrictionForce)
+        if (frictionForceScalar > 0 && frictionForceScalar > sqr(maxFrictionForce))
           frictionForce = frictionForce / frictionForceScalar * maxFrictionForce;
 
         frictionForces.push_back({ frictionForce, ptRotated });
@@ -173,10 +195,10 @@ namespace game
     }
 
     for (const ForceAndPoint& f : frictionForces)
-      applyForceGlobal(f.first / div, f.second);
+      applyGlobalForceAtGlobalPoint(f.first / div, f.second);
 
     for (const ForceAndPoint& f : nForces)
-      applyForceGlobal(f.first / div, f.second);
+      applyGlobalForceAtGlobalPoint(f.first / div, f.second);
   }
 
   void Car::updateControl(float dt)
@@ -187,13 +209,17 @@ namespace game
       0
     };
 
-    enginePower = carConfig.enginePower * float(IsKeyDown(KEY_HOME) - IsKeyDown(KEY_END));
+    handBreaked = IsKeyDown(KEY_SPACE);
+
+    float step = float(IsKeyDown(KEY_HOME) - IsKeyDown(KEY_END)) == sign(enginePower) ? carConfig.enginePower * dt : carConfig.enginePower * 4 * dt;
+    float maxEnginePower = mapRangeClamped(velocity.length(), 0, carConfig.maxSpeed, carConfig.enginePower, 0);
+    enginePower = moveTo(enginePower, maxEnginePower * float(IsKeyDown(KEY_HOME) - IsKeyDown(KEY_END)), step);
     //brakePower = carConfig.brakePower * float(IsKeyDown(KEY_END));
 
-    applyForceGlobal(thrust);
+    applyGlobalForceAtCenterOfMass(thrust);
 
     float steeringDirection = float(IsKeyDown(KEY_DELETE) - IsKeyDown(KEY_PAGE_DOWN));
-    float maxSteeringAngle = mapRangeClamped(velocity.length(), 0, carConfig.maxSpeed, carConfig.maxSteeringAngle, 0.1f * carConfig.maxSteeringAngle);
+    float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0, carConfig.maxSpeed, carConfig.maxSteeringAngle, 0.1f * carConfig.maxSteeringAngle);
     float steeringTarget;
 
     if (steeringDirection == 0.0f)
@@ -236,15 +262,10 @@ namespace game
     vec3 rearLeftWheelConnectionPointGlobal = position + rearLeftWheelConnectionPoint.rotatedBy(rotation);
     vec3 rearRightWheelConnectionPointGlobal = position + rearRightWheelConnectionPoint.rotatedBy(rotation);
 
-    vec3 frontLeftWheelForceGlobal = frontLeftWheelForce.rotatedBy(rotation);
-    vec3 frontRightWheelForceGlobal = frontRightWheelForce.rotatedBy(rotation);
-    vec3 rearLeftWheelForceGlobal = rearLeftWheelForce.rotatedBy(rotation);
-    vec3 rearRightWheelForceGlobal = rearRightWheelForce.rotatedBy(rotation);
-
-    drawVector(frontLeftWheelConnectionPointGlobal, 0.5f * frontLeftWheelForceGlobal.logarithmic(), RED);
-    drawVector(frontRightWheelConnectionPointGlobal, 0.5f * frontRightWheelForceGlobal.logarithmic(), RED);
-    drawVector(rearLeftWheelConnectionPointGlobal, 0.5f * rearLeftWheelForceGlobal.logarithmic(), RED);
-    drawVector(rearRightWheelConnectionPointGlobal, 0.5f * rearRightWheelForceGlobal.logarithmic(), RED);
+    drawVector(frontLeftWheelConnectionPointGlobal, 0.5f * frontLeftWheelForce.logarithmic(), RED);
+    drawVector(frontRightWheelConnectionPointGlobal, 0.5f * frontRightWheelForce.logarithmic(), RED);
+    drawVector(rearLeftWheelConnectionPointGlobal, 0.5f * rearLeftWheelForce.logarithmic(), RED);
+    drawVector(rearRightWheelConnectionPointGlobal, 0.5f * rearRightWheelForce.logarithmic(), RED);
   }
 }
 

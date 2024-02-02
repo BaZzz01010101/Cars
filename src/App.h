@@ -12,9 +12,9 @@ namespace game
     static constexpr int SCREEN_HEIGHT = 720;
     static constexpr const char* TITLE = "Mad Max";
 
-    Config config;
-    Scene scene;
-    Hud hud;
+    Config config{};
+    Scene scene{};
+    Hud hud{};
 
     void initialize();
     void run();
@@ -22,7 +22,11 @@ namespace game
     void update(float dt);
     void draw();
 
+    void togglePaused();
+
   private:
+    bool paused{};
+
     void drawDebug();
     void updateShortcuts();
   };

@@ -9,9 +9,9 @@ namespace game
   class Scene
   {
   public:
-    Camera camera;
-    Terrain terrain;
-    Car player;
+    Camera camera{};
+    Terrain terrain{};
+    Car player{};
 
     Scene() = default;
     Scene(Scene&) = delete;
@@ -21,16 +21,18 @@ namespace game
     void init(const Config& config);
     void update(float dt);
     void draw();
-    void regenerateTerrain(const char * texturePath, Terrain::Mode mode);
-    void togglePause();
+    void regenerateTerrain(const char* texturePath, Terrain::Mode mode);
+    inline void setPaused(bool paused) { this->paused = paused; }
     void toggleDrawWires();
     void toggleSlowMotion();
+    void toggleFirstPersonMode() { firstPersonMode = !firstPersonMode; }
     void reset(vec3 playerPosition, quat playerRotation);
 
   private:
-    bool paused;
-    bool drawWires;
-    bool slowMotion;
+    bool paused{};
+    bool drawWires{};
+    bool slowMotion{};
+    bool firstPersonMode{};
 
     Model carModel{};
     Model wheelModel{};

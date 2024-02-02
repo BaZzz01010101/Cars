@@ -6,11 +6,13 @@ namespace game
   class RigidBody
   {
   public:
-    static constexpr float GRAVITY = -9.81f;
     const char* debugName = "None";
+
+    float gravity{};
 
     vec3 position{};
     quat rotation = quat::identity;
+    vec3 eulerRotation{};
 
     vec3 velocity{};
     vec3 angularVelocity{};
@@ -23,14 +25,13 @@ namespace game
 
     vec3 size{};
 
-    void init();
     void updateBody(float dt);
     void resetForces();
-    void applyForceLocal(vec3 force, vec3 point);
-    void applyForceLocal(vec3 force);
-    void applyForceGlobal(vec3 force, vec3 point);
+    void applyLocalForceAtLocalPoint(vec3 force, vec3 point);
+    void applyLocalForceAtCenterOfMass(vec3 force);
+    void applyGlobalForceAtGlobalPoint(vec3 force, vec3 point);
     void applyGlobalForceAtLocalPoint(vec3 globalForce, vec3 localPoint);
-    void applyForceGlobal(vec3 force);
+    void applyGlobalForceAtCenterOfMass(vec3 force);
     void applyMoment(const vec3 moment);
     void applyImpulseLocal(vec3 impulse, vec3 point);
     void applyImpulseGlobal(vec3 impulse, vec3 point);

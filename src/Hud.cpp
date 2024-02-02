@@ -30,7 +30,7 @@ namespace game
 
   void Hud::print(const char* text, Color color, int posX, int posY)
   {
-    print(text, lastColor, posX, posY, lastFontSize);
+    print(text, color, posX, posY, lastFontSize);
   }
 
   void Hud::print(const char* text, Color color, int posX, int posY, int fontSize)
@@ -58,12 +58,12 @@ namespace game
 
   void Hud::printIf(bool condition, const char* text, Color color, int posX)
   {
-    printIf(condition, text, lastColor, posX, lastPosY + lastFontSize, lastFontSize);
+    printIf(condition, text, color, posX, lastPosY + lastFontSize, lastFontSize);
   }
 
   void Hud::printIf(bool condition, const char* text, Color color, int posX, int posY)
   {
-    printIf(condition, text, lastColor, posX, posY, lastFontSize);
+    printIf(condition, text, color, posX, posY, lastFontSize);
   }
 
   void Hud::printIf(bool condition, const char* text, Color color, int posX, int posY, int fontSize)
@@ -165,5 +165,9 @@ namespace game
     print("Moment", scene.player.moment, BLUE);
     print("Velocity", scene.player.velocity, GREEN);
     print("Angular velocity", scene.player.angularVelocity, BLUE);
+    print("Wheel 1 ang.speed", scene.player.frontLeftWheel.wheelRotationSpeed, LIGHTGRAY);
+    print("Wheel 2 ang.speed", scene.player.frontRightWheel.wheelRotationSpeed, LIGHTGRAY);
+    print("Wheel 3 ang.speed", scene.player.rearLeftWheel.wheelRotationSpeed, LIGHTGRAY);
+    print("Wheel 4 ang.speed", scene.player.rearRightWheel.wheelRotationSpeed, LIGHTGRAY);
   }
 }

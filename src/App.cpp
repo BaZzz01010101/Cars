@@ -13,12 +13,13 @@ namespace game
     config = {
       .physics = {
         .maxDt = 0.02f,
+        .gravity = 9.8f,
         .car = {
           .mass = 1000,
-          .enginePower = 3000,
+          .enginePower = 1000,
           .brakePower = 10000,
           .handBrakePower = 100000,
-          .maxSpeed = 30,
+          .maxSpeed = 50,
           .maxSteeringAngle = PI / 4,
           .maxSteeringSpeed = PI / 2,
           .carAligningForce = 15,
@@ -27,19 +28,19 @@ namespace game
         .frontWheels = {
           .mass = 20,
           .radius = 0.5f,
-          .suspensionStiffness = 200000,
-          .suspensionDamping = 2000,
+          .suspensionStiffness = 100000,
+          .suspensionDamping = 0.2f,
           .maxSuspensionOffset = 0.5f,
-          .tireFriction = 0.8f,
+          .tireFriction = 1.5f,
           .rollingFriction = 0.01f,
         },
         .rearWheels = {
           .mass = 20,
           .radius = 0.5f,
           .suspensionStiffness = 200000,
-          .suspensionDamping = 2000,
+          .suspensionDamping = 0.2f,
           .maxSuspensionOffset = 0.25f,
-          .tireFriction = 0.8f,
+          .tireFriction = 1.5f,
           .rollingFriction = 0.01f,
         }
       },
@@ -114,20 +115,33 @@ namespace game
     EndDrawing();
   }
 
+  void App::togglePaused()
+  {
+    paused = !paused;
+    scene.setPaused(paused);
+    hud.setPaused(paused);
+  }
+
   void App::drawDebug()
   {
   }
 
   void App::updateShortcuts()
   {
-    if (IsKeyPressed(KEY_SPACE))
-      scene.togglePause();
+    if (IsKeyPressed(KEY_P))
+      togglePaused();
 
     if (IsKeyPressed(KEY_O))
       scene.toggleSlowMotion();
 
     if (IsKeyPressed(KEY_T))
       scene.toggleDrawWires();
+
+    if (IsKeyPressed(KEY_R))
+      scene.player.rotation = scene.player.rotation * quat::fromEuler(PI / 2, 0, 0);
+
+    if (IsKeyPressed(KEY_C))
+      scene.toggleFirstPersonMode();
 
     if (IsKeyPressed(KEY_ZERO))
       scene.regenerateTerrain(config.graphics.resources.terrainTexturePath, Terrain::Normal);
@@ -142,7 +156,18 @@ namespace game
       scene.reset(vec3::zero, quat::identity);
 
     if (IsKeyPressed(KEY_F2))
+    {
       scene.reset({ 0, 0, 25 }, quat::identity);
+      scene.player.rotation = quat::fromEuler(0, 0, 0.19f * PI);
+    }
+
+    if (IsKeyPressed(KEY_F3))
+    {
+      scene.reset({ 0, 0, 25 }, quat::identity);
+      scene.player.rotation = quat::fromEuler(0, 0, 0.18f * PI);
+      scene.player.rotation = scene.player.rotation * quat::fromEuler(PI / 2, 0, 0);
+      scene.player.rotation = scene.player.rotation * quat::fromEuler(0, 0, 0.02f * PI);
+    }
   }
 
 }

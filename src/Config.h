@@ -4,6 +4,7 @@ struct Config
   struct Physics
   {
     float maxDt;
+    float gravity;
 
     struct Car
     {

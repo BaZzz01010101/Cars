@@ -5,7 +5,7 @@ using namespace game;
 
 int main()
 {
-  App app;
+  App app{};
   app.initialize();
   app.run();
   app.shutdown();

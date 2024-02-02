@@ -253,4 +253,28 @@ namespace game
     if(sqLength() < sqr(delta))
       *this = vec3::zero;
   }
+
+  float vec3::getXAngle() const
+  {
+    if(y == 0 && z == 0)
+      return 0;
+
+    return atan2f(y, z);
+  }
+
+  float vec3::getYAngle() const
+  {
+    if (x == 0 && z == 0)
+      return 0;
+
+    return atan2f(x, z);
+  }
+
+  float vec3::getZAngle() const
+  {
+    if (x == 0 && y == 0)
+      return 0;
+
+    return atan2f(x, y);
+  }
 }

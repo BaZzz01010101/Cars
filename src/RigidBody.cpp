@@ -9,11 +9,17 @@ namespace game
     velocity += force / mass * dt;
     angularVelocity += moment / momentOfInertia * dt;
 
-    //const float DELTA = 0.001f;
-    //velocity.zeroIfLessThen(DELTA);
-    //angularVelocity.zeroIfLessThen(DELTA);
-    //force.zeroIfLessThen(DELTA);
-    //moment.zeroIfLessThen(DELTA);
+    if (velocity.sqLength() > 10000)
+      velocity = velocity.normalized() * 100;
+
+    if (angularVelocity.sqLength() > 100)
+      angularVelocity = angularVelocity.normalized() * 10;
+
+    const float DELTA = 0.01f;
+    velocity.zeroIfLessThen(DELTA);
+    angularVelocity.zeroIfLessThen(DELTA);
+    force.zeroIfLessThen(DELTA);
+    moment.zeroIfLessThen(DELTA);
 
     position += velocity * dt;
 
@@ -51,7 +57,6 @@ namespace game
   void RigidBody::applyGlobalForceAtLocalPoint(vec3 globalForce, vec3 localPoint)
   {
     this->force += globalForce;
-    localPoint.y += 0.44;
     vec3 localForce = globalForce.rotatedBy(rotation.inverted());
     this->moment += localPoint % localForce;
   }
@@ -64,20 +69,6 @@ namespace game
   void RigidBody::applyMoment(vec3 moment)
   {
     this->moment += moment;
-  }
-
-  void RigidBody::applyImpulseLocal(vec3 impulse, vec3 point)
-  {
-    velocity += impulse / mass;
-    angularVelocity += (point % impulse) / momentOfInertia;
-  }
-
-  void RigidBody::applyImpulseGlobal(vec3 impulse, vec3 point)
-  {
-    velocity += impulse / mass;
-    vec3 localImpulse = impulse.rotatedBy(rotation.inverted());
-    vec3 localPoint = point.rotatedBy(rotation.inverted());
-    angularVelocity += (localPoint % localImpulse) / momentOfInertia;
   }
 
   void RigidBody::applyGravity()

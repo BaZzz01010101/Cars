@@ -1,52 +1,60 @@
 #pragma once
-struct Config
+
+namespace game
 {
-  struct Physics
+
+  struct Config
   {
-    float maxDt;
-    float gravity;
-
-    struct Car
+    struct Physics
     {
-      float mass;
-      float enginePower;
-      float brakePower;
-      float handBrakePower;
-      float maxSpeed;
-      float maxSteeringAngle;
-      float maxSteeringSpeed;
-      float carAligningForce;
-      float bodyFriction;
-    } car;
+      float maxDt;
+      float gravity;
 
-    struct Wheels
+      struct Car
+      {
+        float mass;
+        float enginePower;
+        float brakePower;
+        float handBrakePower;
+        float maxSpeed;
+        float minSteeringAngle;
+        float maxSteeringAngle;
+        float maxSteeringSpeed;
+        float carAligningForce;
+        float bodyFriction;
+        float aerodynamicKoef;
+        float speedSteeringDrop;
+      } car;
+
+      struct Wheels
+      {
+        float mass;
+        float radius;
+        float suspensionStiffness;
+        float suspensionDamping;
+        float maxSuspensionOffset;
+        float tireFriction;
+        float rollingFriction;
+      } frontWheels, rearWheels;
+    } physics;
+
+    struct Graphics
     {
-      float mass;
-      float radius;
-      float suspensionStiffness;
-      float suspensionDamping;
-      float maxSuspensionOffset;
-      float tireFriction;
-      float rollingFriction;
-    } frontWheels, rearWheels;
-  } physics;
+      struct Hud
+      {
+        int fontSize;
+        int screenMargins;
+      } hud;
 
-  struct Graphics
-  {
-    struct Hud
-    {
-      float fontSize;
-      float screenMargins;
-    } hud;
+      struct Resources
+      {
+        const char* fontPath;
+        const char* terrainTexturePath;
+        const char* carModelPath;
+        const char* wheelModelPath;
+        const char* turretModelPath;
+      } resources;
+    } graphics;
+  };
 
-    struct Resources
-    {
-      const char* fontPath;
-      const char* terrainTexturePath;
-      const char* carModelPath;
-      const char* wheelModelPath;
-      const char* turretModelPath;
-    } resources;
-  } graphics;
-};
-
+}

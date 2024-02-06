@@ -6,12 +6,13 @@ namespace game
 {
   void Wheel::init(const Config::Physics::Wheels& config, const Model& model, const char* debugName, float gravity)
   {
+    wheelConfig = config;
     this->debugName = debugName;
     this->gravity = gravity;
-    wheelConfig = config;
+    this->momentOfInertia = 0.5f * wheelConfig.mass * sqr(wheelConfig.radius);
     Renderable::init(model);
   }
-
+  
   void Wheel::update(float dt, const Terrain& terrain, const RigidBody& parent, vec3 parentConnectionPoint, float steeringAngle)
   {
     vec3 globalConnectionPoint = parentConnectionPoint.rotatedBy(parent.rotation);
@@ -28,22 +29,20 @@ namespace game
 
     float terrainY = terrain.getHeight2(position.x, position.z, &normal);
     float bottomY = position.y + suspensionOffset - wheelConfig.radius;
-    float MAX_PENETRATION = 0.1f;
-    float penetration = std::max(terrainY - bottomY, 0.0f) / MAX_PENETRATION;
+    float penetration = terrainY - bottomY;
+    isGrounded = penetration > 0;
 
-    if (penetration > 0)
+    if (isGrounded)
     {
-      suspensionOffset += terrainY - bottomY;
+      suspensionOffset += penetration;
       suspensionSpeed = -velocity * vec3::up;
     }
 
     suspensionOffset = clamp(suspensionOffset, -wheelConfig.maxSuspensionOffset, wheelConfig.maxSuspensionOffset);
-
     wheelRotation = quat::fromEuler(0, 0, wheelRotationSpeed * dt) * wheelRotation;
-    isGrounded = penetration > 0;
   }
 
-  vec3 Wheel::getForce(float dt, float sharedMass, float aerodinamicForce, float enginePower, float brakePower, bool handBreaked)
+  vec3 Wheel::getForce(float dt, float sharedMass, float enginePower, float brakePower, bool handBreaked)
   {
     vec3 force = vec3::zero;
 
@@ -52,16 +51,13 @@ namespace game
     vec3 suspensionLeft = vec3::left.rotatedBy(rotation);
 
     vec3 frictionUp = normal;
-    vec3 frictionForward = suspensionForward.projectedOnPlane(normal);
+    vec3 frictionForward = suspensionForward.rotatedOnPlane(normal);
     vec3 frictionLeft = frictionUp % frictionForward;
 
-    float frictionSpeed = (velocity.projectedOnPlane(normal) - wheelRotationSpeed * wheelConfig.radius * frictionForward).length();
-
-    float momentOfInertia = 0.5f * wheelConfig.mass * sqr(wheelConfig.radius);
     wheelRotationSpeed += enginePower / momentOfInertia * dt;
     wheelRotationSpeed = moveTo(wheelRotationSpeed, 0, std::max(wheelRotationSpeed * wheelConfig.rollingFriction, 0.1f));
-    float maxRPS = float(!handBreaked) * (20 + 2 * velocity.length());
-    wheelRotationSpeed = clamp(wheelRotationSpeed,  -maxRPS, maxRPS);
+    /*float maxRPS = float(!handBreaked) * (20 + 4 * velocity.length());
+    wheelRotationSpeed = clamp(wheelRotationSpeed, -maxRPS, maxRPS);*/
 
     if (isGrounded)
     {
@@ -77,27 +73,32 @@ namespace game
         force += dampingForce;
       }
 
-      float frictionKoef = wheelConfig.tireFriction + mapRangeClamped(frictionSpeed, 10, 20, 0.0f, -0.2f);
-      float maxFrictionForce = std::min(nForce * vec3::up + aerodinamicForce, 50000.0f) * 1 * frictionKoef;
+      float frictionSpeed = (velocity.projectedOnPlane(normal) - wheelRotationSpeed * wheelConfig.radius * frictionForward).length();
+      float frictionKoef = wheelConfig.tireFriction + mapRangeClamped(frictionSpeed, 5, 30, 0.0f, -0.1f);
+      float maxFrictionForce = std::min(nForceScalar * frictionKoef, sharedMass * 100);
 
-      vec3 velocityForecast = velocity + vec3{ 0, -gravity * dt, 0 };
+      vec3 lastFrictionForce = frictionForce;
 
-      frictionForce = -(velocityForecast.projectedOnPlane(normal) * sharedMass / dt).projectedOnVector(frictionLeft);
+      vec3 gravityVelocity = handBreaked ?
+        vec3{ 0, -gravity * dt, 0 }.projectedOnPlane(normal) :
+        vec3{ 0, -gravity * dt, 0 }.projectedOnVector(frictionLeft);
 
-      float tireFrictionSpeed = (wheelRotationSpeed * wheelConfig.radius - velocity * frictionForward);
-      //frictionForce += (tireFrictionSpeed * frictionForward * sharedMass / dt) * 0.7;
-      frictionForce += tireFrictionSpeed * frictionForward / (sqr(1.69) / 270 + 1 / sharedMass) / dt;
+      vec3 frictionVelocityForecast = velocity + gravityVelocity - wheelRotationSpeed * wheelConfig.radius * frictionForward;
+      frictionForce = -frictionVelocityForecast.projectedOnPlane(normal) * sharedMass / dt; 
 
       if (frictionForce.sqLength() > sqr(maxFrictionForce))
         frictionForce = frictionForce.normalized() * maxFrictionForce;
+
+      frictionForce = 0.5 * frictionForce + 0.5 * lastFrictionForce;
+
+      force += frictionForce;
 
       float targetWheelRotationSpeed = float(!handBreaked) * velocity * frictionForward / wheelConfig.radius;
       float step = (frictionForce * frictionForward) * wheelConfig.radius / momentOfInertia * dt;
       wheelRotationSpeed = moveTo(wheelRotationSpeed, targetWheelRotationSpeed, step);
 
-      force += frictionForce;
-
       frictionVelocity = velocity.projectedOnPlane(normal) - wheelRotationSpeed * wheelConfig.radius * frictionForward;
+      this->force = force;
     }
 
     return force;
@@ -117,8 +118,10 @@ namespace game
     {
       vec3 bottom = position + vec3{ 0, -wheelConfig.radius + 0.2f, 0 };
       //DrawSphere(bottom, 0.3f, ORANGE);
+
       //drawVector(bottom, velocity, LIME);
       drawVector(bottom, frictionVelocity, GREEN);
+      drawVector(position, 0.001f * force, RED);
       drawVector(bottom, 0.001f * frictionForce, ORANGE);
     }
   }

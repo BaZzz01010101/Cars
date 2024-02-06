@@ -164,10 +164,12 @@ namespace game
     print("Force", scene.player.force, RED);
     print("Moment", scene.player.moment, BLUE);
     print("Velocity", scene.player.velocity, GREEN);
+    print("Engine Pow.", scene.player.enginePower, YELLOW);
+
     print("Angular velocity", scene.player.angularVelocity, BLUE);
-    print("Wheel 1 ang.speed", scene.player.frontLeftWheel.wheelRotationSpeed, LIGHTGRAY);
-    print("Wheel 2 ang.speed", scene.player.frontRightWheel.wheelRotationSpeed, LIGHTGRAY);
-    print("Wheel 3 ang.speed", scene.player.rearLeftWheel.wheelRotationSpeed, LIGHTGRAY);
-    print("Wheel 4 ang.speed", scene.player.rearRightWheel.wheelRotationSpeed, LIGHTGRAY);
+    print("Wheel 1 fr.force", scene.player.frontLeftWheel.frictionForce.length(), LIGHTGRAY);
+    print("Wheel 2 fr.force", scene.player.frontRightWheel.frictionForce.length(), LIGHTGRAY);
+    print("Wheel 3 fr.force", scene.player.rearLeftWheel.frictionForce.length(), LIGHTGRAY);
+    print("Wheel 4 fr.force", scene.player.rearRightWheel.frictionForce.length(), LIGHTGRAY);
   }
 }

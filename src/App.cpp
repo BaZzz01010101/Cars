@@ -15,15 +15,17 @@ namespace game
         .maxDt = 0.02f,
         .gravity = 9.8f,
         .car = {
-          .mass = 1000,
-          .enginePower = 1000,
+          .mass = 1500,
+          .enginePower = 350,
           .brakePower = 10000,
           .handBrakePower = 100000,
           .maxSpeed = 50,
+          .minSteeringAngle = PI / 8,
           .maxSteeringAngle = PI / 4,
           .maxSteeringSpeed = PI / 2,
           .carAligningForce = 15,
           .bodyFriction = 0.05f,
+          .aerodynamicKoef = 5.7f,
         },
         .frontWheels = {
           .mass = 20,
@@ -31,7 +33,7 @@ namespace game
           .suspensionStiffness = 100000,
           .suspensionDamping = 0.2f,
           .maxSuspensionOffset = 0.5f,
-          .tireFriction = 1.5f,
+          .tireFriction = 1.0f,
           .rollingFriction = 0.01f,
         },
         .rearWheels = {
@@ -40,7 +42,7 @@ namespace game
           .suspensionStiffness = 200000,
           .suspensionDamping = 0.2f,
           .maxSuspensionOffset = 0.25f,
-          .tireFriction = 1.5f,
+          .tireFriction = 1.0f,
           .rollingFriction = 0.01f,
         }
       },
@@ -123,8 +125,7 @@ namespace game
   }
 
   void App::drawDebug()
-  {
-  }
+  {}
 
   void App::updateShortcuts()
   {

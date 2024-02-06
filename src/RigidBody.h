@@ -33,8 +33,6 @@ namespace game
     void applyGlobalForceAtLocalPoint(vec3 globalForce, vec3 localPoint);
     void applyGlobalForceAtCenterOfMass(vec3 force);
     void applyMoment(const vec3 moment);
-    void applyImpulseLocal(vec3 impulse, vec3 point);
-    void applyImpulseGlobal(vec3 impulse, vec3 point);
     void applyGravity();
     vec3 forward() const;
     vec3 left() const;

@@ -5,28 +5,23 @@
 namespace game
 {
 
-  Car::Car()
-  {
-    frontLeftWheelConnectionPoint = { 0.97f, -0.36f, 1.34f };
-    frontRightWheelConnectionPoint = { -0.97f, -0.36f, 1.34f };
-    rearLeftWheelConnectionPoint = { 0.97f, -0.536f, -1.20f };
-    rearRightWheelConnectionPoint = { -0.97f, -0.536f, -1.20f };
-
-    size = { 2.04f, 2.32f, 4.56f };
-    //wheelSize = { 0.327f, 0.925f, 0.925f };
-  }
-
   void Car::init(Config config, Model carModel, Model wheelModel, Model turretModel)
   {
     mass = config.physics.car.mass;
     gravity = config.physics.gravity;
     carConfig = config.physics.car;
+    size = { 2.04f, 2.32f, 4.56f };
+
+    frontLeftWheelConnectionPoint = { 0.97f, -0.36f, 1.34f };
+    frontRightWheelConnectionPoint = { -0.97f, -0.36f, 1.34f };
+    rearLeftWheelConnectionPoint = { 0.97f, -0.536f, -1.20f };
+    rearRightWheelConnectionPoint = { -0.97f, -0.536f, -1.20f };
 
     frontLeftWheel.init(config.physics.frontWheels, wheelModel, "FrontLeftWheel", gravity);
     frontRightWheel.init(config.physics.frontWheels, wheelModel, "FrontRightWheel", gravity);
     rearLeftWheel.init(config.physics.rearWheels, wheelModel, "RearLeftWheel", gravity);
     rearRightWheel.init(config.physics.rearWheels, wheelModel, "RearRightWheel", gravity);
-
+     
     float radius = (size.x + size.y + size.z) / 6;
     momentOfInertia = 0.5f * mass * sqr(radius);
 
@@ -41,6 +36,9 @@ namespace game
     angularVelocity = vec3::zero;
     force = vec3::zero;
     moment = vec3::zero;
+    enginePower = 0;
+    brakePower = 0;
+    handBreaked = false;
     steeringAngle = 0.0f;
     frontLeftWheel.reset();
     frontRightWheel.reset();
@@ -58,7 +56,7 @@ namespace game
     resetForces();
     applyGravity();
 
-    float aerodinamicForce = 5.7f * velocity.sqLength();
+    float aerodinamicForce = carConfig.aerodynamicKoef * velocity.sqLength();
     applyGlobalForceAtCenterOfMass(-aerodinamicForce * up());
 
     vec3 alignmentMoment = getAutoAlignmentMoment(dt);
@@ -70,11 +68,14 @@ namespace game
     updateControl(dt);
 
     quat wheelRotation = rotation * quat::fromEuler(steeringAngle, 0, 0);
-
-    frontLeftWheelForce = getWheelForce(dt, frontLeftWheel, terrain, frontLeftWheelConnectionPoint, wheelRotation, 2 * enginePower, brakePower);
-    frontRightWheelForce = getWheelForce(dt, frontRightWheel, terrain, frontRightWheelConnectionPoint, wheelRotation, 2 * enginePower, brakePower);
-    rearLeftWheelForce = getWheelForce(dt, rearLeftWheel, terrain, rearLeftWheelConnectionPoint, rotation, 1 * enginePower, brakePower);
-    rearRightWheelForce = getWheelForce(dt, rearRightWheel, terrain, rearRightWheelConnectionPoint, rotation, 1 * enginePower, brakePower);
+    float frontPower = 1.5;
+    float rearPower = 1.5;
+    float contactsCount = std::max(1.0f, float(frontLeftWheel.isGrounded + frontRightWheel.isGrounded + rearLeftWheel.isGrounded + rearRightWheel.isGrounded));
+    float sharedMass = mass / contactsCount;
+    frontLeftWheelForce = frontLeftWheel.getForce(dt, sharedMass, frontPower * enginePower, brakePower, handBreaked);
+    frontRightWheelForce = frontRightWheel.getForce(dt, sharedMass, frontPower * enginePower, brakePower, handBreaked);
+    rearLeftWheelForce = rearLeftWheel.getForce(dt, sharedMass, rearPower * enginePower, brakePower, handBreaked);
+    rearRightWheelForce = rearRightWheel.getForce(dt, sharedMass, rearPower * enginePower, brakePower, handBreaked);
 
     vec3 nForce = frontLeftWheel.nForce + frontRightWheel.nForce + rearLeftWheel.nForce + rearRightWheel.nForce;
     vec3 gravityForce = mass * vec3{ 0, -gravity, 0 };
@@ -88,17 +89,6 @@ namespace game
 
     updateBody(dt);
     updateWheels(dt, terrain);
-  }
-
-  vec3 Car::getWheelForce(float dt, Wheel& wheel, const Terrain& terrain, vec3 connectionPoint, quat wheelRotation, float enginePower, float brakePower)
-  {
-    //vec3 positionGlobal = position + connectionPoint.rotatedBy(rotation);
-    //vec3 normal = 0.25f * (frontLeftWheel.normal + frontRightWheel.normal + rearLeftWheel.normal + rearRightWheel.normal);
-    //vec3 dv = vec3{ 0, -9.8f * dt, 0 }.projectedOnPlane(normal);
-    //vec3 velocityGlobal = (velocity + dv) + (angularVelocity % connectionPoint).rotatedBy(rotation);
-    wheel.carForward = forward();
-
-    return wheel.getForce(dt, mass / 4, 0, enginePower, brakePower, handBreaked);
   }
 
   void Car::updateWheels(float dt, const Terrain& terrain)
@@ -212,14 +202,15 @@ namespace game
     handBreaked = IsKeyDown(KEY_SPACE);
 
     float step = float(IsKeyDown(KEY_HOME) - IsKeyDown(KEY_END)) == sign(enginePower) ? carConfig.enginePower * dt : carConfig.enginePower * 4 * dt;
-    float maxEnginePower = mapRangeClamped(velocity.length(), 0, carConfig.maxSpeed, carConfig.enginePower, 0);
-    enginePower = moveTo(enginePower, maxEnginePower * float(IsKeyDown(KEY_HOME) - IsKeyDown(KEY_END)), step);
+    float maxForwardEnginePower = mapRangeClamped(velocity * forward(), 0, carConfig.maxSpeed, carConfig.enginePower, 0);
+    float maxBackwardEnginePower = mapRangeClamped(velocity * forward(), -carConfig.maxSpeed, 0, 0, carConfig.enginePower);
+    enginePower = moveTo(enginePower, maxForwardEnginePower * float(IsKeyDown(KEY_HOME)) - maxBackwardEnginePower * float(IsKeyDown(KEY_END)), step);
     //brakePower = carConfig.brakePower * float(IsKeyDown(KEY_END));
 
     applyGlobalForceAtCenterOfMass(thrust);
 
     float steeringDirection = float(IsKeyDown(KEY_DELETE) - IsKeyDown(KEY_PAGE_DOWN));
-    float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0, carConfig.maxSpeed, carConfig.maxSteeringAngle, 0.1f * carConfig.maxSteeringAngle);
+    float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0, carConfig.maxSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
     float steeringTarget;
 
     if (steeringDirection == 0.0f)
@@ -250,22 +241,12 @@ namespace game
 
   void Car::drawDebug()
   {
-    drawVector(position, 3 * forward(), WHITE);
-    drawVector(position, 3 * left(), LIGHTGRAY);
-    drawVector(position, 3 * up(), DARKGRAY);
+    //drawVector(position, 3 * forward(), WHITE);
+    //drawVector(position, 3 * left(), LIGHTGRAY);
+    //drawVector(position, 3 * up(), DARKGRAY);
 
-    drawVector(position, 0.5f * force.logarithmic(), RED);
+    //drawVector(position, 0.001f * force, RED);
     drawVector(position, 0.5f * moment.logarithmic(), BLUE);
-
-    vec3 frontLeftWheelConnectionPointGlobal = position + frontLeftWheelConnectionPoint.rotatedBy(rotation);
-    vec3 frontRightWheelConnectionPointGlobal = position + frontRightWheelConnectionPoint.rotatedBy(rotation);
-    vec3 rearLeftWheelConnectionPointGlobal = position + rearLeftWheelConnectionPoint.rotatedBy(rotation);
-    vec3 rearRightWheelConnectionPointGlobal = position + rearRightWheelConnectionPoint.rotatedBy(rotation);
-
-    drawVector(frontLeftWheelConnectionPointGlobal, 0.5f * frontLeftWheelForce.logarithmic(), RED);
-    drawVector(frontRightWheelConnectionPointGlobal, 0.5f * frontRightWheelForce.logarithmic(), RED);
-    drawVector(rearLeftWheelConnectionPointGlobal, 0.5f * rearLeftWheelForce.logarithmic(), RED);
-    drawVector(rearRightWheelConnectionPointGlobal, 0.5f * rearRightWheelForce.logarithmic(), RED);
   }
 }
 

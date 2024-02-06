@@ -14,8 +14,9 @@ namespace game
     Wheel frontRightWheel{};
     Wheel rearLeftWheel{};
     Wheel rearRightWheel{};
+    float enginePower{};
 
-    Car();
+    Car() = default;
     void init(Config config, Model carModel, Model wheelModel, Model turretModel);
     void update(float dt, const Terrain& terrain);
     void draw(bool drawWires);
@@ -30,7 +31,6 @@ namespace game
 
     Config::Physics::Car carConfig{};
 
-    float enginePower{};
     float brakePower{};
     bool handBreaked{};
     float steeringSpeed{};
@@ -45,7 +45,6 @@ namespace game
 
     void drawDebug();
     void updateControl(float dt);
-    vec3 getWheelForce(float dt, Wheel& wheel, const Terrain& terrain, vec3 connectionPoint, quat wheelRotation, float enginePower, float brakePower);
     void updateWheels(float dt, const Terrain& terrain);
     vec3 getAutoAlignmentMoment(float dt);
     void updateCollisions(float dt, const Terrain& terrain);

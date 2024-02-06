@@ -89,7 +89,7 @@ namespace game
     //player.position.y = terrainY + 0.5f * player.size.y;
 
     thread_local int slowMoCounter = 0;
-    const int slowMoCounterMax = 10;
+    const int slowMoCounterMax = 40;
     slowMoCounter = (slowMoCounter + 1) % slowMoCounterMax;
 
     if (!paused && (!slowMotion || slowMoCounter == 0))

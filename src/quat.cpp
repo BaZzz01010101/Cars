@@ -7,6 +7,21 @@ namespace game
 
   const quat quat::identity = { 0, 0, 0, 1 };
 
+  quat quat::fromXAngle(float angle)
+  {
+    return quat{ sinf(0.5f * angle), 0, 0, cosf(0.5f * angle) };
+  }
+
+  quat quat::fromYAngle(float angle)
+  {
+    return quat{ 0, sinf(0.5f * angle), 0, cosf(0.5f * angle) };
+  }
+
+  quat quat::fromZAngle(float angle)
+  {
+    return quat{ 0, 0, sinf(0.5f * angle), cosf(0.5f * angle) };
+  }
+
   quat quat::fromAxisAngle(const vec3& axis, float angle)
   {
     return QuaternionFromAxisAngle(axis, angle);
@@ -84,6 +99,60 @@ namespace game
   void quat::normalize()
   {
     *this = normalized();
+  }
+
+  quat quat::rotatedByXAngle(float angle) const
+  {
+    float sinha = sinf(0.5f * angle);
+    float cosha = cosf(0.5f * angle);
+
+    float nw = cosha * w - sinha * x;
+    float nx = cosha * x + sinha * w;
+    float ny = cosha * y - sinha * z;
+    float nz = cosha * z + sinha * y;
+
+    return quat{ nx, ny, nz, nw };
+  }
+
+  quat quat::rotatedByYAngle(float angle) const
+  {
+    float sinha = sinf(0.5f * angle);
+    float cosha = cosf(0.5f * angle);
+
+    float nw = cosha * w - sinha * y;
+    float nx = cosha * x + sinha * z;
+    float ny = cosha * y + sinha * w;
+    float nz = cosha * z - sinha * x;
+
+    return quat{ nx, ny, nz, nw };
+  }
+
+  quat quat::rotatedByZAngle(float angle) const
+  {
+    float sinha = sinf(0.5f * angle);
+    float cosha = cosf(0.5f * angle);
+
+    float nw = cosha * w + sinha * z;
+    float nx = cosha * x + sinha * y;
+    float ny = cosha * y - sinha * x;
+    float nz = cosha * z - sinha * w;
+
+    return quat{ nx, ny, nz, nw };
+  }
+
+  void quat::rotateByXAngle(float angle)
+  {
+    *this = rotatedByXAngle(angle);
+  }
+
+  void quat::rotateByYAngle(float angle)
+  {
+    *this = rotatedByYAngle(angle);
+  }
+
+  void quat::rotateByZAngle(float angle)
+  {
+    *this = rotatedByZAngle(angle);
   }
 
   void quat::toAxisAngle(vec3* axis, float* angle) const

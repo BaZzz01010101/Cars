@@ -39,7 +39,7 @@ namespace game
     }
 
     suspensionOffset = clamp(suspensionOffset, -wheelConfig.maxSuspensionOffset, wheelConfig.maxSuspensionOffset);
-    wheelRotation = quat::fromEuler(0, 0, wheelRotationSpeed * dt) * wheelRotation;
+    wheelRotation.rotateByXAngle(wheelRotationSpeed * dt);
   }
 
   vec3 Wheel::getForce(float dt, float sharedMass, float enginePower, float brakePower, bool handBreaked)

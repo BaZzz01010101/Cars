@@ -32,15 +32,11 @@ namespace game
     float suspensionOffset{};
     float suspensionSpeed{};
     vec3 position{};
-    vec3 lastPosition{};
     quat rotation{};
-    quat lastRotation{};
     vec3 velocity{};
     vec3 angularVelocity{};
     quat wheelRotation = quat::identity;
     vec3 frictionVelocity{};
-    vec3 microVelForce{};
-    vec3 lastVelocity{};
     const char* debugName = "UNKNOWN";
   };
 

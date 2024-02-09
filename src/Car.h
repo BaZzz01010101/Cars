@@ -6,6 +6,7 @@
 #include "Config.h"
 #include "Renderable.h"
 #include "Physable.h"
+#include "CustomCamera.h"
 
 namespace game
 {
@@ -24,7 +25,7 @@ namespace game
 
     Car() = default;
     void init(Config config, Model carModel, Model wheelModel, Model turretModel);
-    void update(float dt, const Terrain& terrain, vec3 cameraTarget);
+    void update(float dt, const Terrain& terrain, const CustomCamera& camera);
     void draw(bool drawWires);
 
     void resetToPosition(vec3 position, quat rotation);

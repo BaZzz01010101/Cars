@@ -56,7 +56,7 @@ namespace game
     rearRightWheelForce = vec3::zero;
   }
 
-  void Car::update(float dt, const Terrain& terrain, vec3 cameraTarget)
+  void Car::update(float dt, const Terrain& terrain, const CustomCamera& camera)
   {
     lastForce = force;
     resetForces();
@@ -202,21 +202,21 @@ namespace game
   {
     vec3 thrust = {
       0,
-      mass * 20 * float(IsKeyDown(KEY_ENTER)),
+      mass * 20 * float(IsKeyDown(KEY_LEFT_SHIFT)),
       0
     };
 
     handBreaked = IsKeyDown(KEY_SPACE);
 
-    float step = float(IsKeyDown(KEY_HOME) - IsKeyDown(KEY_END)) == sign(enginePower) ? carConfig.enginePower * dt : carConfig.enginePower * 4 * dt;
+    float step = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S)) == sign(enginePower) ? carConfig.enginePower * dt : carConfig.enginePower * 4 * dt;
     float maxForwardEnginePower = mapRangeClamped(velocity * forward(), 0, carConfig.maxSpeed, carConfig.enginePower, 0);
     float maxBackwardEnginePower = mapRangeClamped(velocity * forward(), -carConfig.maxSpeed, 0, 0, carConfig.enginePower);
-    enginePower = moveTo(enginePower, maxForwardEnginePower * float(IsKeyDown(KEY_HOME)) - maxBackwardEnginePower * float(IsKeyDown(KEY_END)), step);
+    enginePower = moveTo(enginePower, maxForwardEnginePower * float(IsKeyDown(KEY_W)) - maxBackwardEnginePower * float(IsKeyDown(KEY_S)), step);
     //brakePower = carConfig.brakePower * float(IsKeyDown(KEY_END));
 
     applyGlobalForceAtCenterOfMass(thrust);
 
-    float steeringDirection = float(IsKeyDown(KEY_DELETE) - IsKeyDown(KEY_PAGE_DOWN));
+    float steeringDirection = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D));
     float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0, carConfig.maxSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
     float steeringTarget;
 

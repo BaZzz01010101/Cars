@@ -57,6 +57,8 @@ namespace game
     float getXAngle() const;
     float getYAngle() const;
     float getZAngle() const;
+
+
   };
 
   vec3 operator*(float f, const vec3& v);

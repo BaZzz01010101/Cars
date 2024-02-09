@@ -49,6 +49,24 @@ namespace game
 
     struct Graphics
     {
+      struct Screen
+      {
+        const char* title;
+        int width;
+        int height;
+      } screen;
+
+      struct Camera
+      {
+        float focusElevation;
+        float minDistance;
+        float maxDistance;
+        float maxPitch;
+        float horzSensitivity;
+        float vertSensitivity;
+        bool invertY;
+      } camera;
+
       struct Hud
       {
         int fontSize;

@@ -8,8 +8,6 @@ namespace game
 
   void App::initialize()
   {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, TITLE);
-
     config = {
       .physics = {
         .maxDt = 0.02f,
@@ -54,6 +52,20 @@ namespace game
         }
       },
       .graphics = {
+        .screen = {
+          .title = "Mad Max",
+          .width = 1280,
+          .height = 720,
+        },
+        .camera = {
+          .focusElevation = 5,
+          .minDistance = 10,
+          .maxDistance = 20,
+          .maxPitch = PI * 3 / 8,
+          .horzSensitivity = 1.0f,
+          .vertSensitivity = 1.0f,
+          .invertY = false,
+        },
         .hud = {
           .fontSize = 20,
           .screenMargins = 10,
@@ -67,6 +79,8 @@ namespace game
         },
       }
     };
+
+    InitWindow(config.graphics.screen.width, config.graphics.screen.height, config.graphics.screen.title);
 
     scene.init(config);
     hud.init(config);
@@ -110,8 +124,6 @@ namespace game
 
   void App::draw()
   {
-    HideCursor();
-    SetMousePosition(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
     ClearBackground(BLACK);
 
     BeginDrawing();
@@ -147,9 +159,6 @@ namespace game
 
     if (IsKeyPressed(KEY_R))
       scene.player.rotation = scene.player.rotation * quat::fromEuler(PI / 2, 0, 0);
-
-    if (IsKeyPressed(KEY_C))
-      scene.toggleFirstPersonMode();
 
     if (IsKeyPressed(KEY_ZERO))
       scene.regenerateTerrain(config.graphics.resources.terrainTexturePath, Terrain::Normal);

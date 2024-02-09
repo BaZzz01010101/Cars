@@ -2,6 +2,7 @@
 #include "Terrain.h"
 #include "Car.h"
 #include "Config.h"
+#include <CustomCamera.h>
 
 namespace game
 {
@@ -9,7 +10,7 @@ namespace game
   class Scene
   {
   public:
-    Camera camera{};
+    CustomCamera camera{};
     Terrain terrain{};
     Car player{};
 
@@ -25,14 +26,12 @@ namespace game
     inline void setPaused(bool paused) { this->paused = paused; }
     void toggleDrawWires();
     void toggleSlowMotion();
-    void toggleFirstPersonMode() { firstPersonMode = !firstPersonMode; }
     void reset(vec3 playerPosition, quat playerRotation);
 
   private:
     bool paused{};
     bool drawWires{};
     bool slowMotion{};
-    bool firstPersonMode{};
 
     Model carModel{};
     Model wheelModel{};
@@ -41,8 +40,6 @@ namespace game
     bool carModelLoaded{};
     bool wheelModelLoaded{};
     bool turretModelLoaded{};
-
-    void followPlayer(Camera& camera, Car& player);
   };
 
 }

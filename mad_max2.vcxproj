@@ -97,6 +97,7 @@
   <ItemGroup>
     <ClCompile Include="src\App.cpp" />
     <ClCompile Include="src\Config.cpp" />
+    <ClCompile Include="src\CustomCamera.cpp" />
     <ClCompile Include="src\DebugGraphs.cpp" />
     <ClCompile Include="src\Helpers.cpp" />
     <ClCompile Include="src\Hud.cpp" />
@@ -118,6 +119,7 @@
   <ItemGroup>
     <ClInclude Include="src\App.h" />
     <ClInclude Include="src\Config.h" />
+    <ClInclude Include="src\CustomCamera.h" />
     <ClInclude Include="src\DebugGraphs.h" />
     <ClInclude Include="src\Helpers.h" />
     <ClInclude Include="src\Hud.h" />

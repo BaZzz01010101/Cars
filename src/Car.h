@@ -1,15 +1,21 @@
 #pragma once
 #include "RigidBody.h"
 #include "Terrain.h"
+#include "Turret.h"
 #include "Wheel.h"
 #include "Config.h"
+#include "Renderable.h"
+#include "Physable.h"
 
 namespace game
 {
 
-  class Car : public RigidBody, public Renderable
+  class Car : public Renderable, public Physable
   {
   public:
+    Turret gun{};
+    Turret cannon{};
+
     Wheel frontLeftWheel{};
     Wheel frontRightWheel{};
     Wheel rearLeftWheel{};
@@ -18,12 +24,15 @@ namespace game
 
     Car() = default;
     void init(Config config, Model carModel, Model wheelModel, Model turretModel);
-    void update(float dt, const Terrain& terrain);
+    void update(float dt, const Terrain& terrain, vec3 cameraTarget);
     void draw(bool drawWires);
 
     void resetToPosition(vec3 position, quat rotation);
 
   private:
+    vec3 turretConnectionPoint{};
+    vec3 cannonConnectionPoint{};
+
     vec3 frontLeftWheelConnectionPoint{};
     vec3 frontRightWheelConnectionPoint{};
     vec3 rearLeftWheelConnectionPoint{};

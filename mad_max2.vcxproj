@@ -80,8 +80,7 @@
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <ForcedIncludeFiles>
-      </ForcedIncludeFiles>
+      <ForcedIncludeFiles>($Solution)copilot.h</ForcedIncludeFiles>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -103,11 +102,16 @@
     <ClCompile Include="src\Hud.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Car.cpp" />
+    <ClCompile Include="src\Movable.cpp" />
+    <ClCompile Include="src\Physable.cpp" />
+    <ClCompile Include="src\Positionable.cpp" />
     <ClCompile Include="src\quat.cpp" />
     <ClCompile Include="src\Renderable.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\RigidBody.cpp" />
     <ClCompile Include="src\Terrain.cpp" />
+    <ClCompile Include="src\Turret.cpp" />
+    <ClCompile Include="src\TurretPlatform.cpp" />
     <ClCompile Include="src\vec3.cpp" />
     <ClCompile Include="src\Wheel.cpp" />
   </ItemGroup>
@@ -117,13 +121,18 @@
     <ClInclude Include="src\DebugGraphs.h" />
     <ClInclude Include="src\Helpers.h" />
     <ClInclude Include="src\Hud.h" />
+    <ClInclude Include="src\Movable.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Car.h" />
+    <ClInclude Include="src\Physable.h" />
+    <ClInclude Include="src\Positionable.h" />
     <ClInclude Include="src\quat.h" />
     <ClInclude Include="src\Renderable.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\RigidBody.h" />
     <ClInclude Include="src\Terrain.h" />
+    <ClInclude Include="src\Turret.h" />
+    <ClInclude Include="src\TurretPlatform.h" />
     <ClInclude Include="src\vec3.h" />
     <ClInclude Include="src\Wheel.h" />
   </ItemGroup>

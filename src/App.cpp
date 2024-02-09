@@ -27,6 +27,13 @@ namespace game
           .bodyFriction = 0.05f,
           .aerodynamicKoef = 5.7f,
         },
+        .turret = {
+          .minPitch = -PI / 16,
+          .maxPitch = PI / 4,
+          .yawSpeed = PI / 2,
+          .pitchSpeed = PI / 2,
+          .bodyFriction = 0.1f,
+        },
         .frontWheels = {
           .mass = 20,
           .radius = 0.5f,

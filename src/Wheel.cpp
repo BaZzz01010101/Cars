@@ -13,11 +13,11 @@ namespace game
     Renderable::init(model);
   }
   
-  void Wheel::update(float dt, const Terrain& terrain, const RigidBody& parent, vec3 parentConnectionPoint, float steeringAngle)
+  void Wheel::update(float dt, const Terrain& terrain, const Physable& parent, vec3 parentConnectionPoint, float steeringAngle)
   {
     vec3 globalConnectionPoint = parentConnectionPoint.rotatedBy(parent.rotation);
     position = parent.position + globalConnectionPoint;
-    rotation = parent.rotation * quat::fromEuler(steeringAngle, 0, 0);
+    rotation = parent.rotation * quat::fromYAngle(steeringAngle);
     velocity = parent.velocity + parent.angularVelocity.rotatedBy(rotation) % globalConnectionPoint;
     angularVelocity = parent.angularVelocity;
 

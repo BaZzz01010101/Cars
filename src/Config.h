@@ -26,6 +26,15 @@ namespace game
         float speedSteeringDrop;
       } car;
 
+      struct Turret
+      {
+        float minPitch;
+        float maxPitch;
+        float yawSpeed;
+        float pitchSpeed;
+        float bodyFriction;
+      } turret;
+
       struct Wheels
       {
         float mass;

@@ -26,7 +26,6 @@ namespace game
     vec3 dr = angularVelocity * dt;
     rotation = rotation * quat::fromEuler(dr.y, dr.z, dr.x);
     rotation.normalize();
-    rotation.toEuler(&eulerRotation.y, &eulerRotation.z, &eulerRotation.x);
   }
 
   void RigidBody::resetForces()
@@ -76,18 +75,4 @@ namespace game
     applyGlobalForceAtCenterOfMass(mass * vec3{ 0, -gravity, 0 });
   }
 
-  vec3 RigidBody::forward() const
-  {
-    return vec3::forward.rotatedBy(rotation);
-  }
-
-  vec3 RigidBody::left() const
-  {
-    return vec3::left.rotatedBy(rotation);
-  }
-
-  vec3 RigidBody::up() const
-  {
-    return vec3::up.rotatedBy(rotation);
-  }
 }

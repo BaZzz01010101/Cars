@@ -1,21 +1,16 @@
 #pragma once
+#include "Positionable.h"
+#include "Movable.h"
 
 namespace game
 {
 
-  class RigidBody
+  class RigidBody : public Movable
   {
   public:
     const char* debugName = "None";
 
     float gravity{};
-
-    vec3 position{};
-    quat rotation = quat::identity;
-    vec3 eulerRotation{};
-
-    vec3 velocity{};
-    vec3 angularVelocity{};
 
     vec3 force{};
     vec3 moment{};
@@ -34,9 +29,6 @@ namespace game
     void applyGlobalForceAtCenterOfMass(vec3 force);
     void applyMoment(const vec3 moment);
     void applyGravity();
-    vec3 forward() const;
-    vec3 left() const;
-    vec3 up() const;
   };
 
 }

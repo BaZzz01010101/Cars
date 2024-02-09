@@ -1,7 +1,7 @@
 #pragma once
 #include "DebugGraphs.h"
 #include "Config.h"
-#include <Scene.h>
+#include "Scene.h"
 
 namespace game
 {

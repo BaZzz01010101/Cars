@@ -6,6 +6,6 @@ class Renderable
     void draw(const Matrix& transform, bool drawWires);
 
   private:
-    Model model;
+    Model model{};
 };
 

@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Scene.h"
-#include <Helpers.h>
+#include "Helpers.h"
 
 namespace game
 {
@@ -26,16 +26,14 @@ namespace game
     wheelModel = LoadModel(config.graphics.resources.wheelModelPath);
     wheelModelLoaded = true;
 
-    //turretModel = LoadModel(carConfig.graphics.turretModelPath);
-    //turretModelLoaded = true;
-
+    turretModel = LoadModel(config.graphics.resources.turretModelPath);
+    turretModelLoaded = true;
 
     terrain.generate2(config.graphics.resources.terrainTexturePath, Terrain::Mode::Normal);
 
     float h = terrain.getHeight2(0, 0);
 
-    player.position = { 0, h + 0.5f * player.size.y, 0 };
-    player.debugName = "PlayerCar";
+    player.position = { 0, h + 2, 0 };
     //player.rotation = { 0, 0, 0, 1 };
     //player.angularSpeed = { 0.1, 0.2, 0.4 };
     //player.speed = vec3::zero;
@@ -93,7 +91,7 @@ namespace game
     slowMoCounter = (slowMoCounter + 1) % slowMoCounterMax;
 
     if (!paused && (!slowMotion || slowMoCounter == 0))
-      player.update(dt, terrain);
+      player.update(dt, terrain, camera.target);
 
     followPlayer(camera, player);
   }
@@ -127,7 +125,7 @@ namespace game
   void Scene::reset(vec3 playerPosition, quat playerRotation)
   {
     float terrainY = terrain.getHeight2(playerPosition.x, playerPosition.z);
-    playerPosition.y = terrainY + 0.5f * player.size.y;
+    playerPosition.y = terrainY + 2;
     player.resetToPosition(playerPosition, playerRotation);
     camera.position = playerPosition + vec3{ -4, 1, 0 };
     camera.target = playerPosition;
@@ -157,15 +155,22 @@ namespace game
     vec3 toPlayer = player.position - camera.position;
     float range = toPlayer.length();
 
-    vec3 position = range > 10 ? vec3(camera.position) + (toPlayer + vec3{ 0, 5, 0 }).normalized() * (range - 10) :
-      range < 5 ? vec3(camera.position) - toPlayer.normalized() * (5 - range) :
+    float MIN_RANGE = 10;
+    float MAX_RANGE = 20;
+
+    vec3 position = range > MAX_RANGE ? vec3(camera.position) + (toPlayer + 5 * vec3::up).normalized() * (range - MAX_RANGE) :
+      range < MIN_RANGE ? vec3(camera.position) - toPlayer.normalized() * (MIN_RANGE - range) :
       camera.position;
 
-    position = moveTo(camera.position, position, (position - camera.position).length() * 0.1f);
-    position.y = std::max(position.y, terrain.getHeight2(position.x, position.z) + 0.5f);
+    vec3 sight = player.position;
+    sight.y += 5;
 
-    vec3 target = player.position;
-    target = moveTo(camera.target, target, (target - camera.target).length() * 0.1f);
+    //position = moveTo(camera.position, position, (position - camera.position).length() * 0.1f);
+    position.y = std::max(position.y, terrain.getHeight2(position.x, position.z) + 0.5f);
+    //position.y = player.position.y + 10.0f;
+
+    vec3 target = player.position + vec3::up * 8.0f;
+    //target = moveTo(camera.target, target, (target - camera.target).length() * 0.1f);
 
     camera.position = position;
     camera.target = target;

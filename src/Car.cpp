@@ -19,8 +19,8 @@ namespace game
     rearLeftWheelConnectionPoint = { 0.97f, -0.536f, -1.20f };
     rearRightWheelConnectionPoint = { -0.97f, -0.536f, -1.20f };
 
-    gun.init(config.physics.turret, turretModel, 1);
-    cannon.init(config.physics.turret, turretModel, 2);
+    gun.init(config.physics.gun, turretModel, 1);
+    cannon.init(config.physics.cannon, turretModel, 2);
 
     frontLeftWheel.init(config.physics.frontWheels, wheelModel, "FrontLeftWheel", config.physics.gravity);
     frontRightWheel.init(config.physics.frontWheels, wheelModel, "FrontRightWheel", config.physics.gravity);
@@ -94,8 +94,8 @@ namespace game
 
     Physable::update(dt);
     updateWheels(dt, terrain);
-    gun.update(dt, terrain, *this, turretConnectionPoint, vec3::forward);
-    cannon.update(dt, terrain, *this, cannonConnectionPoint, vec3::forward);
+    gun.update(dt, terrain, *this, turretConnectionPoint, camera.direction);
+    cannon.update(dt, terrain, *this, cannonConnectionPoint, camera.direction);
   }
 
   void Car::updateWheels(float dt, const Terrain& terrain)

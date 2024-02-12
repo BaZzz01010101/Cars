@@ -18,10 +18,11 @@ namespace game
 
     private:
       Config::Physics::Turret turretConfig{};
+      float scale{};
+
       vec3 position{};
       quat rotation{};
       float yaw{};
       float pitch{};
-      float scale{};
   };
 }

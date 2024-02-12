@@ -38,10 +38,13 @@ namespace game
 
     void update();
     void draw(const Scene& scene);
+    void drawCrosshairs(const Scene& scene);
 
   private:
     Config::Graphics::Hud hudConfig{};
+    Config::Graphics::Screen screenConfig{};
     Font font;
+    Texture crosshairsTexture{};
     Color lastColor{};
     int lastPosX{};
     int lastPosY{};

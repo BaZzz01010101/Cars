@@ -16,7 +16,12 @@ namespace game
     vec3 globalConnectionPoint = parentConnectionPoint.rotatedBy(parent.rotation);
 
     position = parent.position + globalConnectionPoint;
-    rotation = parent.rotation.rotatedByYAngle(yaw);
+    rotation = parent.rotation.rotatedByXAngle(pitch).rotatedByYAngle(yaw);
+
+    vec3 currentDir = vec3::forward.rotatedBy(rotation);
+    vec3 axis = currentDir % target;
+    float angle = turretConfig.rotationSpeed * dt;
+    rotation = rotation * quat::fromAxisAngle(axis, angle);
   }
 
   void Turret::draw(bool drawWires)

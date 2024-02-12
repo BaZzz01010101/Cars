@@ -26,15 +26,6 @@ namespace game
         float speedSteeringDrop;
       } car;
 
-      struct Turret
-      {
-        float minPitch;
-        float maxPitch;
-        float yawSpeed;
-        float pitchSpeed;
-        float bodyFriction;
-      } turret;
-
       struct Wheels
       {
         float mass;
@@ -45,6 +36,16 @@ namespace game
         float tireFriction;
         float rollingFriction;
       } frontWheels, rearWheels;
+
+      struct Turret
+      {
+        float minPitch;
+        float maxPitch;
+        float minYaw;
+        float maxYaw;
+        float rotationSpeed;
+        float bodyFriction;
+      } gun, cannon;
     } physics;
 
     struct Graphics
@@ -80,6 +81,7 @@ namespace game
         const char* carModelPath;
         const char* wheelModelPath;
         const char* turretModelPath;
+        const char* crosshairsTexturePath;
       } resources;
     } graphics;
   };

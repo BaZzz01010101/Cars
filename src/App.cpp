@@ -25,13 +25,6 @@ namespace game
           .bodyFriction = 0.05f,
           .aerodynamicKoef = 5.7f,
         },
-        .turret = {
-          .minPitch = -PI / 16,
-          .maxPitch = PI / 4,
-          .yawSpeed = PI / 2,
-          .pitchSpeed = PI / 2,
-          .bodyFriction = 0.1f,
-        },
         .frontWheels = {
           .mass = 20,
           .radius = 0.5f,
@@ -49,6 +42,22 @@ namespace game
           .maxSuspensionOffset = 0.25f,
           .tireFriction = 1.0f,
           .rollingFriction = 0.01f,
+        },
+        .gun = {
+          .minPitch = -PI / 16,
+          .maxPitch = PI / 4,
+          .minYaw = -PI * 3 / 4,
+          .maxYaw = PI * 3 / 4,
+          .rotationSpeed = PI / 2,
+          .bodyFriction = 0.1f,
+        },
+        .cannon = {
+          .minPitch = -PI / 16,
+          .maxPitch = PI / 4,
+          .minYaw = -PI / 4,
+          .maxYaw = PI / 4,
+          .rotationSpeed = PI / 2,
+          .bodyFriction = 0.1f,
         }
       },
       .graphics = {
@@ -76,6 +85,7 @@ namespace game
           .carModelPath = "resources/models/jeep.gltf",
           .wheelModelPath = "resources/models/wheel.gltf",
           .turretModelPath = "resources/models/turret.gltf",
+          .crosshairsTexturePath = "resources/textures/crosshairs.png",
         },
       }
     };

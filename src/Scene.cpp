@@ -33,7 +33,7 @@ namespace game
 
     float h = terrain.getHeight2(0, 0);
     player.position = { 0, h + 2, 0 };
-    player.init(config, carModel, wheelModel, turretModel);
+    player.init(config, carModel, wheelModel, turretModel, terrain, camera);
 
     camera.init(config.graphics);
   }
@@ -59,7 +59,7 @@ namespace game
     slowMoCounter = (slowMoCounter + 1) % slowMoCounterMax;
 
     if (!paused && (!slowMotion || slowMoCounter == 0))
-      player.update(dt, terrain, camera);
+      player.update(dt);
 
     camera.update(dt, terrain, player.position);
   }

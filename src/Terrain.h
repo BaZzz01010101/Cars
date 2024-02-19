@@ -1,9 +1,10 @@
 #pragma once
+#include "CollidableObject.h"
 
 namespace game
 {
 
-	class Terrain
+	class Terrain : virtual public CollidableObject
 	{
 	public:
 		enum Mode
@@ -12,13 +13,14 @@ namespace game
 			Debug1,
 			Debug2
 		};
+
 		inline static const int HEIGHT_MAP_SIZE = 91;
 		inline static const float TERRAIN_SIZE = 300.0f;
 		inline static const float TERRAIN_HEIGHT = 40.0f;
 
 		Terrain() = default;
 		Terrain(Terrain&) = delete;
-		~Terrain();
+		virtual ~Terrain();
 		Terrain& operator=(Terrain&) = delete;
 
 		void unloadResources();
@@ -32,6 +34,9 @@ namespace game
 		void getTriangle(float worldX, float worldY, vec3* v1, vec3* v2, vec3* v3) const;
 		bool collidePoint(vec3 position, vec3* collision, float* penetration) const;
 		void draw(bool drawWires);
+
+		virtual bool traceRay(vec3 origin, vec3 direction, vec3* collision, vec3* normal, float* penetration);
+		virtual bool collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration);
 
 	private:
 		Mode mode = Mode::Normal;

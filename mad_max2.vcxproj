@@ -96,6 +96,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\App.cpp" />
+    <ClCompile Include="src\CollidableObject.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\CustomCamera.cpp" />
     <ClCompile Include="src\DebugGraphs.cpp" />
@@ -103,9 +104,9 @@
     <ClCompile Include="src\Hud.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Car.cpp" />
-    <ClCompile Include="src\Movable.cpp" />
-    <ClCompile Include="src\Physable.cpp" />
-    <ClCompile Include="src\Positionable.cpp" />
+    <ClCompile Include="src\DynamicObject.cpp" />
+    <ClCompile Include="src\PhysicalObject.cpp" />
+    <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\quat.cpp" />
     <ClCompile Include="src\Renderable.cpp" />
     <ClCompile Include="src\Scene.cpp" />
@@ -118,16 +119,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.h" />
+    <ClInclude Include="src\CollidableObject.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\CustomCamera.h" />
     <ClInclude Include="src\DebugGraphs.h" />
     <ClInclude Include="src\Helpers.h" />
     <ClInclude Include="src\Hud.h" />
-    <ClInclude Include="src\Movable.h" />
+    <ClInclude Include="src\DynamicObject.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\Car.h" />
-    <ClInclude Include="src\Physable.h" />
-    <ClInclude Include="src\Positionable.h" />
+    <ClInclude Include="src\PhysicalObject.h" />
+    <ClInclude Include="src\Object.h" />
     <ClInclude Include="src\quat.h" />
     <ClInclude Include="src\Renderable.h" />
     <ClInclude Include="src\Scene.h" />

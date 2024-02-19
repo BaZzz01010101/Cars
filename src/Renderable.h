@@ -1,11 +1,19 @@
 #pragma once
 class Renderable
 {
-  public:
-    void init(const Model& model);
-    void draw(const Matrix& transform, bool drawWires);
+public:
+  virtual ~Renderable() = default;
 
-  private:
-    Model model{};
+  void init(const Model& model);
+  void draw(bool drawWires);
+
+protected:
+  Matrix transform{};
+
+  virtual void updateTransform() = 0;
+  virtual void drawDebug() = 0;
+
+private:
+  Model model{};
 };
 

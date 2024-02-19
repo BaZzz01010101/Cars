@@ -4,14 +4,19 @@
 
 namespace game
 {
+  Car::Car()
+  {}
 
-  void Car::init(Config config, Model carModel, Model wheelModel, Model turretModel)
+  void Car::init(Config config, Model carModel, Model wheelModel, Model turretModel, const Terrain& terrain, const CustomCamera& camera)
   {
+    this->terrain = &terrain;
+    this->camera = &camera;
+
     mass = config.physics.car.mass;
     carConfig = config.physics.car;
     vec3 size = { 2.04f, 2.32f, 4.56f };
 
-    turretConnectionPoint = { 0, 0.45f, -0.2f };
+    gunConnectionPoint = { 0, 0.45f, -0.2f };
     cannonConnectionPoint = { 0, 0.55f, -1.6f };
 
     frontLeftWheelConnectionPoint = { 0.97f, -0.36f, 1.34f };
@@ -19,19 +24,19 @@ namespace game
     rearLeftWheelConnectionPoint = { 0.97f, -0.536f, -1.20f };
     rearRightWheelConnectionPoint = { -0.97f, -0.536f, -1.20f };
 
-    gun.init(config.physics.gun, turretModel, 1);
-    cannon.init(config.physics.cannon, turretModel, 2);
+    gun.init(config.physics.gun, turretModel, terrain, *this, gunConnectionPoint, 1);
+    cannon.init(config.physics.cannon, turretModel, terrain, *this, cannonConnectionPoint, 2);
 
-    frontLeftWheel.init(config.physics.frontWheels, wheelModel, "FrontLeftWheel", config.physics.gravity);
-    frontRightWheel.init(config.physics.frontWheels, wheelModel, "FrontRightWheel", config.physics.gravity);
-    rearLeftWheel.init(config.physics.rearWheels, wheelModel, "RearLeftWheel", config.physics.gravity);
-    rearRightWheel.init(config.physics.rearWheels, wheelModel, "RearRightWheel", config.physics.gravity);
+    frontLeftWheel.init(config.physics.frontWheels, wheelModel, terrain, *this, frontLeftWheelConnectionPoint, "FrontLeftWheel", config.physics.gravity);
+    frontRightWheel.init(config.physics.frontWheels, wheelModel, terrain, *this, frontRightWheelConnectionPoint, "FrontRightWheel", config.physics.gravity);
+    rearLeftWheel.init(config.physics.rearWheels, wheelModel, terrain, *this, rearLeftWheelConnectionPoint, "RearLeftWheel", config.physics.gravity);
+    rearRightWheel.init(config.physics.rearWheels, wheelModel, terrain, *this, rearRightWheelConnectionPoint, "RearRightWheel", config.physics.gravity);
      
     float radius = (size.x + size.y + size.z) / 6;
     momentOfInertia = 0.5f * mass * sqr(radius);
 
     Renderable::init(carModel);
-    Physable::init(config.physics);
+    PhysicalObject::init(config.physics);
   }
 
   void Car::resetToPosition(vec3 position, quat rotation)
@@ -56,7 +61,17 @@ namespace game
     rearRightWheelForce = vec3::zero;
   }
 
-  void Car::update(float dt, const Terrain& terrain, const CustomCamera& camera)
+  bool Car::traceRay(vec3 origin, vec3 direction, vec3* collision, vec3* normal, float* penetration)
+  {
+    return false;
+  }
+
+  bool Car::collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration)
+  {
+    return false;
+  }
+
+  void Car::update(float dt)
   {
     lastForce = force;
     resetForces();
@@ -90,23 +105,27 @@ namespace game
     applyGlobalForceAtLocalPoint(rearLeftWheelForce, rearLeftWheelConnectionPoint);
     applyGlobalForceAtLocalPoint(rearRightWheelForce, rearRightWheelConnectionPoint);
 
-    updateCollisions(dt, terrain);
+    updateCollisions(dt);
 
-    Physable::update(dt);
-    updateWheels(dt, terrain);
-    gun.update(dt, terrain, *this, turretConnectionPoint, camera.direction);
-    cannon.update(dt, terrain, *this, cannonConnectionPoint, camera.direction);
+    PhysicalObject::update(dt);
+    updateWheels(dt);
+    gun.target = camera->direction;
+    cannon.target = camera->direction;
+    gun.update(dt);
+    cannon.update(dt);
   }
 
-  void Car::updateWheels(float dt, const Terrain& terrain)
+  void Car::updateWheels(float dt)
   {
     float maxCorrectionAngle = (frontLeftWheelConnectionPoint - 0.5f * (rearLeftWheelConnectionPoint + rearRightWheelConnectionPoint)).getYAngle();
     float correctionAngle = fabs(mapRangeClamped(steeringAngle, -PI / 2, PI / 2, -maxCorrectionAngle, maxCorrectionAngle));
 
-    frontLeftWheel.update(dt, terrain, *this, frontLeftWheelConnectionPoint, steeringAngle + correctionAngle);
-    frontRightWheel.update(dt, terrain, *this, frontRightWheelConnectionPoint, steeringAngle - correctionAngle);
-    rearLeftWheel.update(dt, terrain, *this, rearLeftWheelConnectionPoint, 0);
-    rearRightWheel.update(dt, terrain, *this, rearRightWheelConnectionPoint, 0);
+    frontLeftWheel.steeringAngle = steeringAngle + correctionAngle;
+    frontRightWheel.steeringAngle = steeringAngle - correctionAngle;
+    frontLeftWheel.update(dt);
+    frontRightWheel.update(dt);
+    rearLeftWheel.update(dt);
+    rearRightWheel.update(dt);
   }
 
   vec3 Car::getAutoAlignmentMoment(float dt)
@@ -132,7 +151,7 @@ namespace game
     return moment;
   }
 
-  void Car::updateCollisions(float dt, const Terrain& terrain)
+  void Car::updateCollisions(float dt)
   {
     const std::vector<vec3> points = {
       {0.81f, 0.11f, 2.34f},
@@ -162,7 +181,7 @@ namespace game
       vec3 ptRotated = pt.rotatedBy(rotation);
       vec3 ptGlobal = ptRotated + position;
       vec3 normal;
-      float terrainY = terrain.getHeight2(ptGlobal.x, ptGlobal.z, &normal);
+      float terrainY = terrain->getHeight2(ptGlobal.x, ptGlobal.z, &normal);
       const float MAX_PENETRATION = 0.1f;
       float penetration = std::max(terrainY - ptGlobal.y, 0.0f) / MAX_PENETRATION;
       vec3 ptRotationfVelocity = (angularVelocity % pt).rotatedBy(rotation);
@@ -235,9 +254,8 @@ namespace game
 
   void Car::draw(bool drawWires)
   {
-    Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation), MatrixTranslate(position.x, position.y, position.z));
 
-    Renderable::draw(transform, drawWires);
+    Renderable::draw(drawWires);
 
     frontLeftWheel.draw(drawWires);
     frontRightWheel.draw(drawWires);
@@ -248,6 +266,11 @@ namespace game
     cannon.draw(drawWires);
 
     drawDebug();
+  }
+
+  void Car::updateTransform()
+  {
+    transform = MatrixMultiply(QuaternionToMatrix(rotation), MatrixTranslate(position.x, position.y, position.z));
   }
 
   void Car::drawDebug()

@@ -5,13 +5,13 @@
 #include "Wheel.h"
 #include "Config.h"
 #include "Renderable.h"
-#include "Physable.h"
+#include "PhysicalObject.h"
 #include "CustomCamera.h"
 
 namespace game
 {
 
-  class Car : public Renderable, public Physable
+  class Car : virtual public Renderable, virtual public PhysicalObject, virtual public CollidableObject
   {
   public:
     Turret gun{};
@@ -23,15 +23,25 @@ namespace game
     Wheel rearRightWheel{};
     float enginePower{};
 
-    Car() = default;
-    void init(Config config, Model carModel, Model wheelModel, Model turretModel);
-    void update(float dt, const Terrain& terrain, const CustomCamera& camera);
+    Car();
+    virtual ~Car() = default;
+    void init(Config config, Model carModel, Model wheelModel, Model turretModel, const Terrain& terrain, const CustomCamera& camera);
+    void update(float dt);
     void draw(bool drawWires);
 
     void resetToPosition(vec3 position, quat rotation);
+    virtual bool traceRay(vec3 origin, vec3 direction, vec3* collision, vec3* normal, float* penetration);
+    virtual bool collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration);
+
+  protected:
+    virtual void updateTransform();
+    virtual void drawDebug();
 
   private:
-    vec3 turretConnectionPoint{};
+    const Terrain* terrain{};
+    const CustomCamera* camera{};
+
+    vec3 gunConnectionPoint{};
     vec3 cannonConnectionPoint{};
 
     vec3 frontLeftWheelConnectionPoint{};
@@ -53,11 +63,10 @@ namespace game
 
     vec3 lastForce{};
 
-    void drawDebug();
     void updateControl(float dt);
-    void updateWheels(float dt, const Terrain& terrain);
+    void updateWheels(float dt);
     vec3 getAutoAlignmentMoment(float dt);
-    void updateCollisions(float dt, const Terrain& terrain);
+    void updateCollisions(float dt);
   };
 
 }

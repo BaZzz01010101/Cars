@@ -4,22 +4,25 @@
 
 namespace game
 {
-  void Wheel::init(const Config::Physics::Wheels& config, const Model& model, const char* debugName, float gravity)
+  void Wheel::init(const Config::Physics::Wheels& config, const Model& model, const Terrain& terrain, const PhysicalObject& parent, vec3 parentConnectionPoint, const char* debugName, float gravity)
   {
     wheelConfig = config;
+    this->terrain = &terrain;
+    this->parent = &parent;
+    this->parentConnectionPoint = parentConnectionPoint;
     this->debugName = debugName;
     this->gravity = gravity;
     this->momentOfInertia = 0.5f * wheelConfig.mass * sqr(wheelConfig.radius);
     Renderable::init(model);
   }
   
-  void Wheel::update(float dt, const Terrain& terrain, const Physable& parent, vec3 parentConnectionPoint, float steeringAngle)
+  void Wheel::update(float dt)
   {
-    vec3 globalConnectionPoint = parentConnectionPoint.rotatedBy(parent.rotation);
-    position = parent.position + globalConnectionPoint;
-    rotation = parent.rotation * quat::fromYAngle(steeringAngle);
-    velocity = parent.velocity + parent.angularVelocity.rotatedBy(rotation) % globalConnectionPoint;
-    angularVelocity = parent.angularVelocity;
+    vec3 globalConnectionPoint = parentConnectionPoint.rotatedBy(parent->rotation);
+    position = parent->position + globalConnectionPoint;
+    rotation = parent->rotation * quat::fromYAngle(steeringAngle);
+    velocity = parent->velocity + parent->angularVelocity.rotatedBy(rotation) % globalConnectionPoint;
+    angularVelocity = parent->angularVelocity;
 
     float springForce = -suspensionOffset * wheelConfig.suspensionStiffness;
     suspensionSpeed += springForce / wheelConfig.mass * dt;
@@ -27,7 +30,7 @@ namespace game
     suspensionSpeed += dampingForce / wheelConfig.mass * dt;
     suspensionOffset += suspensionSpeed * dt;
 
-    float terrainY = terrain.getHeight2(position.x, position.z, &normal);
+    float terrainY = terrain->getHeight2(position.x, position.z, &normal);
     float bottomY = position.y + suspensionOffset - wheelConfig.radius;
     float penetration = terrainY - bottomY;
     isGrounded = penetration > 0;
@@ -55,7 +58,7 @@ namespace game
     vec3 frictionLeft = frictionUp % frictionForward;
 
     wheelRotationSpeed += enginePower / momentOfInertia * dt;
-    wheelRotationSpeed = moveTo(wheelRotationSpeed, 0, std::max(wheelRotationSpeed * wheelConfig.rollingFriction, 0.1f));
+    wheelRotationSpeed = moveTo(wheelRotationSpeed, 0, std::max(wheelRotationSpeed * wheelConfig.rollingFriction, 0.01f));
     /*float maxRPS = float(!handBreaked) * (20 + 4 * velocity.length());
     wheelRotationSpeed = clamp(wheelRotationSpeed, -maxRPS, maxRPS);*/
 
@@ -104,12 +107,24 @@ namespace game
     return force;
   }
 
-  void Wheel::draw(bool drawWires)
+  void Wheel::reset()
   {
-    Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation * wheelRotation), MatrixTranslate(position.x, position.y + suspensionOffset, position.z));
-    Renderable::draw(transform, drawWires);
+    position = vec3::zero;
+    rotation = quat::identity;
+    velocity = vec3::zero;
+    angularVelocity = vec3::zero;
+    wheelRotation = quat::identity;
+    wheelRotationSpeed = 0;
+    suspensionOffset = 0;
+    suspensionSpeed = 0;
+    nForce = vec3::zero;
+    frictionForce = vec3::zero;
+    frictionVelocity = vec3::zero;
+  }
 
-    drawDebug();
+  void Wheel::updateTransform()
+  {
+    transform = MatrixMultiply(QuaternionToMatrix(rotation * wheelRotation), MatrixTranslate(position.x, position.y + suspensionOffset, position.z));
   }
 
   void Wheel::drawDebug()
@@ -126,18 +141,4 @@ namespace game
     }
   }
 
-  void Wheel::reset()
-  {
-    position = vec3::zero;
-    rotation = quat::identity;
-    velocity = vec3::zero;
-    angularVelocity = vec3::zero;
-    wheelRotation = quat::identity;
-    wheelRotationSpeed = 0;
-    suspensionOffset = 0;
-    suspensionSpeed = 0;
-    nForce = vec3::zero;
-    frictionForce = vec3::zero;
-    frictionVelocity = vec3::zero;
-  }
 }

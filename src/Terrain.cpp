@@ -185,6 +185,16 @@ namespace game
     return false;
   }
 
+  bool Terrain::traceRay(vec3 origin, vec3 direction, vec3* collision, vec3* normal, float* penetration)
+  {
+      return false;
+  }
+
+  bool Terrain::collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration)
+  {
+    return false;
+  }
+
   void Terrain::getTriangle(float worldX, float worldY, vec3* v1, vec3* v2, vec3* v3) const
   {
     float x = clamp(worldX + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);

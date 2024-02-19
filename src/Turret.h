@@ -6,23 +6,30 @@
 
 namespace game
 {
-  class Turret : public Renderable, public Positionable
+  class Turret : virtual public Renderable, virtual public Object
   {
   public:
-    void init(const Config::Physics::Turret& config, const Model& model, float scale);
-    void update(float dt, const Terrain& terrain, const Positionable& parent, vec3 parentConnectionPoint, vec3 target);
+    vec3 target{};
 
-    void draw(bool drawWires);
-    void drawDebug();
+    void init(const Config::Physics::Turret& config, const Model& model, const Terrain& terrain, const Object& parent, vec3 parentConnectionPoint, float scale);
     void reset();
 
-    private:
-      Config::Physics::Turret turretConfig{};
-      float scale{};
+    virtual void update(float dt);
 
-      vec3 position{};
-      quat rotation{};
-      float yaw{};
-      float pitch{};
+  protected:
+    virtual void updateTransform();
+    virtual void drawDebug();
+
+  private:
+    Config::Physics::Turret turretConfig{};
+    const Terrain* terrain;
+    const Object* parent;
+    float scale{};
+    vec3 parentConnectionPoint{};
+
+    vec3 position{};
+    quat rotation{};
+    float yaw{};
+    float pitch{};
   };
 }

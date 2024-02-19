@@ -5,7 +5,7 @@
 
 namespace game
 {
-  class TurretPlatform : public Renderable, public Positionable
+  class TurretPlatform : public Renderable, public Object
   {
     public:
     void init(const Config::Physics::Turret& config, const Model& model, float scale);

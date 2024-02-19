@@ -1,11 +1,11 @@
 #pragma once
-#include "Positionable.h"
-#include "Movable.h"
+#include "Object.h"
+#include "DynamicObject.h"
 
 namespace game
 {
 
-  class RigidBody : public Movable
+  class RigidBody : public DynamicObject
   {
   public:
     const char* debugName = "None";

@@ -155,7 +155,7 @@ namespace game
 
   void Hud::drawCrosshairs(const Scene& scene)
   {
-    Vector2 cameraCrosshairPosition{ screenConfig.width / 2, screenConfig.height / 2 };
+    Vector2 cameraCrosshairPosition{ float(screenConfig.width) / 2, float(screenConfig.height) / 2 };
     float crosshairSrcSize = (float)crosshairsTexture.height;
     float crosshairDstSize = (float)std::min(screenConfig.width, screenConfig.height) / 16;
 

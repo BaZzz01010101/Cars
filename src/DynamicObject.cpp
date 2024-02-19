@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "Movable.h"
+#include "DynamicObject.h"
 
 namespace game
 {
-  void Movable::update(float dt)
+  void DynamicObject::update(float dt)
   {
     position += velocity * dt;
     vec3 dr = angularVelocity * dt;

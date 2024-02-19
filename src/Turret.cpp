@@ -4,19 +4,29 @@
 
 namespace game
 {
-  void Turret::init(const Config::Physics::Turret& config, const Model& model, float scale)
+  void Turret::init(const Config::Physics::Turret& config, const Model& model, const Terrain& terrain, const Object& parent, vec3 parentConnectionPoint, float scale)
   {
     turretConfig = config;
+    this->terrain = &terrain;
+    this->parent = &parent;
+    this->parentConnectionPoint = parentConnectionPoint;
     this->scale = scale;
+
     Renderable::init(model);
   }
 
-  void Turret::update(float dt, const Terrain& terrain, const Positionable& parent, vec3 parentConnectionPoint, vec3 target)
+  void Turret::reset()
   {
-    vec3 globalConnectionPoint = parentConnectionPoint.rotatedBy(parent.rotation);
+  }
 
-    position = parent.position + globalConnectionPoint;
-    rotation = parent.rotation.rotatedByXAngle(pitch).rotatedByYAngle(yaw);
+  void Turret::update(float dt)
+  {
+    _ASSERT(parent != nullptr);
+
+    vec3 globalConnectionPoint = parentConnectionPoint.rotatedBy(parent->rotation);
+
+    position = parent->position + globalConnectionPoint;
+    rotation = parent->rotation.rotatedByXAngle(pitch).rotatedByYAngle(yaw);
 
     vec3 currentDir = vec3::forward.rotatedBy(rotation);
     vec3 axis = currentDir % target;
@@ -24,19 +34,14 @@ namespace game
     rotation = rotation * quat::fromAxisAngle(axis, angle);
   }
 
-  void Turret::draw(bool drawWires)
+  void Turret::updateTransform()
   {
-    Matrix transform = MatrixMultiply(MatrixMultiply(QuaternionToMatrix(rotation), MatrixScale(scale, scale, scale)), MatrixTranslate(position.x, position.y, position.z));
-    Renderable::draw(transform, drawWires);
-
-    drawDebug();
+    transform = MatrixMultiply(MatrixMultiply(QuaternionToMatrix(rotation), MatrixScale(scale, scale, scale)), MatrixTranslate(position.x, position.y, position.z));
   }
+
   void Turret::drawDebug()
   {
     //drawVector(position, )
   }
 
-  void Turret::reset()
-  {
-  }
 }

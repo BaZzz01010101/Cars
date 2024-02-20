@@ -1,5 +1,4 @@
 #pragma once
-#include <Object.h>
 
 namespace game
 {
@@ -9,7 +8,7 @@ namespace game
   public:
     Pool(int capacity) :
       objects(capacity),
-      flags(capacity),
+      alive(capacity, false),
       capacity(capacity),
       count(0)
     {}
@@ -21,10 +20,10 @@ namespace game
 
       if (count < capacity)
         for (int i = 0; i < capacity; i++)
-          if (!flags[i])
+          if (!alive[i])
           {
             new (&objects[i]) T(std::forward<Args>(args)...);
-            flags[i] = true;
+            alive[i] = true;
             count++;
 
             return i;
@@ -38,17 +37,17 @@ namespace game
     void remove(int index)
     {
       _ASSERT(index >= 0 && index < capacity);
-      _ASSERT(flags[index]);
+      _ASSERT(alive[index]);
 
       objects[index].~T();
-      flags[index] = false;
+      alive[index] = false;
       count--;
     }
 
     T& get(int index)
     {
       _ASSERT(index >= 0 && index < capacity);
-      _ASSERT(flags[index]);
+      _ASSERT(alive[index]);
 
       return objects[index];
     }
@@ -56,12 +55,12 @@ namespace game
     const T& get(int index) const
     {
       _ASSERT(index >= 0 && index < capacity);
-      _ASSERT(flags[index]);
+      _ASSERT(alive[index]);
 
       return objects[index];
     }
 
-    int size()
+    int size() const
     {
       return count;
     }
@@ -71,7 +70,7 @@ namespace game
       for (int i = 0; i < capacity; i++)
       {
         objects[i].~T();
-        flags[i] = false;
+        alive[i] = false;
       }
 
       count = 0;
@@ -79,7 +78,7 @@ namespace game
 
   private:
     std::vector<T> objects;
-    std::vector<bool> flags;
+    std::vector<bool> alive;
     int count{};
     int capacity{};
   };

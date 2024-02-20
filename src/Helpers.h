@@ -20,41 +20,13 @@ namespace game
   // min2 can be greater than max2
   // min1 can be greater than max1
   // min1 can be equal to max1
-  inline float mapRangeClamped(float value, float min1, float max1, float min2, float max2)
-  {
-    if (min1 == max1)
-      return (min2 + max2) / 2;
+  float mapRangeClamped(float value, float min1, float max1, float min2, float max2);
 
-    float delta1 = max1 - min1;
-    float delta2 = max2 - min2;
-    value = clamp(value, min1, max1);
+  vec3 moveTo(vec3 current, vec3 target, float maxDelta);
 
-    return min2 + (value - min1) * delta2 / delta1;
-  }
+  float moveTo(float current, float target, float maxDelta);
 
-  inline vec3 moveTo(vec3 current, vec3 target, float maxDelta)
-  {
-    maxDelta = fabsf(maxDelta);
-    vec3 delta = target - current;
-    float len = Vector3Length(delta);
-
-    if (len <= maxDelta)
-      return target;
-    else
-      return current + delta / len * maxDelta;
-  }
-
-  inline float moveTo(float current, float target, float maxDelta)
-  {
-    maxDelta = fabsf(maxDelta);
-    float delta = target - current;
-    float len = fabsf(delta);
-
-    if (len <= maxDelta)
-      return target;
-    else
-      return current + delta / len * maxDelta;
-  }
+  float moveAngleTo(float current, float target, float maxDelta);
 
   template <typename T>
   inline T sign(T val)

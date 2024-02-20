@@ -275,6 +275,24 @@ namespace game
     if (x == 0 && y == 0)
       return 0;
 
-    return atan2f(x, y);
+    return atan2f(y, x);
+  }
+
+  void vec3::yawPitch(float* yaw, float* pitch) const
+  {
+    if (yaw) *yaw = atan2(x, z);
+
+    if (pitch)
+    {
+      float distanceXY = sqrt(x * x + z * z); 
+      *pitch = atan2(-y, distanceXY);
+    }
+  }
+
+  void vec3::yawPitchTo(vec3 target, float* yaw, float* pitch) const
+  {
+    if (yaw) *yaw = atan2(target.z - z, target.x - x);
+    float distanceXY = sqrt((target.x - x) * (target.x - x) + (target.z - z) * (target.z - z));
+    if (pitch) *pitch = atan2(target.y - y, distanceXY);
   }
 }

@@ -109,10 +109,7 @@ namespace game
 
     PhysicalObject::update(dt);
     updateWheels(dt);
-    gun.target = camera->direction;
-    cannon.target = camera->direction;
-    gun.update(dt);
-    cannon.update(dt);
+    updateTurrets(dt);
   }
 
   void Car::updateWheels(float dt)
@@ -126,6 +123,14 @@ namespace game
     frontRightWheel.update(dt);
     rearLeftWheel.update(dt);
     rearRightWheel.update(dt);
+  }
+
+  void Car::updateTurrets(float dt)
+  {
+    gun.target = camera->direction;
+    cannon.target = camera->direction;
+    gun.update(dt);
+    cannon.update(dt);
   }
 
   vec3 Car::getAutoAlignmentMoment(float dt)
@@ -194,7 +199,7 @@ namespace game
         div += 1.0f;
         //position.y += terrainY - ptGlobal.y;
         float nForceScalar = mass / dt * penetration;
-        nForceScalar = std::min(nForceScalar, 100000.0f);
+        nForceScalar = std::min(nForceScalar, 50000.0f);
         vec3 nForce = normal * nForceScalar;
 
         vec3 frictionForce = -ptVelocity.projectedOnPlane(normal) / dt / (pt.sqLength() / momentOfInertia + 1 / mass);

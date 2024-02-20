@@ -76,7 +76,7 @@ namespace game
     return QuaternionMultiply(*this, q);
   }
 
-  quat quat::inverted()
+  quat quat::inverted() const
   {
     return QuaternionInvert(*this);
   }
@@ -91,7 +91,7 @@ namespace game
     return { x, y, z, w };
   }
 
-  quat quat::normalized()
+  quat quat::normalized() const
   {
     return QuaternionNormalize(*this);
   }
@@ -160,12 +160,42 @@ namespace game
     QuaternionToAxisAngle(*this, axis, angle);
   }
 
+  //void quat::toEuler(float* yaw, float* pitch, float* roll) const
+  //{
+  //  vec3 euler = QuaternionToEuler(*this);
+
+  //  if (yaw) *yaw = normalizeAngle(euler.y);
+  //  if (pitch) *pitch = normalizeAngle(euler.z);
+  //  if (roll) *roll = normalizeAngle(euler.x);
+  //}
+
   void quat::toEuler(float* yaw, float* pitch, float* roll) const
   {
-    Vector3 euler = QuaternionToEuler(*this);
+    // Calculate euler angles from quaternion
+    float sqw = w * w;
+    float sqx = x * x;
+    float sqy = y * y;
+    float sqz = z * z;
 
-    if (yaw) *yaw = normalizeAngle(euler.y);
-    if (pitch) *pitch = normalizeAngle(euler.z);
-    if (roll) *roll = normalizeAngle(euler.x);
+    // Yaw (heading) calculation
+    float t0 = 2.0f * (w * x + y * z);
+    float t1 = 1.0f - 2.0f * (sqx + sqy);
+    float t2 = atan2f(t0, t1);
+
+    // Pitch (elevation) calculation
+    float t3 = 2.0f * (w * y - z * x);
+    t3 = t3 > 1.0f ? 1.0f : t3;
+    t3 = t3 < -1.0f ? -1.0f : t3;
+    float t4 = asinf(t3);
+
+    // Roll (bank) calculation
+    float t5 = 2.0f * (w * z + x * y);
+    float t6 = 1.0f - 2.0f * (sqy + sqz);
+    float t7 = atan2f(t5, t6);
+
+    // Assign values to output variables
+    if (yaw) *yaw = t2;
+    if (pitch) *pitch = t4;
+    if (roll) *roll = t7;
   }
 }

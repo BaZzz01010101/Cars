@@ -20,10 +20,10 @@ namespace game
 
     quat operator*(quat q) const;
 
-    quat inverted();
+    quat inverted() const;
     void invert();
 
-    quat normalized();
+    quat normalized() const;
     void normalize();
     
     quat rotatedByXAngle(float angle) const;

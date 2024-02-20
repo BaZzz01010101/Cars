@@ -57,8 +57,8 @@ namespace game
     float getXAngle() const;
     float getYAngle() const;
     float getZAngle() const;
-
-
+    void yawPitch(float* yaw, float* pitch) const;
+    void yawPitchTo(vec3 target, float* yaw, float* pitch) const;
   };
 
   vec3 operator*(float f, const vec3& v);

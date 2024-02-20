@@ -65,6 +65,7 @@ namespace game
 
     void updateControl(float dt);
     void updateWheels(float dt);
+    void updateTurrets(float dt);
     vec3 getAutoAlignmentMoment(float dt);
     void updateCollisions(float dt);
   };

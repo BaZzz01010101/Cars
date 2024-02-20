@@ -31,7 +31,7 @@ namespace game
           .suspensionStiffness = 100000,
           .suspensionDamping = 0.2f,
           .maxSuspensionOffset = 0.5f,
-          .tireFriction = 1.0f,
+          .tireFriction = 1.5f,
           .rollingFriction = 0.01f,
         },
         .rearWheels = {
@@ -40,23 +40,23 @@ namespace game
           .suspensionStiffness = 200000,
           .suspensionDamping = 0.2f,
           .maxSuspensionOffset = 0.25f,
-          .tireFriction = 1.0f,
+          .tireFriction = 1.5f,
           .rollingFriction = 0.01f,
         },
         .gun = {
-          .minPitch = -PI / 16,
-          .maxPitch = PI / 4,
+          .minPitch = -PI / 4 ,
+          .maxPitch = PI / 16,
           .minYaw = -PI * 3 / 4,
           .maxYaw = PI * 3 / 4,
           .rotationSpeed = PI / 2,
           .bodyFriction = 0.1f,
         },
         .cannon = {
-          .minPitch = -PI / 16,
-          .maxPitch = PI / 4,
+          .minPitch = -PI / 8 ,
+          .maxPitch = PI / 32,
           .minYaw = -PI / 4,
           .maxYaw = PI / 4,
-          .rotationSpeed = PI / 2,
+          .rotationSpeed = PI / 8,
           .bodyFriction = 0.1f,
         }
       },
@@ -85,7 +85,7 @@ namespace game
           .carModelPath = "resources/models/jeep.gltf",
           .wheelModelPath = "resources/models/wheel.gltf",
           .turretModelPath = "resources/models/turret.gltf",
-          .crosshairsTexturePath = "resources/textures/crosshairs.png",
+          .crosshairsTexturePath = "resources/textures/crosshairs_white.png",
         },
       }
     };

@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <stdlib.h>
 #include <cstdint>
+#include <optional>
+#include <memory>
 #include <vector>
 #include <list>
 #include <string>

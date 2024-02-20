@@ -158,6 +158,8 @@ namespace game
 
   void App::updateShortcuts()
   {
+    Car& player = scene.getPlayer();
+
     if (IsKeyPressed(KEY_P))
       togglePaused();
 
@@ -168,7 +170,7 @@ namespace game
       scene.toggleDrawWires();
 
     if (IsKeyPressed(KEY_R))
-      scene.player.rotation = scene.player.rotation * quat::fromEuler(PI / 2, 0, 0);
+      player.rotation = player.rotation * quat::fromEuler(PI / 2, 0, 0);
 
     if (IsKeyPressed(KEY_ZERO))
       scene.regenerateTerrain(config.graphics.resources.terrainTexturePath, Terrain::Normal);
@@ -185,15 +187,15 @@ namespace game
     if (IsKeyPressed(KEY_F2))
     {
       scene.reset({ 0, 0, 25 }, quat::identity);
-      scene.player.rotation = quat::fromEuler(0, 0, 0.19f * PI);
+      scene.getPlayer().rotation = quat::fromEuler(0, 0, 0.19f * PI);
     }
 
     if (IsKeyPressed(KEY_F3))
     {
       scene.reset({ 0, 0, 25 }, quat::identity);
-      scene.player.rotation = quat::fromEuler(0, 0, 0.18f * PI);
-      scene.player.rotation = scene.player.rotation * quat::fromEuler(PI / 2, 0, 0);
-      scene.player.rotation = scene.player.rotation * quat::fromEuler(0, 0, 0.02f * PI);
+      player.rotation = quat::fromEuler(0, 0, 0.18f * PI);
+      player.rotation = player.rotation * quat::fromEuler(PI / 2, 0, 0);
+      player.rotation = player.rotation * quat::fromEuler(0, 0, 0.02f * PI);
     }
   }
 

@@ -4,6 +4,10 @@
 
 namespace game
 {
+  Scene::Scene()
+  {
+  }
+
   Scene::~Scene()
   {
     if (carModelLoaded)
@@ -31,6 +35,8 @@ namespace game
 
     terrain.generate2(config.graphics.resources.terrainTexturePath, Terrain::Mode::Normal);
 
+    playerIndex = cars.tryAdd();
+    Car& player = cars.get(playerIndex);
     float h = terrain.getHeight2(0, 0);
     player.position = { 0, h + 2, 0 };
     player.init(config, carModel, wheelModel, turretModel, terrain, camera);
@@ -58,6 +64,8 @@ namespace game
     const int slowMoCounterMax = 40;
     slowMoCounter = (slowMoCounter + 1) % slowMoCounterMax;
 
+    Car& player = cars.get(playerIndex);
+
     if (!paused && (!slowMotion || slowMoCounter == 0))
       player.update(dt);
 
@@ -68,6 +76,7 @@ namespace game
   {
     BeginMode3D(camera);
 
+    Car& player = cars.get(playerIndex);
     terrain.draw(drawWires);
     player.draw(drawWires);
 
@@ -77,6 +86,7 @@ namespace game
   void Scene::regenerateTerrain(const char* texturePath, Terrain::Mode mode)
   {
     terrain.generate2(texturePath, mode);
+    Car& player = cars.get(playerIndex);
     reset(player.position, player.rotation);
   }
 
@@ -94,6 +104,7 @@ namespace game
   {
     float terrainY = terrain.getHeight2(playerPosition.x, playerPosition.z);
     playerPosition.y = terrainY + 2;
+    Car& player = cars.get(playerIndex);
     player.resetToPosition(playerPosition, playerRotation);
     camera.reset(playerPosition);
   }

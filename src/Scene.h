@@ -2,19 +2,18 @@
 #include "Terrain.h"
 #include "Car.h"
 #include "Config.h"
-#include <CustomCamera.h>
+#include "CustomCamera.h"
+#include "Pool.h"
 
 namespace game
 {
-
   class Scene
   {
   public:
     CustomCamera camera{};
     Terrain terrain{};
-    Car player{};
 
-    Scene() = default;
+    Scene();
     Scene(Scene&) = delete;
     ~Scene();
     Scene& operator=(Scene&) = delete;
@@ -27,8 +26,13 @@ namespace game
     void toggleDrawWires();
     void toggleSlowMotion();
     void reset(vec3 playerPosition, quat playerRotation);
+    const Car& getPlayer() const { return cars.get(playerIndex); }
+    Car& getPlayer() { return cars.get(playerIndex); }
 
   private:
+    Pool<Car> cars{ 100 };
+    int playerIndex{};
+
     bool paused{};
     bool drawWires{};
     bool slowMotion{};

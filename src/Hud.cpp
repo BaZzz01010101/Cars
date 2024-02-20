@@ -171,19 +171,20 @@ namespace game
     else
       DrawFPS(10, 10);
 
-    print("Position", scene.player.position, LIGHTGRAY, 10, 30);
+    const Car& player = scene.getPlayer();
+    print("Position", player.position, LIGHTGRAY, 10, 30);
     vec3 rotation;
-    scene.player.rotation.toEuler(&rotation.y, &rotation.z, &rotation.x);
+    player.rotation.toEuler(&rotation.y, &rotation.z, &rotation.x);
     print("Rotation", rotation, GRAY);
-    print("Force", scene.player.force, RED);
-    print("Moment", scene.player.moment, BLUE);
-    print("Velocity", scene.player.velocity, GREEN);
-    print("Engine Pow.", scene.player.enginePower, YELLOW);
+    print("Force", player.force, RED);
+    print("Moment", player.moment, BLUE);
+    print("Velocity", player.velocity, GREEN);
+    print("Engine Pow.", player.enginePower, YELLOW);
 
-    print("Angular velocity", scene.player.angularVelocity, BLUE);
-    print("Wheel 1 fr.force", scene.player.frontLeftWheel.frictionForce.length(), LIGHTGRAY);
-    print("Wheel 2 fr.force", scene.player.frontRightWheel.frictionForce.length(), LIGHTGRAY);
-    print("Wheel 3 fr.force", scene.player.rearLeftWheel.frictionForce.length(), LIGHTGRAY);
-    print("Wheel 4 fr.force", scene.player.rearRightWheel.frictionForce.length(), LIGHTGRAY);
+    print("Angular velocity", player.angularVelocity, BLUE);
+    print("Wheel 1 fr.force", player.frontLeftWheel.frictionForce.length(), LIGHTGRAY);
+    print("Wheel 2 fr.force", player.frontRightWheel.frictionForce.length(), LIGHTGRAY);
+    print("Wheel 3 fr.force", player.rearLeftWheel.frictionForce.length(), LIGHTGRAY);
+    print("Wheel 4 fr.force", player.rearRightWheel.frictionForce.length(), LIGHTGRAY);
   }
 }

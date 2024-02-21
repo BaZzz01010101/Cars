@@ -151,10 +151,7 @@ namespace game
 
         timeToNextCannonFire = config.physics.cannon.fireInterval;
       }
-
     }
-    else
-      timeToNextCannonFire = 0;
 
     timeToNextCannonFire -= dt;
     timeToNextGunFire -= dt;

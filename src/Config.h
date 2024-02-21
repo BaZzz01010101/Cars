@@ -45,6 +45,10 @@ namespace game
         float maxYaw;
         float rotationSpeed;
         float bodyFriction;
+        float fireInterval;
+        float projectileSpeed;
+        float baseDamage;
+        float projectileLifeTime;
       } gun, cannon;
     } physics;
 
@@ -80,7 +84,8 @@ namespace game
         const char* terrainTexturePath;
         const char* carModelPath;
         const char* wheelModelPath;
-        const char* turretModelPath;
+        const char* gunModelPath;
+        const char* cannonModelPath;
         const char* crosshairsTexturePath;
       } resources;
     } graphics;

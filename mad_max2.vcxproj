@@ -96,6 +96,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\App.cpp" />
+    <ClCompile Include="src\Projectile.cpp" />
     <ClCompile Include="src\Pool.cpp" />
     <ClCompile Include="src\CollidableObject.cpp" />
     <ClCompile Include="src\Config.cpp" />
@@ -120,6 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.h" />
+    <ClInclude Include="src\Projectile.h" />
     <ClInclude Include="src\Pool.h" />
     <ClInclude Include="src\CollidableObject.h" />
     <ClInclude Include="src\Config.h" />

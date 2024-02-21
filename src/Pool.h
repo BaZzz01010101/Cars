@@ -60,6 +60,13 @@ namespace game
       return objects[index];
     }
 
+    bool isAlive(int index) const
+    {
+      _ASSERT(index >= 0 && index < capacity);
+
+      return alive[index];
+    }
+
     int size() const
     {
       return count;

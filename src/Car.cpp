@@ -7,7 +7,7 @@ namespace game
   Car::Car()
   {}
 
-  void Car::init(Config config, Model carModel, Model wheelModel, Model turretModel, const Terrain& terrain, const CustomCamera& camera)
+  void Car::init(Config config, Model carModel, Model wheelModel, Model gunModel, Model cannonModel, const Terrain& terrain, const CustomCamera& camera)
   {
     this->terrain = &terrain;
     this->camera = &camera;
@@ -24,8 +24,8 @@ namespace game
     rearLeftWheelConnectionPoint = { 0.97f, -0.536f, -1.20f };
     rearRightWheelConnectionPoint = { -0.97f, -0.536f, -1.20f };
 
-    gun.init(config.physics.gun, turretModel, terrain, *this, gunConnectionPoint, 1);
-    cannon.init(config.physics.cannon, turretModel, terrain, *this, cannonConnectionPoint, 2);
+    gun.init(config.physics.gun, gunModel, terrain, *this, gunConnectionPoint, 1);
+    cannon.init(config.physics.cannon, cannonModel, terrain, *this, cannonConnectionPoint, 2);
 
     frontLeftWheel.init(config.physics.frontWheels, wheelModel, terrain, *this, frontLeftWheelConnectionPoint, "FrontLeftWheel", config.physics.gravity);
     frontRightWheel.init(config.physics.frontWheels, wheelModel, terrain, *this, frontRightWheelConnectionPoint, "FrontRightWheel", config.physics.gravity);

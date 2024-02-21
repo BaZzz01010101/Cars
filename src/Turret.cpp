@@ -43,6 +43,8 @@ namespace game
     rotation = parent->rotation * quat::identity.rotatedByXAngle(pitch).rotatedByYAngle(yaw);
     rotation.normalize();
 
+    vec3 f = forward();
+
     //vec3 currentDir = vec3::forward.rotatedBy(rotation);
     //vec3 axis = currentDir % target;
     //float angle = turretConfig.rotationSpeed * dt;

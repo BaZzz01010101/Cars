@@ -50,6 +50,10 @@ namespace game
           .maxYaw = PI * 3 / 4,
           .rotationSpeed = PI / 2,
           .bodyFriction = 0.1f,
+          .fireInterval = 0.1f,
+          .projectileSpeed = 300,
+          .baseDamage = 10,
+          .projectileLifeTime = 2.0f,
         },
         .cannon = {
           .minPitch = -PI / 8 ,
@@ -58,6 +62,10 @@ namespace game
           .maxYaw = PI / 4,
           .rotationSpeed = PI / 8,
           .bodyFriction = 0.1f,
+          .fireInterval = 1.0f,
+          .projectileSpeed = 100,
+          .baseDamage = 100,
+          .projectileLifeTime = 3.0f,
         }
       },
       .graphics = {
@@ -84,7 +92,8 @@ namespace game
           .terrainTexturePath = "resources/textures/terrain.png",
           .carModelPath = "resources/models/jeep.gltf",
           .wheelModelPath = "resources/models/wheel.gltf",
-          .turretModelPath = "resources/models/turret.gltf",
+          .gunModelPath = "resources/models/gun.gltf",
+          .cannonModelPath = "resources/models/cannon.gltf",
           .crosshairsTexturePath = "resources/textures/crosshairs_white.png",
         },
       }
@@ -159,6 +168,9 @@ namespace game
   void App::updateShortcuts()
   {
     Car& player = scene.getPlayer();
+
+    scene.gunFiring = IsMouseButtonDown(MOUSE_LEFT_BUTTON);
+    scene.cannonFiring = IsMouseButtonDown(MOUSE_RIGHT_BUTTON);
 
     if (IsKeyPressed(KEY_P))
       togglePaused();

@@ -4,12 +4,15 @@
 #include "Config.h"
 #include "CustomCamera.h"
 #include "Pool.h"
+#include "Projectile.h"
 
 namespace game
 {
   class Scene
   {
   public:
+    bool gunFiring{};
+    bool cannonFiring{};
     CustomCamera camera{};
     Terrain terrain{};
 
@@ -30,8 +33,11 @@ namespace game
     Car& getPlayer() { return cars.get(playerIndex); }
 
   private:
-    Pool<Car> cars{ 100 };
+    Config config{};
     int playerIndex{};
+    Pool<Car> cars{ 1 };
+
+    Pool<Projectile> projectiles{ 1000 };
 
     bool paused{};
     bool drawWires{};
@@ -39,11 +45,19 @@ namespace game
 
     Model carModel{};
     Model wheelModel{};
-    Model turretModel{};
+    Model gunModel{};
+    Model cannonModel{};
 
     bool carModelLoaded{};
     bool wheelModelLoaded{};
-    bool turretModelLoaded{};
+    bool gunModelLoaded{};
+    bool cannonModelLoaded{};
+
+    float timeToNextGunFire{};
+    float timeToNextCannonFire{};
+
+    void updateGameObjects(float dt);
+    void updateFiring(float dt);
   };
 
 }

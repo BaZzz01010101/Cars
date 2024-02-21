@@ -25,7 +25,7 @@ namespace game
 
     Car();
     virtual ~Car() = default;
-    void init(Config config, Model carModel, Model wheelModel, Model turretModel, const Terrain& terrain, const CustomCamera& camera);
+    void init(Config config, Model carModel, Model wheelModel, Model gunModel, Model cannonModel, const Terrain& terrain, const CustomCamera& camera);
     void update(float dt);
     void draw(bool drawWires);
 

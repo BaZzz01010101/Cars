@@ -1,4 +1,5 @@
 #pragma once
+#include "vec2.h"
 
 namespace game
 {
@@ -59,6 +60,9 @@ namespace game
     float getZAngle() const;
     void yawPitch(float* yaw, float* pitch) const;
     void yawPitchTo(vec3 target, float* yaw, float* pitch) const;
+    vec2 xy() const;
+    vec2 yz() const;
+    vec2 xz() const;
   };
 
   vec3 operator*(float f, const vec3& v);

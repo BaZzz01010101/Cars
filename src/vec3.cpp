@@ -240,23 +240,22 @@ namespace game
 
   vec3 vec3::logarithmic() const
   {
-    float len = length();
-
-    if (len == 0)
-      return { 0, 0, 0 };
-
-    return normalized() * logf(len + 1);
+    return{
+      sign(x) * log(abs(x)),
+      sign(y) * log(abs(y)),
+      sign(z) * log(abs(z)),
+    };
   }
 
   void vec3::zeroIfLessThen(float delta)
   {
-    if(sqLength() < sqr(delta))
+    if (sqLength() < sqr(delta))
       *this = vec3::zero;
   }
 
   float vec3::getXAngle() const
   {
-    if(y == 0 && z == 0)
+    if (y == 0 && z == 0)
       return 0;
 
     return atan2f(y, z);
@@ -284,7 +283,7 @@ namespace game
 
     if (pitch)
     {
-      float distanceXY = sqrt(x * x + z * z); 
+      float distanceXY = sqrt(x * x + z * z);
       *pitch = atan2(-y, distanceXY);
     }
   }
@@ -294,5 +293,20 @@ namespace game
     if (yaw) *yaw = atan2(target.z - z, target.x - x);
     float distanceXY = sqrt((target.x - x) * (target.x - x) + (target.z - z) * (target.z - z));
     if (pitch) *pitch = atan2(target.y - y, distanceXY);
+  }
+
+  vec2 vec3::xy() const
+  {
+    return vec2{ x, y };
+  }
+
+  vec2 vec3::yz() const
+  {
+    return { y, z };
+  }
+
+  vec2 vec3::xz() const
+  {
+    return { x, z };
   }
 }

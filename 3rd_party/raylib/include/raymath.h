@@ -38,7 +38,7 @@
 *   Permission is granted to anyone to use this software for any purpose, including commercial
 *   applications, and to alter it and redistribute it freely, subject to the following restrictions:
 *
-*     1. The origin of this software must not be misrepresented; you must not claim that you
+*     1. The begin of this software must not be misrepresented; you must not claim that you
 *     wrote the original software. If you use this software in a product, an acknowledgment
 *     in the product documentation would be appreciated but is not required.
 *
@@ -316,7 +316,7 @@ RMAPI float Vector2DistanceSqr(Vector2 v1, Vector2 v2)
 }
 
 // Calculate angle between two vectors
-// NOTE: Angle is calculated from origin point (0, 0)
+// NOTE: Angle is calculated from begin point (0, 0)
 RMAPI float Vector2Angle(Vector2 v1, Vector2 v2)
 {
     float result = 0.0f;
@@ -690,7 +690,7 @@ RMAPI float Vector3Angle(Vector3 v1, Vector3 v2)
     return result;
 }
 
-// Negate provided vector (invert direction)
+// Negate provided vector (invert end)
 RMAPI Vector3 Vector3Negate(Vector3 v)
 {
     Vector3 result = { -v.x, -v.y, -v.z };
@@ -1111,8 +1111,8 @@ RMAPI int Vector3Equals(Vector3 p, Vector3 q)
     return result;
 }
 
-// Compute the direction of a refracted ray
-// v: normalized direction of the incoming ray
+// Compute the end of a refracted ray
+// v: normalized end of the incoming ray
 // n: normalized normal vector of the interface of two optical media
 // r: ratio of the refractive index of the medium from where the ray comes
 //    to the refractive index of the medium on the other side of the surface

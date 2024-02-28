@@ -5,10 +5,12 @@
     <ClCompile Include="src\tests\tests.cpp" />
     <ClCompile Include="src\vec2.cpp" />
     <ClCompile Include="src\vec3.cpp" />
+    <ClCompile Include="src\Terrain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Helpers.h" />
     <ClInclude Include="src\vec2.h" />
     <ClInclude Include="src\vec3.h" />
+    <ClInclude Include="src\Terrain.h" />
   </ItemGroup>
 </Project>

@@ -167,10 +167,12 @@
   <ItemGroup>
     <ClCompile Include="src\Helpers.cpp" />
     <ClCompile Include="src\tests\tests.cpp" />
+    <ClCompile Include="src\vec2.cpp" />
     <ClCompile Include="src\vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Helpers.h" />
+    <ClInclude Include="src\vec2.h" />
     <ClInclude Include="src\vec3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

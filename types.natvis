@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="game::vec2">
+    <DisplayString>{{ x={x}, y={y} }}</DisplayString>
+    <Expand>
+      <Item Name="x">x</Item>
+      <Item Name="y">y</Item>
+    </Expand>
+  </Type>
+  <Type Name="game::vec3">
+    <DisplayString>{{{x,f}, {y,f}, {z,f}}}</DisplayString>
+    <Expand>
+      <Item Name="x">x</Item>
+      <Item Name="y">y</Item>
+      <Item Name="z">z</Item>
+    </Expand>
+  </Type>
+  <Type Name="game::quat">
+    <DisplayString>{{{x,f}, {y,f}, {z,f}, {w,f}}}</DisplayString>
+    <Expand>
+      <Item Name="x">x</Item>
+      <Item Name="y">y</Item>
+      <Item Name="z">z</Item>
+      <Item Name="w">w</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

@@ -30,7 +30,7 @@ namespace game
     void draw(bool drawWires);
 
     void resetToPosition(vec3 position, quat rotation);
-    virtual bool traceRay(vec3 origin, vec3 direction, vec3* collision, vec3* normal, float* penetration);
+    virtual bool traceRay(vec3 origin, vec3 direction, vec3* collision, vec3* normal);
     virtual bool collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration);
 
   protected:

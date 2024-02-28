@@ -31,7 +31,7 @@ namespace game
     frontRightWheel.init(config.physics.frontWheels, wheelModel, terrain, *this, frontRightWheelConnectionPoint, "FrontRightWheel", config.physics.gravity);
     rearLeftWheel.init(config.physics.rearWheels, wheelModel, terrain, *this, rearLeftWheelConnectionPoint, "RearLeftWheel", config.physics.gravity);
     rearRightWheel.init(config.physics.rearWheels, wheelModel, terrain, *this, rearRightWheelConnectionPoint, "RearRightWheel", config.physics.gravity);
-     
+
     float radius = (size.x + size.y + size.z) / 6;
     momentOfInertia = 0.5f * mass * sqr(radius);
 
@@ -61,7 +61,7 @@ namespace game
     rearRightWheelForce = vec3::zero;
   }
 
-  bool Car::traceRay(vec3 origin, vec3 direction, vec3* collision, vec3* normal, float* penetration)
+  bool Car::traceRay(vec3 origin, vec3 direction, vec3* collision, vec3* normal)
   {
     return false;
   }
@@ -93,8 +93,8 @@ namespace game
     float rearPower = 1.5;
     float contactsCount = std::max(1.0f, float(frontLeftWheel.isGrounded + frontRightWheel.isGrounded + rearLeftWheel.isGrounded + rearRightWheel.isGrounded));
     float sharedMass = mass / contactsCount;
-    frontLeftWheelForce = frontLeftWheel.getForce(dt, sharedMass, frontPower * enginePower, brakePower, handBreaked);
-    frontRightWheelForce = frontRightWheel.getForce(dt, sharedMass, frontPower * enginePower, brakePower, handBreaked);
+    frontLeftWheelForce = frontLeftWheel.getForce(dt, sharedMass, frontPower * enginePower, brakePower, false);
+    frontRightWheelForce = frontRightWheel.getForce(dt, sharedMass, frontPower * enginePower, brakePower, false);
     rearLeftWheelForce = rearLeftWheel.getForce(dt, sharedMass, rearPower * enginePower, brakePower, handBreaked);
     rearRightWheelForce = rearRightWheel.getForce(dt, sharedMass, rearPower * enginePower, brakePower, handBreaked);
 
@@ -285,7 +285,9 @@ namespace game
     //drawVector(position, 3 * up(), DARKGRAY);
 
     //drawVector(position, 0.001f * force, RED);
-    drawVector(position, 0.5f * moment.logarithmic(), BLUE);
+    //drawVector(position, 0.5f * moment.logarithmic(), BLUE);
+    drawVector(position, 5 * vec3::forward, WHITE);
+    drawVector(position, 5 * vec3::left, LIGHTGRAY);
   }
 }
 

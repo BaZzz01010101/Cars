@@ -108,7 +108,6 @@ namespace game
   {
     float x = clamp(worldX + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);
     float y = clamp(worldZ + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);
-    float CELL_SIZE = TERRAIN_SIZE / (HEIGHT_MAP_SIZE - 1);
 
     x = x / CELL_SIZE;
     y = y / CELL_SIZE;
@@ -185,9 +184,120 @@ namespace game
     return false;
   }
 
-  bool Terrain::traceRay(vec3 origin, vec3 direction, vec3* collision, vec3* normal, float* penetration)
+  bool Terrain::intersectRayTriangle(const vec3 origin, const vec3 direction, const vec3 v0, const vec3 v1, const vec3 v2, vec3* collision, vec3* normal)
   {
+    vec3 edge01 = v1 - v0;
+    vec3 edge12 = v2 - v1;
+    vec3 edge20 = v0 - v2;
+    vec3 norm = (edge01 % edge20).normalized();
+    float originToPlaneDistanceSigned = (v0 - origin) * norm;
+    float cosAngle = direction * norm;
+
+    if (fabsf(cosAngle) < EPSILON)
       return false;
+
+    float originToHitDistance = (originToPlaneDistanceSigned / cosAngle);
+
+    if (originToHitDistance < 0)
+      return false;
+
+    vec3 hit = origin + direction * originToHitDistance;
+
+    vec3 v0toHit = hit - v0;
+    vec3 v1toHit = hit - v1;
+    vec3 v2toHit = hit - v2;
+
+    if ((edge01 % v0toHit) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
+      return false;
+
+    if ((edge12 % v1toHit) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
+      return false;
+
+    if ((edge20 % v2toHit) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
+      return false;
+
+    if (collision)
+      *collision = hit;
+
+    if (normal)
+      *normal = norm;
+
+    return true;
+  }
+
+  std::vector<Terrain::Cell> Terrain::traceGrid2D(vec2 origin, vec2 direction)
+  {
+    static const float HALF_TERRAIN_SIZE = TERRAIN_SIZE / 2;
+
+    if (fabsf(direction.x) < EPSILON && fabsf(direction.y) < EPSILON)
+    {
+      return { {
+          int((origin.x + HALF_TERRAIN_SIZE) / CELL_SIZE),
+          int((origin.y + HALF_TERRAIN_SIZE) / CELL_SIZE)
+        } };
+    }
+
+    std::vector<Cell> cells;
+    constexpr int MAX_CROSSED_CELLS = int(2 * M_SQRT2 * HEIGHT_MAP_SIZE);
+    cells.reserve(MAX_CROSSED_CELLS);
+
+    vec2 current = (origin + vec2{ HALF_TERRAIN_SIZE, HALF_TERRAIN_SIZE }) / CELL_SIZE;
+    // division by null is checked above
+    vec2 step = direction / std::max(fabsf(direction.x), fabsf(direction.y)) * 0.999f;
+
+    int x = (int)current.x;
+    int y = (int)current.y;
+
+    while (x >= 0 && x < HEIGHT_MAP_SIZE - 1 && y >= 0 && y < HEIGHT_MAP_SIZE - 1)
+    {
+      cells.push_back({ x, y });
+
+      vec2 next = current + step;
+      int nx = (int)next.x;
+      int ny = (int)next.y;
+
+      // diagonal step
+      if (nx != x && ny != y)
+      {
+        vec2 gridPoint = vec2{ float(std::min(x, nx) + 1), float(std::min(y, ny) + 1) };
+        vec2 toGridPoint = gridPoint - current;
+        vec2 right = vec2{ toGridPoint.y, -toGridPoint.x };
+        float k = direction * right * sign(step.x) * sign(step.y);
+
+        if (k > 0 && nx >= 0 && nx < HEIGHT_MAP_SIZE - 1)
+          cells.push_back({ nx, y });
+        else if (k < 0 && ny >= 0 && ny < HEIGHT_MAP_SIZE - 1)
+          cells.push_back({ x, ny });
+      }
+
+      x = nx;
+      y = ny;
+      current = next;
+    }
+
+    return cells;
+  }
+
+  bool Terrain::traceRay(vec3 origin, vec3 direction, vec3* collision, vec3* normal)
+  {
+    if (direction.isZero())
+      return false;
+
+    auto cells = traceGrid2D(origin.xz(), direction.xz());
+
+    for (const Cell cell : cells)
+    {
+      vec3 v00, v01, v10, v11;
+      getTrianglePair(cell.x, cell.y, &v00, &v01, &v10, &v11);
+
+      if (intersectRayTriangle(origin, direction, v00, v10, v11, collision, normal))
+        return true;
+
+      if (intersectRayTriangle(origin, direction, v00, v11, v01, collision, normal))
+        return true;
+    }
+
+    return false;
   }
 
   bool Terrain::collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration)
@@ -199,7 +309,6 @@ namespace game
   {
     float x = clamp(worldX + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);
     float y = clamp(worldY + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);
-    float CELL_SIZE = TERRAIN_SIZE / (HEIGHT_MAP_SIZE - 1);
 
     x = x / CELL_SIZE;
     y = y / CELL_SIZE;
@@ -251,6 +360,22 @@ namespace game
     }
   }
 
+  void Terrain::getTrianglePair(int x, int y, vec3* v00, vec3* v01, vec3* v10, vec3* v11) const
+  {
+    float startX = x * CELL_SIZE - TERRAIN_SIZE / 2;
+    float startY = y * CELL_SIZE - TERRAIN_SIZE / 2;
+
+    float h00 = heightMap2[y * HEIGHT_MAP_SIZE + x] * TERRAIN_HEIGHT;
+    float h01 = heightMap2[(y + 1) * HEIGHT_MAP_SIZE + x] * TERRAIN_HEIGHT;
+    float h10 = heightMap2[y * HEIGHT_MAP_SIZE + x + 1] * TERRAIN_HEIGHT;
+    float h11 = heightMap2[(y + 1) * HEIGHT_MAP_SIZE + x + 1] * TERRAIN_HEIGHT;
+
+    *v00 = { startX, h00, startY };
+    *v01 = { startX, h01, startY + CELL_SIZE };
+    *v10 = { startX + CELL_SIZE, h10, startY };
+    *v11 = { startX + CELL_SIZE, h11, startY + CELL_SIZE };
+  }
+
   bool Terrain::collidePoint(vec3 position, vec3* collision, float* penetration) const
   {
     vec3 v1, v2, v3;
@@ -271,7 +396,7 @@ namespace game
 
   void Terrain::draw(bool drawWires)
   {
-    if(drawWires)
+    if (drawWires)
       DrawModelWires(model, { -TERRAIN_SIZE / 2, 0, -TERRAIN_SIZE / 2 }, 1, WHITE);
     else
     {
@@ -458,8 +583,11 @@ namespace game
     model = LoadModelFromMesh(mesh);
     modelLoaded = true;
 
-    texture = LoadTexture(texturePath);
-    textureLoaded = true;
+    if (texturePath)
+    {
+      texture = LoadTexture(texturePath);
+      textureLoaded = true;
+    }
 
     //GenTextureMipmaps(&texture);
     //SetTextureFilter(texture, TEXTURE_FILTER_ANISOTROPIC_16X);

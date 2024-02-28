@@ -3,7 +3,7 @@
 namespace game
 {
   static int gSeed = 0;
-  const int FAST_RAND_MAX = 0x7fff;
+  const int FAST_RAND_MAX = 0x7fffffff;
 
   template<class T>
   T clamp(T val, T min, T max)
@@ -38,7 +38,7 @@ namespace game
 
   inline int randi(int max)
   {
-    return max * fastRand() / FAST_RAND_MAX;
+    return int((long long int)(max) * fastRand() / FAST_RAND_MAX);
   }
 
   inline int randi(int min, int max)
@@ -48,7 +48,7 @@ namespace game
 
   inline float randf(float max)
   {
-    return max * fastRand() / FAST_RAND_MAX;
+    return float(double(max) * fastRand() / FAST_RAND_MAX); 
   }
 
   inline float randf(float min, float max)
@@ -81,4 +81,5 @@ namespace game
     DrawLine3D(pos, pos + vec, color);
     DrawSphere(pos + vec, 0.1f, color);
   }
+
 }

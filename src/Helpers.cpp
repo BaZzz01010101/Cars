@@ -55,9 +55,8 @@ namespace game
 
   int fastRand(void)
 	{
-		gSeed = (214013 * gSeed + 2531011);
-
-		return (gSeed >> 16) & FAST_RAND_MAX;
+    gSeed = 1664525u * gSeed + 1013904223u;
+      
+    return (gSeed ^ (gSeed >> 16u)) & FAST_RAND_MAX;
 	}
-
 }

@@ -116,6 +116,7 @@
     <ClCompile Include="src\Terrain.cpp" />
     <ClCompile Include="src\Turret.cpp" />
     <ClCompile Include="src\TurretPlatform.cpp" />
+    <ClCompile Include="src\vec2.cpp" />
     <ClCompile Include="src\vec3.cpp" />
     <ClCompile Include="src\Wheel.cpp" />
   </ItemGroup>
@@ -141,6 +142,7 @@
     <ClInclude Include="src\Terrain.h" />
     <ClInclude Include="src\Turret.h" />
     <ClInclude Include="src\TurretPlatform.h" />
+    <ClInclude Include="src\vec2.h" />
     <ClInclude Include="src\vec3.h" />
     <ClInclude Include="src\Wheel.h" />
   </ItemGroup>

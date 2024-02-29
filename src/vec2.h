@@ -9,6 +9,7 @@ namespace game
     static const vec2 xAxis;
     static const vec2 yAxis;
     static vec2 randomInCircle(float radius);
+    static vec2 randomInRing(float minRadius, float maxRadius);
     static vec2 randomInSquare(float size);
 
     vec2() = default;
@@ -18,12 +19,16 @@ namespace game
     vec2 operator+(vec2 v) const;
     vec2 operator-(vec2 v) const;
     float operator*(vec2 v) const;
+    vec2 operator+(float f) const;
+    vec2 operator-(float f) const;
     vec2 operator*(float f) const;
     vec2 operator/(float f) const;
     vec2& operator+=(vec2 v);
     vec2& operator-=(vec2 v);
-    vec2& operator*=(float v);
-    vec2& operator/=(float v);
+    vec2& operator+=(float f);
+    vec2& operator-=(float f);
+    vec2& operator*=(float f);
+    vec2& operator/=(float f);
     vec2 operator-() const;
 
     bool operator==(vec2 v) const;
@@ -44,6 +49,9 @@ namespace game
     vec2 logarithmic() const;
     void zeroIfLessThen(float delta);
     float getAngle() const;
+    vec3 intoYZWithX(float x) const;
+    vec3 intoXZWithY(float y) const;
+    vec3 intoXYWithZ(float z) const;
   };
 
   vec2 operator*(float f, const vec2& v);

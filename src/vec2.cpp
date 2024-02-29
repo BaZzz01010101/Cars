@@ -22,6 +22,20 @@ namespace game
     return v;
   }
 
+  vec2 vec2::randomInRing(float minRadius, float maxRadius)
+  {
+    vec2 v;
+    float thickness = maxRadius - minRadius;
+
+    do
+    {
+      v.x = randf(-thickness, thickness);
+      v.y = randf(-thickness, thickness);
+    } while (v.sqLength() >= thickness * thickness);
+
+    return v + minRadius;
+  }
+
   vec2 vec2::randomInSquare(float size)
   {
     return
@@ -52,6 +66,16 @@ namespace game
     return x * v.x + y * v.y;
   }
 
+  vec2 vec2::operator+(float f) const
+  {
+    return { x + f, y + f };
+  }
+
+  vec2 vec2::operator-(float f) const
+  {
+    return { x - f, y - f };
+  }
+
   vec2 vec2::operator*(float f) const
   {
     return { x * f, y * f };
@@ -74,6 +98,20 @@ namespace game
   {
     x -= v.x;
     y -= v.y;
+
+    return *this;
+  }
+
+  vec2& vec2::operator+=(float f)
+  {
+    *this = *this + f;
+
+    return *this;
+  }
+
+  vec2& vec2::operator-=(float f)
+  {
+    *this = *this - f;
 
     return *this;
   }
@@ -193,6 +231,21 @@ namespace game
   float vec2::getAngle() const
   {
     return atan2(y, x);
+  }
+
+  vec3 vec2::intoYZWithX(float x) const
+  {
+    return vec3{ x, this->x, y };
+  }
+
+  vec3 vec2::intoXZWithY(float y) const
+  {
+    return vec3{ x, y, this->y };
+  }
+
+  vec3 vec2::intoXYWithZ(float z) const
+  {
+    return vec3{ x, y, z };
   }
 
   vec2 operator*(float f, const vec2& v)

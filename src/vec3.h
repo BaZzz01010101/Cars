@@ -12,6 +12,7 @@ namespace game
     static const vec3 up;
     static const vec3 left;
     static vec3 randomInSphere(float radius);
+    static vec3 randomInHollowSphere(float minRadius, float maxRadius);
     static vec3 randomInCube(float size);
 
     vec3() = default;
@@ -22,10 +23,14 @@ namespace game
     vec3 operator-(vec3 v) const;
     float operator*(vec3 v) const;
     vec3 operator%(vec3 v) const;
+    vec3 operator+(float f) const;
+    vec3 operator-(float f) const;
     vec3 operator*(float f) const;
     vec3 operator/(float f) const;
     vec3& operator+=(vec3 v);
     vec3& operator-=(vec3 v);
+    vec3& operator+=(float f);
+    vec3& operator-=(float f);
     vec3& operator*=(float v);
     vec3& operator/=(float v);
     vec3 operator-() const;

@@ -15,7 +15,6 @@ namespace game
   vec3 vec3::randomInSphere(float radius)
   {
     vec3 v;
-    const float RAND_MAX_2 = RAND_MAX / 2.0f;
 
     do
     {
@@ -25,6 +24,21 @@ namespace game
     } while (v.sqLength() >= radius * radius);
 
     return v;
+  }
+
+  vec3 vec3::randomInHollowSphere(float minRadius, float maxRadius)
+  {
+    vec3 v;
+    float thickness = maxRadius - minRadius;
+
+    do
+    {
+      v.x = randf(-thickness, thickness);
+      v.y = randf(-thickness, thickness);
+      v.z = randf(-thickness, thickness);
+    } while (v.sqLength() >= thickness * thickness);
+
+    return v + minRadius;
   }
 
   vec3 vec3::randomInCube(float size)
@@ -68,6 +82,16 @@ namespace game
     };
   }
 
+  vec3 vec3::operator+(float f) const
+  {
+    return { x + f, y + f, z + f };
+  }
+
+  vec3 vec3::operator-(float f) const
+  {
+    return { x - f, y - f, z - f };
+  }
+
   vec3 vec3::operator*(float f) const
   {
     return { x * f, y * f, z * f };
@@ -91,6 +115,20 @@ namespace game
   vec3& vec3::operator-=(vec3 v)
   {
     *this = *this - v;
+
+    return *this;
+  }
+
+  vec3& vec3::operator+=(float f)
+  {
+    *this = *this + f;
+
+    return *this;
+  }
+
+  vec3& vec3::operator-=(float f)
+  {
+    *this = *this - f;
 
     return *this;
   }

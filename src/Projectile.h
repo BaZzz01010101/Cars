@@ -4,9 +4,15 @@
 namespace game
 {
  
-  class Projectile
+  struct Projectile
   {
-  public:
+    enum Type
+    {
+      UNKNOWN = 0,
+      Bullet,
+      Shell,
+    };
+
     vec3 position{};
     vec3 velocity{};
     float gravity{};
@@ -14,9 +20,10 @@ namespace game
     float size{};
     int ownerIndex{};
     float damage{};
+    Type type{};
 
     void update(float dt);
-    void draw();
+    void draw() const;
   };
 
 }

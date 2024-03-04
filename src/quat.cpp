@@ -37,6 +37,23 @@ namespace game
     return QuaternionFromVector3ToVector3(v0, v1);
   }
 
+  quat quat::random()
+  {
+    return quat::fromEuler(randf(2 * PI), randf(2 * PI), randf(2 * PI));
+
+    float x, y, z, w;
+
+    do
+    {
+      x = randf(-1, 1);
+      y = randf(-1, 1);
+      z = randf(-1, 1);
+      w = randf(-1, 1);
+    } while (x * x + y * y + z * z + w * w > 1);
+
+    return quat{ x, y, z, w }.normalized();
+  }
+
   //quat::quat(const quat& q) :
   //  Quaternion{ q }
   //{}

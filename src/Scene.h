@@ -5,6 +5,7 @@
 #include "CustomCamera.h"
 #include "Pool.h"
 #include "Projectile.h"
+#include "ExplosionParticle.h"
 
 namespace game
 {
@@ -15,6 +16,8 @@ namespace game
     bool cannonFiring{};
     CustomCamera camera{};
     Terrain terrain{};
+    vec3 gunRayHit{};
+    vec3 cannonRayHit{};
 
     Scene();
     Scene(Scene&) = delete;
@@ -36,8 +39,8 @@ namespace game
     Config config{};
     int playerIndex{};
     Pool<Car> cars{ 1 };
-
     Pool<Projectile> projectiles{ 1000 };
+    Pool<ExplosionParticle> explosionParticles{ 10000 };
 
     bool paused{};
     bool drawWires{};
@@ -58,6 +61,7 @@ namespace game
 
     void updateGameObjects(float dt);
     void updateFiring(float dt);
+    void createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position);
   };
 
 }

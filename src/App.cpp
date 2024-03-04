@@ -54,6 +54,7 @@ namespace game
           .projectileSpeed = 300,
           .baseDamage = 10,
           .projectileLifeTime = 2.0f,
+          .barrelPosition = { 0, 0.35f, 1.5f},
         },
         .cannon = {
           .minPitch = -PI / 8 ,
@@ -66,7 +67,13 @@ namespace game
           .projectileSpeed = 100,
           .baseDamage = 100,
           .projectileLifeTime = 3.0f,
-        }
+          .barrelPosition = { 0, 0.75f, 3.0f},
+        },
+        .cannonExplosion = {
+          .radius = 3,
+          .duration = 0.5f,
+          .force = 100000,
+        },
       },
       .graphics = {
         .screen = {
@@ -86,6 +93,28 @@ namespace game
         .hud = {
           .fontSize = 20,
           .screenMargins = 10,
+        },
+        .bulletExplosionParticles = {
+          .count = 10,
+          .minSize = 0.1f,
+          .maxSize = 0.3f,
+          .minSpeed = 5,
+          .maxSpeed = 10,
+          .minAngularSpeed = PI,
+          .maxAngularSpeed = 8 * PI,
+          .minLifeTime = 0.5f,
+          .maxLifeTime = 1.0f,
+        },
+        .shellExplosionParticles = {
+          .count = 100,
+          .minSize = 0.3f,
+          .maxSize = 0.5f,
+          .minSpeed = 10,
+          .maxSpeed = 20,
+          .minAngularSpeed = PI,
+          .maxAngularSpeed = 8 * PI,
+          .minLifeTime = 1.0f,
+          .maxLifeTime = 2.0f,
         },
         .resources = {
           .fontPath = "resources/fonts/JetBrainsMono-Bold.ttf",

@@ -61,12 +61,12 @@ namespace game
     rearRightWheelForce = vec3::zero;
   }
 
-  bool Car::traceRay(vec3 origin, vec3 direction, vec3* collision, vec3* normal)
+  bool Car::traceRay(vec3 origin, vec3 direction, float distance, vec3* collision, vec3* normal) const
   {
     return false;
   }
 
-  bool Car::collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration)
+  bool Car::collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration) const
   {
     return false;
   }
@@ -127,8 +127,13 @@ namespace game
 
   void Car::updateTurrets(float dt)
   {
-    gun.target = camera->direction;
-    cannon.target = camera->direction;
+    vec3 targetCollisionPosition;
+    bool isHit = terrain->traceRay(camera->position, camera->direction, -1, &targetCollisionPosition, nullptr);
+    vec3 gunPosition = gun.position + 0.35f * up();
+    vec3 cannonPosition = cannon.position + 0.75f * up();
+
+    gun.target = isHit ? (targetCollisionPosition - gunPosition) : camera->direction;
+    cannon.target = isHit ? (targetCollisionPosition - cannonPosition) : camera->direction;
     gun.update(dt);
     cannon.update(dt);
   }

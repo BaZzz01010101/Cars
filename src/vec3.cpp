@@ -14,6 +14,9 @@ namespace game
 
   vec3 vec3::randomInSphere(float radius)
   {
+    if (radius < EPSILON)
+      return vec3::zero;
+
     vec3 v;
 
     do
@@ -26,23 +29,36 @@ namespace game
     return v;
   }
 
-  vec3 vec3::randomInHollowSphere(float minRadius, float maxRadius)
+  vec3 vec3::randomOnSphereSurface(float radius)
   {
+    return vec3::forward.rotatedBy(quat::random()) * radius;
+  }
+
+  vec3 vec3::randomInHollowSphere(float innerRadius, float outerRadius)
+  {
+    if (innerRadius < 0 || outerRadius <= 0 || innerRadius > outerRadius)
+      return vec3::zero;
+
+    if (innerRadius < EPSILON)
+      return vec3::randomInSphere(outerRadius);
+
+    float thickness = outerRadius - innerRadius;
+
+    if (thickness < EPSILON)
+      return vec3::randomOnSphereSurface(innerRadius);
+
     vec3 v;
-    float thickness = maxRadius - minRadius;
+    do v = vec3::randomInSphere(thickness);
+    while (v.sqLength() >= thickness * thickness);
 
-    do
-    {
-      v.x = randf(-thickness, thickness);
-      v.y = randf(-thickness, thickness);
-      v.z = randf(-thickness, thickness);
-    } while (v.sqLength() >= thickness * thickness);
-
-    return v + minRadius;
+    return v + v.normalized() * innerRadius;
   }
 
   vec3 vec3::randomInCube(float size)
   {
+    if (size <= 0)
+      return vec3::zero;
+
     return
     {
       randf(-size, size),

@@ -22,6 +22,47 @@ namespace math_tests
 {
   constexpr float TEST_EPSILON = 0.000001f;
 
+  TEST_CLASS(vec3bench)
+  {
+  public:
+    TEST_METHOD(randomInSphere)
+    {
+      const int count = 10000000;
+      vector<vec3> vv;
+      vv.reserve(count);
+
+      for (int i = 0; i < count; i++)
+        vv.push_back(vec3::randomInSphere(1));
+
+      Assert::IsTrue(vv.size() == count);
+    }
+
+    TEST_METHOD(randomOnSphereSurface)
+    {
+      const int count = 10000000;
+      vector<vec3> vv;
+      vv.reserve(count);
+
+      for (int i = 0; i < count; i++)
+        vv.push_back(vec3::randomOnSphereSurface(1));
+
+      Assert::IsTrue(vv.size() == count);
+    }
+
+    TEST_METHOD(randomInHollowSphere)
+    {
+      const int count = 10000000;
+      vector<vec3> vv;
+      vv.reserve(count);
+
+      for (int i = 0; i < count; i++)
+        vv.push_back(vec3::randomInHollowSphere(0.5, 1));
+
+      Assert::IsTrue(vv.size() == count);
+    }
+    
+  };
+
   TEST_CLASS(vec3test)
   {
   public:
@@ -75,7 +116,7 @@ namespace math_tests
     };
 
     static Terrain terrain;
-    static inline const int TRY_COUNT = 1000000;
+    static inline const int TRY_COUNT = 5000000;
     static inline const float MIN_XZ = -Terrain::TERRAIN_SIZE / 2 + 0.01f;
     static inline const float MAX_XZ = Terrain::TERRAIN_SIZE / 2 - 0.01f;
     static inline const float MIN_Y = -Terrain::TERRAIN_HEIGHT - 1;
@@ -96,7 +137,7 @@ namespace math_tests
         Line line = createLine();
 
         vec3 collision, normal;
-        bool hit = terrain.traceRay(line.begin, (line.end - line.begin).normalized(), &collision, &normal);
+        bool hit = terrain.traceRay(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), &collision, &normal);
         allHit = allHit && hit;
 
         if (!hit)
@@ -131,7 +172,7 @@ namespace math_tests
         Line line = createLine();
 
         vec3 collision, normal;
-        bool hit = terrain.traceRay(line.begin, (line.end - line.begin).normalized(), &collision, &normal);
+        bool hit = terrain.traceRay(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), &collision, &normal);
         anyHit = anyHit || hit;
 
         if (hit)

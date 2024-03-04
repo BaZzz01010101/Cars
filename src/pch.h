@@ -11,7 +11,7 @@
 #include <list>
 #include <string>
 #include <cmath>
-
+#include <array>
 
 #include "raylib.h"
 #include "raymath.h"

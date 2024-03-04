@@ -12,7 +12,7 @@ namespace game
     lifeTime -= dt;
   }
 
-  void Projectile::draw()
+  void Projectile::draw() const
   {
     DrawCapsule(position, position + 0.1f * size * velocity, size, 5, 2, WHITE);
   }

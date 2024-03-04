@@ -91,11 +91,35 @@ namespace game
     for (int i = 0; i < projectiles.size(); i++)
       if (projectiles.isAlive(i))
       {
-        Projectile& bullet = projectiles.get(i);
-        bullet.update(dt);
+        Projectile& projectile = projectiles.get(i);
+        vec3 begin = projectile.position;
+        projectile.update(dt);
+        vec3 end = projectile.position;
+        vec3 collision, normal;
 
-        if (bullet.lifeTime < 0)
+        if (terrain.traceRay(begin, (end - begin).normalized(), (end - begin).length(), &collision, &normal))
+        {
           projectiles.remove(i);
+
+          Config::Graphics::ExplosionParticles explosionConfig = projectile.type == Projectile::Bullet ? 
+            config.graphics.bulletExplosionParticles : 
+            config.graphics.shellExplosionParticles;
+
+          createExplosion(explosionConfig, collision);
+        }
+
+        if (projectile.lifeTime < 0)
+          projectiles.remove(i);
+      }
+
+    for (int i = 0; i < explosionParticles.size(); i++)
+      if (explosionParticles.isAlive(i))
+      {
+        ExplosionParticle& particle = explosionParticles.get(i);
+        particle.update(dt);
+
+        if (particle.lifeTime < 0)
+          explosionParticles.remove(i);
       }
   }
 
@@ -105,29 +129,37 @@ namespace game
     {
       if (timeToNextGunFire <= 0)
       {
-        Car& player = cars.get(playerIndex);
+        const Config::Physics::Turret& gunConfig = config.physics.gun;
+        const Car& player = cars.get(playerIndex);
+        const Turret& gun = player.gun;
+
+        float bulletOffsetfix = gunConfig.projectileSpeed * -timeToNextGunFire;
+        vec3 bulletPosition = gun.barrelPosition() + gun.forward() * bulletOffsetfix;
+        vec3 barrelOffset = 0.2f * gun.left();
 
         projectiles.tryAdd(Projectile{
-          .position = player.gun.position + vec3::up - 0.25f * player.gun.left() + player.gun.forward() * (5.5f + config.physics.gun.projectileSpeed * -timeToNextGunFire),
-          .velocity = player.velocity + player.gun.forward() * config.physics.gun.projectileSpeed,
+          .position = bulletPosition + barrelOffset,
+          .velocity = player.velocity + gun.forward() * gunConfig.projectileSpeed,
           .gravity = config.physics.gravity,
-          .lifeTime = config.physics.gun.projectileLifeTime,
+          .lifeTime = gunConfig.projectileLifeTime,
           .size = 0.05f,
           .ownerIndex = playerIndex,
-          .damage = config.physics.gun.baseDamage,
+          .damage = gunConfig.baseDamage,
+          .type = Projectile::Type::Bullet,
           });
 
         projectiles.tryAdd(Projectile{
-          .position = player.gun.position + vec3::up + 0.25f * player.gun.left() + player.gun.forward() * (5.5f + config.physics.gun.projectileSpeed * -timeToNextGunFire),
-          .velocity = player.velocity + player.gun.forward() * config.physics.gun.projectileSpeed,
+          .position = bulletPosition - barrelOffset,
+          .velocity = player.velocity + gun.forward() * gunConfig.projectileSpeed,
           .gravity = config.physics.gravity,
-          .lifeTime = config.physics.gun.projectileLifeTime,
+          .lifeTime = gunConfig.projectileLifeTime,
           .size = 0.05f,
           .ownerIndex = playerIndex,
-          .damage = config.physics.gun.baseDamage,
+          .damage = gunConfig.baseDamage,
+          .type = Projectile::Type::Bullet,
           });
 
-        timeToNextGunFire = config.physics.gun.fireInterval;
+        timeToNextGunFire = gunConfig.fireInterval;
       }
     }
     else
@@ -137,24 +169,44 @@ namespace game
     {
       if (timeToNextCannonFire <= 0)
       {
-        Car& player = cars.get(playerIndex);
+        const Config::Physics::Turret& cannonConfig = config.physics.cannon;
+        const Car& player = cars.get(playerIndex);
+        const Turret& cannon = player.cannon;
 
         projectiles.tryAdd(Projectile{
-          .position = player.cannon.position + vec3::up + 5 * player.cannon.forward(),
-          .velocity = player.velocity + player.cannon.forward() * config.physics.cannon.projectileSpeed,
+          .position = cannon.barrelPosition(),
+          .velocity = player.velocity + cannon.forward() * cannonConfig.projectileSpeed,
           .gravity = config.physics.gravity,
-          .lifeTime = config.physics.cannon.projectileLifeTime,
+          .lifeTime = cannonConfig.projectileLifeTime,
           .size = 0.2f,
           .ownerIndex = playerIndex,
-          .damage = config.physics.cannon.baseDamage,
+          .damage = cannonConfig.baseDamage,
+          .type = Projectile::Type::Shell,
           });
 
-        timeToNextCannonFire = config.physics.cannon.fireInterval;
+        timeToNextCannonFire = cannonConfig.fireInterval;
       }
     }
 
     timeToNextCannonFire -= dt;
     timeToNextGunFire -= dt;
+  }
+
+  void Scene::createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position)
+  {
+    for (int i = 0; i < config.count; i++)
+      explosionParticles.tryAdd(ExplosionParticle::random(
+        position,
+        config.minSize,
+        config.maxSize,
+        config.minSpeed,
+        config.maxSpeed,
+        config.minAngularSpeed,
+        config.maxAngularSpeed,
+        config.minLifeTime,
+        config.maxLifeTime,
+        this->config.physics.gravity
+      ));
   }
 
   void Scene::draw()
@@ -176,6 +228,24 @@ namespace game
         Projectile& bullet = projectiles.get(i);
         bullet.draw();
       }
+
+    for (int i = 0; i < explosionParticles.size(); i++)
+      if (explosionParticles.isAlive(i))
+      {
+        ExplosionParticle& particle = explosionParticles.get(i);
+        particle.draw();
+      }
+
+    //vec3 gunPosition = player.gun.barrelPosition();
+    //vec3 gunDirection = player.gun.forward();
+
+    //drawVector(gunPosition, 100 * gunDirection, YELLOW);
+
+    //vec3 collision, normal;
+    //if (terrain.traceRay(gunPosition, gunDirection, -1, &collision, &normal))
+    //{
+    //  DrawSphere(collision, 1, YELLOW);
+    //}
 
     EndMode3D();
   }

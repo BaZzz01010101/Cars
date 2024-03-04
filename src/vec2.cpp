@@ -10,6 +10,9 @@ namespace game
 
   vec2 vec2::randomInCircle(float radius)
   {
+    if (radius < EPSILON)
+      return vec2::zero;
+
     vec2 v;
     const float RAND_MAX_2 = RAND_MAX / 2.0f;
 
@@ -22,10 +25,27 @@ namespace game
     return v;
   }
 
-  vec2 vec2::randomInRing(float minRadius, float maxRadius)
+  vec2 vec2::randomOnCircleSurface(float radius)
   {
+    float a = randf(2 * PI);
+
+    return { radius * cosf(a), radius * sinf(a) };
+  }
+
+  vec2 vec2::randomInRing(float innerRadius, float outerRadius)
+  {
+    if (innerRadius < 0 || outerRadius <= 0 || innerRadius > outerRadius)
+      return vec2::zero;
+
+    if (innerRadius < EPSILON)
+      return vec2::randomInCircle(outerRadius);
+
+    float thickness = outerRadius - innerRadius;
+
+    if (thickness < EPSILON)
+      return vec2::randomOnCircleSurface(innerRadius);
+
     vec2 v;
-    float thickness = maxRadius - minRadius;
 
     do
     {
@@ -33,7 +53,7 @@ namespace game
       v.y = randf(-thickness, thickness);
     } while (v.sqLength() >= thickness * thickness);
 
-    return v + minRadius;
+    return v + innerRadius;
   }
 
   vec2 vec2::randomInSquare(float size)
@@ -212,6 +232,11 @@ namespace game
   void vec2::projectOnVector(vec2 v)
   {
     *this = projectedOnVector(v);
+  }
+
+  vec2 vec2::right() const
+  {
+    return { -y, x };
   }
 
   vec2 vec2::logarithmic() const

@@ -111,6 +111,7 @@
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>3rd_party\raylib\lib\raylib.lib;3rd_party\glfw\lib\glfw3.lib;Winmm.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>MSVCRT</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -170,6 +171,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Helpers.cpp" />
+    <ClCompile Include="src\quat.cpp" />
     <ClCompile Include="src\Terrain.cpp" />
     <ClCompile Include="src\tests\tests.cpp" />
     <ClCompile Include="src\vec2.cpp" />
@@ -177,6 +179,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Helpers.h" />
+    <ClInclude Include="src\quat.h" />
     <ClInclude Include="src\Terrain.h" />
     <ClInclude Include="src\vec2.h" />
     <ClInclude Include="src\vec3.h" />

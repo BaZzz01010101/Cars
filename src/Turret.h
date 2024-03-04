@@ -10,9 +10,12 @@ namespace game
   {
   public:
     vec3 target{};
+    vec3 rayHitPosition{};
+    bool isRayHit{};
 
     void init(const Config::Physics::Turret& config, const Model& model, const Terrain& terrain, const Object& parent, vec3 parentConnectionPoint, float scale);
     void reset();
+    vec3 barrelPosition() const;
 
     virtual void update(float dt);
 

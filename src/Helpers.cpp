@@ -59,4 +59,5 @@ namespace game
       
     return (gSeed ^ (gSeed >> 16u)) & FAST_RAND_MAX;
 	}
+
 }

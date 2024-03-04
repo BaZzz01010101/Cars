@@ -49,7 +49,15 @@ namespace game
         float projectileSpeed;
         float baseDamage;
         float projectileLifeTime;
+        vec3 barrelPosition;
       } gun, cannon;
+
+      struct Explosion
+      {
+        float radius;
+        float duration;
+        float force;
+      } cannonExplosion;
     } physics;
 
     struct Graphics
@@ -77,6 +85,19 @@ namespace game
         int fontSize;
         int screenMargins;
       } hud;
+
+      struct ExplosionParticles
+      {
+        int count;
+        float minSize;
+        float maxSize;
+        float minSpeed;
+        float maxSpeed;
+        float minAngularSpeed;
+        float maxAngularSpeed;
+        float minLifeTime;
+        float maxLifeTime;
+      } bulletExplosionParticles, shellExplosionParticles;
 
       struct Resources
       {

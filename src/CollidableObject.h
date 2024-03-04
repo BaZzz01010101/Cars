@@ -9,8 +9,8 @@ namespace game
   public:
     virtual ~CollidableObject() = default;
 
-    virtual bool traceRay(vec3 origin, vec3 direction, vec3* collision, vec3* normal) = 0;
-    virtual bool collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration) = 0;
+    virtual bool traceRay(vec3 origin, vec3 direction, float distance, vec3* collision, vec3* normal) const = 0;
+    virtual bool collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration) const = 0;
   };
 
 }

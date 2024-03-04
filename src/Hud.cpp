@@ -158,22 +158,24 @@ namespace game
     Vector2 cameraCrosshairPosition{ float(screenConfig.width) / 2, float(screenConfig.height) / 2 };
     float crosshairSrcSize = (float)crosshairsTexture.height;
     float crosshairDstSize = (float)std::min(screenConfig.width, screenConfig.height) / 16;
-    DrawTexturePro(crosshairsTexture, { 0, 0, crosshairSrcSize, crosshairSrcSize }, { float(screenConfig.width / 2 - crosshairDstSize / 2), float(screenConfig.height / 2 - crosshairDstSize / 2), crosshairDstSize, crosshairDstSize }, { 0, 0 }, 0, { 255, 255, 255, 128 });
+    DrawTexturePro(crosshairsTexture, { 0, 0, crosshairSrcSize, crosshairSrcSize }, { float(screenConfig.width / 2 - crosshairDstSize / 2), float(screenConfig.height / 2 - crosshairDstSize / 2), crosshairDstSize, crosshairDstSize }, { 0, 0 }, 0, { 255, 255, 255, 196 });
 
     const Turret& cannon = scene.getPlayer().cannon;
-    vec3 cannonDirection = vec3::forward.rotatedBy(cannon.rotation);
+    vec3 cannonDirection = cannon.forward();
     if (scene.camera.direction * cannonDirection > 0)
     {
-      Vector2 cannonCrosshairPosition = GetWorldToScreen(cannon.position + 1000.0f * vec3::forward.rotatedBy(cannon.rotation), scene.camera);
-      DrawTexturePro(crosshairsTexture, { crosshairSrcSize, crosshairSrcSize, crosshairSrcSize, crosshairSrcSize }, { float(cannonCrosshairPosition.x - crosshairDstSize / 2), float(cannonCrosshairPosition.y - crosshairDstSize / 2), crosshairDstSize, crosshairDstSize }, { 0, 0 }, 0, { 255, 255, 255, 128 });
+      vec3 targetPosition = cannon.isRayHit ? cannon.rayHitPosition : cannon.position + 1000.0f * cannonDirection;
+      vec2 crosshairPosition = GetWorldToScreen(targetPosition, scene.camera);
+      DrawTexturePro(crosshairsTexture, { crosshairSrcSize, crosshairSrcSize, crosshairSrcSize, crosshairSrcSize }, { float(crosshairPosition.x - crosshairDstSize / 2), float(crosshairPosition.y - crosshairDstSize / 2), crosshairDstSize, crosshairDstSize }, { 0, 0 }, 0, { 255, 255, 255, 196 });
     }
 
     const Turret& gun = scene.getPlayer().gun;
-    vec3 gunDirection = vec3::forward.rotatedBy(gun.rotation);
+    vec3 gunDirection = gun.forward();
     if (scene.camera.direction * gunDirection > 0)
     {
-      Vector2 gunCrosshairPosition = GetWorldToScreen(gun.position + 1000.0f * gunDirection, scene.camera);
-      DrawTexturePro(crosshairsTexture, { crosshairSrcSize * 2, crosshairSrcSize * 2, crosshairSrcSize, crosshairSrcSize }, { float(gunCrosshairPosition.x - crosshairDstSize / 2), float(gunCrosshairPosition.y - crosshairDstSize / 2), crosshairDstSize, crosshairDstSize }, { 0, 0 }, 0, { 255, 255, 255, 128 });
+      vec3 targetPosition = gun.isRayHit ? gun.rayHitPosition : gun.position + 1000.0f * gunDirection;
+      vec2 crosshairPosition = GetWorldToScreen(targetPosition, scene.camera);
+      DrawTexturePro(crosshairsTexture, { crosshairSrcSize * 2, crosshairSrcSize * 2, crosshairSrcSize, crosshairSrcSize }, { float(crosshairPosition.x - crosshairDstSize / 2), float(crosshairPosition.y - crosshairDstSize / 2), crosshairDstSize, crosshairDstSize }, { 0, 0 }, 0, { 255, 255, 255, 196 });
     }
   }
 

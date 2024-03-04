@@ -9,7 +9,8 @@ namespace game
     static const vec2 xAxis;
     static const vec2 yAxis;
     static vec2 randomInCircle(float radius);
-    static vec2 randomInRing(float minRadius, float maxRadius);
+    static vec2 randomOnCircleSurface(float radius);
+    static vec2 randomInRing(float innerRadius, float outerRadius);
     static vec2 randomInSquare(float size);
 
     vec2() = default;
@@ -46,6 +47,7 @@ namespace game
     void reflect(vec2 normal);
     vec2 projectedOnVector(vec2 v) const;
     void projectOnVector(vec2 v);
+    vec2 right() const;
     vec2 logarithmic() const;
     void zeroIfLessThen(float delta);
     float getAngle() const;

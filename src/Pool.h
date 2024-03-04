@@ -69,6 +69,11 @@ namespace game
 
     int size() const
     {
+      return capacity;
+    }
+
+    int aliveCount() const
+    {
       return count;
     }
 

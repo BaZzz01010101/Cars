@@ -184,7 +184,7 @@ namespace game
     return false;
   }
 
-  bool Terrain::intersectRayTriangle(const vec3 origin, const vec3 direction, const vec3 v0, const vec3 v1, const vec3 v2, vec3* collision, vec3* normal)
+  bool Terrain::intersectRayTriangle(const vec3 origin, const vec3 direction, const vec3 v0, const vec3 v1, const vec3 v2, vec3* collision, vec3* normal) const
   {
     vec3 edge01 = v1 - v0;
     vec3 edge12 = v2 - v1;
@@ -225,7 +225,7 @@ namespace game
     return true;
   }
 
-  std::vector<Terrain::Cell> Terrain::traceGrid2D(vec2 origin, vec2 direction)
+  std::vector<Terrain::Cell> Terrain::traceGrid2D(vec2 origin, vec2 direction, float distance) const
   {
     static const float HALF_TERRAIN_SIZE = TERRAIN_SIZE / 2;
 
@@ -244,11 +244,13 @@ namespace game
     vec2 current = (origin + vec2{ HALF_TERRAIN_SIZE, HALF_TERRAIN_SIZE }) / CELL_SIZE;
     // division by null is checked above
     vec2 step = direction / std::max(fabsf(direction.x), fabsf(direction.y)) * 0.999f;
+    float stepLength = step.length();
+    distance += CELL_SIZE;
 
     int x = (int)current.x;
     int y = (int)current.y;
 
-    while (x >= 0 && x < HEIGHT_MAP_SIZE - 1 && y >= 0 && y < HEIGHT_MAP_SIZE - 1)
+    while (x >= 0 && x < HEIGHT_MAP_SIZE - 1 && y >= 0 && y < HEIGHT_MAP_SIZE - 1 && distance > 0)
     {
       cells.push_back({ x, y });
 
@@ -273,34 +275,61 @@ namespace game
       x = nx;
       y = ny;
       current = next;
+      distance -= stepLength;
     }
 
     return cells;
   }
 
-  bool Terrain::traceRay(vec3 origin, vec3 direction, vec3* collision, vec3* normal)
+  bool Terrain::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* collision, vec3* normal) const
   {
-    if (direction.isZero())
+    distance = (distance < 0) ? 9e9f : distance;
+
+    if (directionNormalized.isZero() || distance < EPSILON)
       return false;
 
-    auto cells = traceGrid2D(origin.xz(), direction.xz());
+    float distance2D = (1 - fabsf(directionNormalized.y) < EPSILON) ? EPSILON : distance * sqrtf(1 - directionNormalized.y * directionNormalized.y);
+    auto cells = traceGrid2D(origin.xz(), directionNormalized.xz(), distance2D);
+    float sqDistance = distance * distance;
+    vec3 collision1, normal1, collision2, normal2;
 
     for (const Cell cell : cells)
     {
       vec3 v00, v01, v10, v11;
       getTrianglePair(cell.x, cell.y, &v00, &v01, &v10, &v11);
 
-      if (intersectRayTriangle(origin, direction, v00, v10, v11, collision, normal))
-        return true;
+      bool isHit1 = intersectRayTriangle(origin, directionNormalized, v00, v10, v11, &collision1, &normal1);
+      bool isHit2 = intersectRayTriangle(origin, directionNormalized, v00, v11, v01, &collision2, &normal2);
 
-      if (intersectRayTriangle(origin, direction, v00, v11, v01, collision, normal))
+      float sqDistance1 = isHit1 ? (collision1 - origin).sqLength() : (10 * sqDistance);
+      float sqDistance2 = isHit2 ? (collision2 - origin).sqLength() : (10 * sqDistance);
+
+      if (sqDistance1 <= sqDistance && sqDistance1 < sqDistance2)
+      {
+        if (collision)
+          *collision = collision1;
+
+        if (normal)
+          *normal = normal1;
+
         return true;
+      }
+      else if(sqDistance2 <= sqDistance)
+      {
+        if (collision)
+          *collision = collision2;
+
+        if (normal)
+          *normal = normal2;
+
+        return true;
+      }
     }
 
     return false;
   }
 
-  bool Terrain::collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration)
+  bool Terrain::collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration) const
   {
     return false;
   }

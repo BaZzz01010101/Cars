@@ -23,6 +23,11 @@ namespace game
     pitch = 0;
   }
 
+  vec3 Turret::barrelPosition() const
+  {
+    return position + turretConfig.barrelPosition.rotatedBy(rotation);
+  }
+
   void Turret::update(float dt)
   {
     _ASSERT(parent != nullptr);
@@ -43,12 +48,7 @@ namespace game
     rotation = parent->rotation * quat::identity.rotatedByXAngle(pitch).rotatedByYAngle(yaw);
     rotation.normalize();
 
-    vec3 f = forward();
-
-    //vec3 currentDir = vec3::forward.rotatedBy(rotation);
-    //vec3 axis = currentDir % target;
-    //float angle = turretConfig.rotationSpeed * dt;
-    //rotation = rotation * quat::fromAxisAngle(axis, angle);
+    isRayHit = terrain->traceRay(barrelPosition(), forward(), -1, &rayHitPosition, nullptr);
   }
 
   void Turret::updateTransform()
@@ -58,7 +58,6 @@ namespace game
 
   void Turret::drawDebug()
   {
-    //drawVector(position, )
   }
 
 }

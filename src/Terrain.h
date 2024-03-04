@@ -14,9 +14,9 @@ namespace game
 			Debug2
 		};
 
-		inline static const int HEIGHT_MAP_SIZE = 91;
-		inline static const float TERRAIN_SIZE = 500.0f;
-		inline static const float TERRAIN_HEIGHT = 50.0f;
+		inline static const int HEIGHT_MAP_SIZE = 101;
+		inline static const float TERRAIN_SIZE = 100.0f;
+		inline static const float TERRAIN_HEIGHT = 10.0f;
 		inline static const float CELL_SIZE = TERRAIN_SIZE / (HEIGHT_MAP_SIZE - 1);
 
 		Terrain() = default;
@@ -32,14 +32,16 @@ namespace game
 		void generate(const char* texturePath, Mode mode);
 		void generate2(const char* texturePath, Mode mode);
 		bool trace(vec3 start, vec3 end, vec3* hit, vec3* normal) const;
-		bool intersectRayTriangle(const vec3 origin, const vec3 direction, const vec3 v0, const vec3 v1, const vec3 v2, vec3* collision, vec3* normal);
+		bool intersectRayTriangle(const vec3 origin, const vec3 direction, const vec3 v0, const vec3 v1, const vec3 v2, vec3* collision, vec3* normal) const;
 		void getTriangle(float worldX, float worldY, vec3* v1, vec3* v2, vec3* v3) const;
 		void getTrianglePair(int x, int y, vec3* v00, vec3* v01, vec3* v10, vec3* v11) const;
 		bool collidePoint(vec3 position, vec3* collision, float* penetration) const;
 		void draw(bool drawWires);
 
-		virtual bool traceRay(vec3 origin, vec3 direction, vec3* collision, vec3* normal);
-		virtual bool collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration);
+		// TODO: Rename collision to hitPosition
+		// TODO: Rename direction to directionNormalized
+		virtual bool traceRay(vec3 origin, vec3 direction, float distance, vec3* collision, vec3* normal) const;
+		virtual bool collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration) const;
 
 	private:
 		struct Cell
@@ -61,7 +63,7 @@ namespace game
 		bool textureLoaded = false;
 
 		float calcHeight(float x, float y, Mode mode) const;
-		std::vector<Cell> traceGrid2D(vec2 origin, vec2 direction);
+		std::vector<Cell> traceGrid2D(vec2 origin, vec2 direction, float distance) const;
 	};
 
 }

@@ -13,6 +13,7 @@ namespace game
     this->debugName = debugName;
     this->gravity = gravity;
     this->momentOfInertia = 0.5f * wheelConfig.mass * sqr(wheelConfig.radius);
+
     Renderable::init(model);
   }
   
@@ -122,9 +123,11 @@ namespace game
     frictionVelocity = vec3::zero;
   }
 
-  void Wheel::updateTransform()
+  void Wheel::draw(bool drawWires)
   {
-    transform = MatrixMultiply(QuaternionToMatrix(rotation * wheelRotation), MatrixTranslate(position.x, position.y + suspensionOffset, position.z));
+    Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation * wheelRotation), MatrixTranslate(position.x, position.y + suspensionOffset, position.z));
+    Renderable::draw(transform, drawWires);
+    drawDebug();
   }
 
   void Wheel::drawDebug()

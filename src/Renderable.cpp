@@ -6,10 +6,8 @@ void Renderable::init(const Model& model)
   this->model = model;
 }
 
-void Renderable::draw(bool drawWires)
+void Renderable::draw(Matrix transform, bool drawWires)
 {
-  updateTransform();
-
   for (int i = 0; i < model.meshCount; i++)
   {
     if(!drawWires)
@@ -19,6 +17,4 @@ void Renderable::draw(bool drawWires)
     DrawMesh(model.meshes[i], LoadMaterialDefault(), transform);
     rlDisableWireMode();
   }
-
-  drawDebug();
 }

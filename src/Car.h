@@ -10,8 +10,7 @@
 
 namespace game
 {
-
-  class Car : virtual public Renderable, virtual public PhysicalObject, virtual public CollidableObject
+  class Car : public Renderable, public PhysicalObject
   {
   public:
     Turret gun{};
@@ -24,18 +23,12 @@ namespace game
     float enginePower{};
 
     Car();
-    virtual ~Car() = default;
     void init(Config config, Model carModel, Model wheelModel, Model gunModel, Model cannonModel, const Terrain& terrain, const CustomCamera& camera);
     void update(float dt);
     void draw(bool drawWires);
 
     void resetToPosition(vec3 position, quat rotation);
-    virtual bool traceRay(vec3 origin, vec3 direction, float distance, vec3* collision, vec3* normal) const;
-    virtual bool collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration) const;
-
-  protected:
-    virtual void updateTransform();
-    virtual void drawDebug();
+    bool traceRay(vec3 origin, vec3 direction, float distance, vec3* collision, vec3* normal) const;
 
   private:
     const Terrain* terrain{};
@@ -66,8 +59,9 @@ namespace game
     void updateControl(float dt);
     void updateWheels(float dt);
     void updateTurrets(float dt);
-    vec3 getAutoAlignmentMoment(float dt);
     void updateCollisions(float dt);
+    vec3 getAutoAlignmentMoment(float dt);
+    void drawDebug();
   };
 
 }

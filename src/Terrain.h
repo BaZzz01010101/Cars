@@ -1,10 +1,9 @@
 #pragma once
-#include "CollidableObject.h"
 
 namespace game
 {
 
-	class Terrain : virtual public CollidableObject
+	class Terrain
 	{
 	public:
 		enum Mode
@@ -21,7 +20,7 @@ namespace game
 
 		Terrain() = default;
 		Terrain(Terrain&) = delete;
-		virtual ~Terrain();
+		~Terrain();
 		Terrain& operator=(Terrain&) = delete;
 
 		void unloadResources();
@@ -40,8 +39,7 @@ namespace game
 
 		// TODO: Rename collision to hitPosition
 		// TODO: Rename direction to directionNormalized
-		virtual bool traceRay(vec3 origin, vec3 direction, float distance, vec3* collision, vec3* normal) const;
-		virtual bool collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration) const;
+		bool traceRay(vec3 origin, vec3 direction, float distance, vec3* collision, vec3* normal) const;
 
 	private:
 		struct Cell

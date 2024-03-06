@@ -6,7 +6,7 @@
 
 namespace game
 {
-  class Turret : virtual public Renderable, virtual public Object
+  class Turret : public Renderable, public Object
   {
   public:
     vec3 target{};
@@ -17,11 +17,8 @@ namespace game
     void reset();
     vec3 barrelPosition() const;
 
-    virtual void update(float dt);
-
-  protected:
-    virtual void updateTransform();
-    virtual void drawDebug();
+    void update(float dt);
+    void draw(bool drawWires);
 
   private:
     Config::Physics::Turret turretConfig{};
@@ -32,5 +29,7 @@ namespace game
 
     float yaw{};
     float pitch{};
+
+    void drawDebug();
   };
 }

@@ -5,7 +5,7 @@
 namespace game
 {
 
-  class PhysicalObject : virtual public DynamicObject
+  class PhysicalObject : public DynamicObject
   {
   public:
     float mass{};
@@ -13,8 +13,6 @@ namespace game
 
     vec3 force{};
     vec3 moment{};
-
-    virtual ~PhysicalObject() = default;
 
     void init(const Config::Physics& physicsConfig);
     void resetForces();
@@ -24,7 +22,7 @@ namespace game
     void applyMoment(const vec3 moment);
     void applyGravity();
 
-    virtual void update(float dt);
+    void update(float dt);
 
   private:
     Config::Physics physicsConfig{};

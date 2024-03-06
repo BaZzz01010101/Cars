@@ -51,9 +51,11 @@ namespace game
     isRayHit = terrain->traceRay(barrelPosition(), forward(), -1, &rayHitPosition, nullptr);
   }
 
-  void Turret::updateTransform()
+  void Turret::draw(bool drawWires)
   {
-    transform = MatrixMultiply(MatrixMultiply(QuaternionToMatrix(rotation), MatrixScale(scale, scale, scale)), MatrixTranslate(position.x, position.y, position.z));
+    Matrix transform = MatrixMultiply(MatrixMultiply(QuaternionToMatrix(rotation), MatrixScale(scale, scale, scale)), MatrixTranslate(position.x, position.y, position.z));
+    Renderable::draw(transform, drawWires);
+    drawDebug();
   }
 
   void Turret::drawDebug()

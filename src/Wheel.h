@@ -7,7 +7,7 @@
 
 namespace game
 {
-  class Wheel : virtual public Renderable, virtual public DynamicObject
+  class Wheel : public Renderable, public DynamicObject
   {
   public:
     bool isGrounded{};
@@ -23,14 +23,11 @@ namespace game
     vec3 getForce(float dt, float sharedMass, float enginePower, float brakePower, bool handBreaked);
     void update(float dt);
     void reset();
-
-  protected:
-    virtual void updateTransform();
-    virtual void drawDebug();
+    void draw(bool drawWires);
 
   private:
     const Terrain* terrain{};
-    const PhysicalObject* parent{};
+    const DynamicObject* parent{};
     vec3 parentConnectionPoint{};
     float gravity{};
     float momentOfInertia{};
@@ -41,6 +38,8 @@ namespace game
     quat wheelRotation = quat::identity;
     vec3 frictionVelocity{};
     const char* debugName = "UNKNOWN";
+
+    void drawDebug();
   };
 
 }

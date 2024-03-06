@@ -66,11 +66,6 @@ namespace game
     return false;
   }
 
-  bool Car::collideWith(const CollidableObject& other, vec3* collision, vec3* normal, float* penetration) const
-  {
-    return false;
-  }
-
   void Car::update(float dt)
   {
     lastForce = force;
@@ -136,29 +131,6 @@ namespace game
     cannon.target = isHit ? (targetCollisionPosition - cannonPosition) : camera->direction;
     gun.update(dt);
     cannon.update(dt);
-  }
-
-  vec3 Car::getAutoAlignmentMoment(float dt)
-  {
-    vec3 moment = vec3::zero;
-
-    vec3 axis;
-    float angle;
-    quat::fromVectorToVector(up(), vec3::up).toAxisAngle(&axis, &angle);
-
-    angle -= clamp(angle, 0.0f, PI / 8);
-    float k = mapRangeClamped(angle, 0, PI, 0, 1);
-    k = sqr(k) * sign(k);
-
-    vec3 rotationMoment = axis.rotatedBy(rotation.inverted()) * k * momentOfInertia * carConfig.carAligningForce;
-    moment += rotationMoment;
-
-    vec3 angularVelocityMoment = -angularVelocity / dt * momentOfInertia * 0.001f * carConfig.carAligningForce;
-    angularVelocityMoment.y = 0;
-
-    moment += angularVelocityMoment;
-
-    return moment;
   }
 
   void Car::updateCollisions(float dt)
@@ -227,6 +199,29 @@ namespace game
       applyGlobalForceAtGlobalPoint(f.first / div, f.second);
   }
 
+  vec3 Car::getAutoAlignmentMoment(float dt)
+  {
+    vec3 moment = vec3::zero;
+
+    vec3 axis;
+    float angle;
+    quat::fromVectorToVector(up(), vec3::up).toAxisAngle(&axis, &angle);
+
+    angle -= clamp(angle, 0.0f, PI / 8);
+    float k = mapRangeClamped(angle, 0, PI, 0, 1);
+    k = sqr(k) * sign(k);
+
+    vec3 rotationMoment = axis.rotatedBy(rotation.inverted()) * k * momentOfInertia * carConfig.carAligningForce;
+    moment += rotationMoment;
+
+    vec3 angularVelocityMoment = -angularVelocity / dt * momentOfInertia * 0.001f * carConfig.carAligningForce;
+    angularVelocityMoment.y = 0;
+
+    moment += angularVelocityMoment;
+
+    return moment;
+  }
+
   void Car::updateControl(float dt)
   {
     vec3 thrust = {
@@ -264,8 +259,8 @@ namespace game
 
   void Car::draw(bool drawWires)
   {
-
-    Renderable::draw(drawWires);
+    Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation), MatrixTranslate(position.x, position.y, position.z));
+    Renderable::draw(transform, drawWires);
 
     frontLeftWheel.draw(drawWires);
     frontRightWheel.draw(drawWires);
@@ -276,11 +271,6 @@ namespace game
     cannon.draw(drawWires);
 
     drawDebug();
-  }
-
-  void Car::updateTransform()
-  {
-    transform = MatrixMultiply(QuaternionToMatrix(rotation), MatrixTranslate(position.x, position.y, position.z));
   }
 
   void Car::drawDebug()

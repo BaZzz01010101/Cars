@@ -23,7 +23,6 @@ namespace game
     position = parent->position + globalConnectionPoint;
     rotation = parent->rotation * quat::fromYAngle(steeringAngle);
     velocity = parent->velocity + parent->angularVelocity.rotatedBy(rotation) % globalConnectionPoint;
-    angularVelocity = parent->angularVelocity;
 
     float springForce = -suspensionOffset * wheelConfig.suspensionStiffness;
     suspensionSpeed += springForce / wheelConfig.mass * dt;
@@ -113,7 +112,6 @@ namespace game
     position = vec3::zero;
     rotation = quat::identity;
     velocity = vec3::zero;
-    angularVelocity = vec3::zero;
     wheelRotation = quat::identity;
     wheelRotationSpeed = 0;
     suspensionOffset = 0;

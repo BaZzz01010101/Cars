@@ -1,8 +1,8 @@
 #pragma once
 #include "Renderable.h"
+#include "Object.h"
 #include "Config.h"
 #include "Terrain.h"
-#include "RigidBody.h"
 
 namespace game
 {

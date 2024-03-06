@@ -99,10 +99,8 @@
   <ItemGroup>
     <ClCompile Include="src\App.cpp" />
     <ClCompile Include="src\ExplosionParticle.cpp" />
-    <ClCompile Include="src\Explosion.cpp" />
     <ClCompile Include="src\Projectile.cpp" />
     <ClCompile Include="src\Pool.cpp" />
-    <ClCompile Include="src\CollidableObject.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\CustomCamera.cpp" />
     <ClCompile Include="src\DebugGraphs.cpp" />
@@ -116,10 +114,8 @@
     <ClCompile Include="src\quat.cpp" />
     <ClCompile Include="src\Renderable.cpp" />
     <ClCompile Include="src\Scene.cpp" />
-    <ClCompile Include="src\RigidBody.cpp" />
     <ClCompile Include="src\Terrain.cpp" />
     <ClCompile Include="src\Turret.cpp" />
-    <ClCompile Include="src\TurretPlatform.cpp" />
     <ClCompile Include="src\vec2.cpp" />
     <ClCompile Include="src\vec3.cpp" />
     <ClCompile Include="src\Wheel.cpp" />
@@ -127,10 +123,8 @@
   <ItemGroup>
     <ClInclude Include="src\App.h" />
     <ClInclude Include="src\ExplosionParticle.h" />
-    <ClInclude Include="src\Explosion.h" />
     <ClInclude Include="src\Projectile.h" />
     <ClInclude Include="src\Pool.h" />
-    <ClInclude Include="src\CollidableObject.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\CustomCamera.h" />
     <ClInclude Include="src\DebugGraphs.h" />
@@ -144,10 +138,8 @@
     <ClInclude Include="src\quat.h" />
     <ClInclude Include="src\Renderable.h" />
     <ClInclude Include="src\Scene.h" />
-    <ClInclude Include="src\RigidBody.h" />
     <ClInclude Include="src\Terrain.h" />
     <ClInclude Include="src\Turret.h" />
-    <ClInclude Include="src\TurretPlatform.h" />
     <ClInclude Include="src\vec2.h" />
     <ClInclude Include="src\vec3.h" />
     <ClInclude Include="src\Wheel.h" />

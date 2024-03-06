@@ -1,5 +1,4 @@
 #pragma once
-#include "RigidBody.h"
 #include "Terrain.h"
 #include "Config.h"
 #include "Renderable.h"
@@ -7,7 +6,7 @@
 
 namespace game
 {
-  class Wheel : public Renderable, public DynamicObject
+  class Wheel : public Renderable, public Object
   {
   public:
     bool isGrounded{};
@@ -30,6 +29,7 @@ namespace game
     const DynamicObject* parent{};
     vec3 parentConnectionPoint{};
     float gravity{};
+    vec3 velocity{};
     float momentOfInertia{};
     Config::Physics::Wheels wheelConfig{};
 

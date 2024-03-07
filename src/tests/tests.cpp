@@ -116,7 +116,7 @@ namespace math_tests
     };
 
     static Terrain terrain;
-    static inline const int TRY_COUNT = 5000000;
+    static inline const size_t TRY_COUNT = 50000000;
     static inline const float MIN_XZ = -Terrain::TERRAIN_SIZE / 2 + 0.01f;
     static inline const float MAX_XZ = Terrain::TERRAIN_SIZE / 2 - 0.01f;
     static inline const float MIN_Y = -Terrain::TERRAIN_HEIGHT - 1;
@@ -195,7 +195,6 @@ namespace math_tests
   public:
     TEST_CLASS_INITIALIZE(initClass)
     {
-      InitWindow(640, 480, "");
       terrain.generate(nullptr, Terrain::Normal);
     }
 

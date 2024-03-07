@@ -236,6 +236,8 @@ namespace game
       for (float& h : heightMap)
         h = (h - min_h) / (max_h - min_h);
 
+#ifndef UNIT_TEST
+
     int square_count = GRID_SIZE * GRID_SIZE;
     mesh = {};
     mesh.triangleCount = square_count * 2;
@@ -365,6 +367,8 @@ namespace game
     //GenTextureMipmaps(&texture);
     //SetTextureFilter(texture, TEXTURE_FILTER_ANISOTROPIC_16X);
     model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+
+#endif // UNIT_TEST
   }
 
   float Terrain::calcHeight(int x, int y, Mode mode) const

@@ -30,7 +30,7 @@ namespace game
     suspensionSpeed += dampingForce / wheelConfig.mass * dt;
     suspensionOffset += suspensionSpeed * dt;
 
-    float terrainY = terrain->getHeight2(position.x, position.z, &normal);
+    float terrainY = terrain->getHeight(position.x, position.z, &normal);
     float bottomY = position.y + suspensionOffset - wheelConfig.radius;
     float penetration = terrainY - bottomY;
     isGrounded = penetration > 0;

@@ -163,7 +163,7 @@ namespace game
       vec3 ptRotated = pt.rotatedBy(rotation);
       vec3 ptGlobal = ptRotated + position;
       vec3 normal;
-      float terrainY = terrain->getHeight2(ptGlobal.x, ptGlobal.z, &normal);
+      float terrainY = terrain->getHeight(ptGlobal.x, ptGlobal.z, &normal);
       const float MAX_PENETRATION = 0.1f;
       float penetration = std::max(terrainY - ptGlobal.y, 0.0f) / MAX_PENETRATION;
       vec3 ptRotationfVelocity = (angularVelocity % pt).rotatedBy(rotation);

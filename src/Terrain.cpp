@@ -37,49 +37,6 @@ namespace game
     float dx = x - (float)x00;
     float dy = y - (float)y00;
 
-    float h00 = heightMap[y00 * HEIGHT_MAP_SIZE + x00] / 255.0f * TERRAIN_HEIGHT;
-    float h01 = heightMap[y01 * HEIGHT_MAP_SIZE + x01] / 255.0f * TERRAIN_HEIGHT;
-    float h10 = heightMap[y10 * HEIGHT_MAP_SIZE + x10] / 255.0f * TERRAIN_HEIGHT;
-    float h11 = heightMap[y11 * HEIGHT_MAP_SIZE + x11] / 255.0f * TERRAIN_HEIGHT;
-
-    float h;
-
-    // Triangles: (1,0) (0,0) (0,1) and (1,0) (1,1) (0,1)
-    if ((1 - dx) > dy)
-    {
-      h = h10 * dx + h01 * dy + h00 * (1 - dx - dy);
-    }
-    else if (dy > (1 - dx))
-    {
-      h = h01 * (1 - dx) + h10 * (1 - dy) - h11 * (1 - dx - dy);
-    }
-    else
-    {
-      h = h10 * (1 - dx) + h01 * dx;
-    }
-
-    return h;
-  }
-
-  float Terrain::getHeight2(float x, float y) const
-  {
-    x = clamp(x + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);
-    y = clamp(y + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);
-
-    x = x / TERRAIN_SIZE * (HEIGHT_MAP_SIZE - 1);
-    y = y / TERRAIN_SIZE * (HEIGHT_MAP_SIZE - 1);
-    int x00 = clamp(int(x), 0, HEIGHT_MAP_SIZE - 2);
-    int y00 = clamp(int(y), 0, HEIGHT_MAP_SIZE - 2);
-    int x01 = x00;
-    int y01 = y00 + 1;
-    int x10 = x00 + 1;
-    int y10 = y00;
-    int x11 = x00 + 1;
-    int y11 = y00 + 1;
-
-    float dx = x - (float)x00;
-    float dy = y - (float)y00;
-
     float h00 = heightMap2[y00 * HEIGHT_MAP_SIZE + x00];
     float h01 = heightMap2[y01 * HEIGHT_MAP_SIZE + x01];
     float h10 = heightMap2[y10 * HEIGHT_MAP_SIZE + x10];
@@ -104,7 +61,7 @@ namespace game
     return h * TERRAIN_HEIGHT;
   }
 
-  float Terrain::getHeight2(float worldX, float worldZ, vec3* normal) const
+  float Terrain::getHeight(float worldX, float worldZ, vec3* normal) const
   {
     float x = clamp(worldX + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);
     float y = clamp(worldZ + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);
@@ -169,11 +126,11 @@ namespace game
 
     for (int i = 0; i < steps; i++)
     {
-      float h = getHeight2(start.x, start.z, nullptr);
+      float h = getHeight(start.x, start.z, nullptr);
 
       if (start.y < h)
       {
-        float h = getHeight2(start.x, start.z, normal);
+        float h = getHeight(start.x, start.z, normal);
 
         return true;
       }
@@ -400,24 +357,6 @@ namespace game
     *v11 = { startX + CELL_SIZE, h11, startY + CELL_SIZE };
   }
 
-  bool Terrain::collidePoint(vec3 position, vec3* collision, float* penetration) const
-  {
-    vec3 v1, v2, v3;
-    getTriangle(position.x, position.z, &v1, &v2, &v3);
-
-    vec3 n = ((v2 - v1) % (v3 - v1)).normalized();
-    float penetrationScalar = (v1 - position) * n;
-
-    if (penetrationScalar > 0)
-    {
-      *penetration = penetrationScalar;
-      *collision = position + penetrationScalar * n;
-      return true;
-    }
-
-    return false;
-  }
-
   void Terrain::draw(bool drawWires)
   {
     if (drawWires)
@@ -430,42 +369,6 @@ namespace game
   }
 
   void Terrain::generate(const char* texturePath, Mode mode)
-  {
-    unloadResources();
-    heightMap.resize(HEIGHT_MAP_SIZE * HEIGHT_MAP_SIZE);
-
-    Image height_map_image;
-    height_map_image.width = HEIGHT_MAP_SIZE;
-    height_map_image.height = HEIGHT_MAP_SIZE;
-    height_map_image.data = heightMap.data();
-    height_map_image.mipmaps = 1;
-    height_map_image.format = PixelFormat::PIXELFORMAT_UNCOMPRESSED_GRAYSCALE;
-
-    for (int y = 0; y < HEIGHT_MAP_SIZE; y++)
-      for (int x = 0; x < HEIGHT_MAP_SIZE; x++)
-        heightMap[y * HEIGHT_MAP_SIZE + x] = int(255 * calcHeight(float(x), float(y), mode));
-
-    uint8_t min_h = 255;
-
-    for (uint8_t h : heightMap)
-      if (h < min_h)
-        min_h = h;
-
-    for (uint8_t& h : heightMap)
-      h -= min_h;
-
-    mesh = GenMeshHeightmap(height_map_image, vec3{ TERRAIN_SIZE, TERRAIN_HEIGHT, TERRAIN_SIZE });
-
-    model = LoadModelFromMesh(mesh);
-    modelLoaded = true;
-
-    texture = LoadTexture(texturePath);
-    textureLoaded = true;
-
-    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
-  }
-
-  void Terrain::generate2(const char* texturePath, Mode mode)
   {
     unloadResources();
     heightMap2.resize(HEIGHT_MAP_SIZE * HEIGHT_MAP_SIZE);

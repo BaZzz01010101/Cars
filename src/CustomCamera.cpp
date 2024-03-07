@@ -25,7 +25,7 @@ namespace game
 
     vec3 focusPoint = playerPosition + vec3{ 0, graphicsConfig.camera.focusElevation, 0 };
     position = focusPoint + vec3{ 0, 0, graphicsConfig.camera.minDistance }.rotatedBy(rotation);
-    float minYPosition = terrain.getHeight2(position.x, position.z) + 0.5f;
+    float minYPosition = terrain.getHeight(position.x, position.z) + 0.5f;
     position.y = std::max(position.y, minYPosition);
 
     vec3 dPos = focusPoint - position;

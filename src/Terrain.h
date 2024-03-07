@@ -26,15 +26,12 @@ namespace game
 		void unloadResources();
 
 		float getHeight(float x, float y) const;
-		float getHeight2(float x, float y) const;
-		float getHeight2(float worldX, float worldY, vec3* normal) const;
+		float getHeight(float worldX, float worldY, vec3* normal) const;
 		void generate(const char* texturePath, Mode mode);
-		void generate2(const char* texturePath, Mode mode);
 		bool trace(vec3 start, vec3 end, vec3* hit, vec3* normal) const;
 		bool intersectRayTriangle(const vec3 origin, const vec3 direction, const vec3 v0, const vec3 v1, const vec3 v2, vec3* collision, vec3* normal) const;
 		void getTriangle(float worldX, float worldY, vec3* v1, vec3* v2, vec3* v3) const;
 		void getTrianglePair(int x, int y, vec3* v00, vec3* v01, vec3* v10, vec3* v11) const;
-		bool collidePoint(vec3 position, vec3* collision, float* penetration) const;
 		void draw(bool drawWires);
 
 		// TODO: Rename collision to hitPosition

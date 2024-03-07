@@ -40,11 +40,11 @@ namespace game
     cannonModel = LoadModel(config.graphics.resources.cannonModelPath);
     cannonModelLoaded = true;
 
-    terrain.generate2(config.graphics.resources.terrainTexturePath, Terrain::Mode::Normal);
+    terrain.generate(config.graphics.resources.terrainTexturePath, Terrain::Mode::Normal);
 
     playerIndex = cars.tryAdd();
     Car& player = cars.get(playerIndex);
-    float h = terrain.getHeight2(0, 0);
+    float h = terrain.getHeight(0, 0);
     player.position = { 0, h + 2, 0 };
     player.init(config, carModel, wheelModel, gunModel, cannonModel, terrain, camera);
 
@@ -252,7 +252,7 @@ namespace game
 
   void Scene::regenerateTerrain(const char* texturePath, Terrain::Mode mode)
   {
-    terrain.generate2(texturePath, mode);
+    terrain.generate(texturePath, mode);
     Car& player = cars.get(playerIndex);
     reset(player.position, player.rotation);
   }
@@ -269,7 +269,7 @@ namespace game
 
   void Scene::reset(vec3 playerPosition, quat playerRotation)
   {
-    float terrainY = terrain.getHeight2(playerPosition.x, playerPosition.z);
+    float terrainY = terrain.getHeight(playerPosition.x, playerPosition.z);
     playerPosition.y = terrainY + 2;
     Car& player = cars.get(playerIndex);
     player.resetToPosition(playerPosition, playerRotation);

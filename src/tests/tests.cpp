@@ -196,7 +196,7 @@ namespace math_tests
     TEST_CLASS_INITIALIZE(initClass)
     {
       InitWindow(640, 480, "");
-      terrain.generate2(nullptr, Terrain::Normal);
+      terrain.generate(nullptr, Terrain::Normal);
     }
 
     TEST_METHOD(traceRay_random)

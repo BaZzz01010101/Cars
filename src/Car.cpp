@@ -61,7 +61,7 @@ namespace game
     rearRightWheelForce = vec3::zero;
   }
 
-  bool Car::traceRay(vec3 origin, vec3 direction, float distance, vec3* collision, vec3* normal) const
+  bool Car::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* normal) const
   {
     return false;
   }

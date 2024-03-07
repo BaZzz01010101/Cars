@@ -136,8 +136,8 @@ namespace math_tests
       {
         Line line = createLine();
 
-        vec3 collision, normal;
-        bool hit = terrain.traceRay(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), &collision, &normal);
+        vec3 hitPosition, normal;
+        bool hit = terrain.traceRay(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), &hitPosition, &normal);
         allHit = allHit && hit;
 
         if (!hit)
@@ -171,8 +171,8 @@ namespace math_tests
       {
         Line line = createLine();
 
-        vec3 collision, normal;
-        bool hit = terrain.traceRay(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), &collision, &normal);
+        vec3 hitPosition, normal;
+        bool hit = terrain.traceRay(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), &hitPosition, &normal);
         anyHit = anyHit || hit;
 
         if (hit)

@@ -95,9 +95,9 @@ namespace game
         vec3 begin = projectile.position;
         projectile.update(dt);
         vec3 end = projectile.position;
-        vec3 collision, normal;
+        vec3 hitPosition, normal;
 
-        if (terrain.traceRay(begin, (end - begin).normalized(), (end - begin).length(), &collision, &normal))
+        if (terrain.traceRay(begin, (end - begin).normalized(), (end - begin).length(), &hitPosition, &normal))
         {
           projectiles.remove(i);
 
@@ -105,7 +105,7 @@ namespace game
             config.graphics.bulletExplosionParticles : 
             config.graphics.shellExplosionParticles;
 
-          createExplosion(explosionConfig, collision);
+          createExplosion(explosionConfig, hitPosition);
         }
 
         if (projectile.lifeTime < 0)
@@ -235,17 +235,6 @@ namespace game
         ExplosionParticle& particle = explosionParticles.get(i);
         particle.draw();
       }
-
-    //vec3 gunPosition = player.gun.barrelPosition();
-    //vec3 gunDirection = player.gun.forward();
-
-    //drawVector(gunPosition, 100 * gunDirection, YELLOW);
-
-    //vec3 collision, normal;
-    //if (terrain.traceRay(gunPosition, gunDirection, -1, &collision, &normal))
-    //{
-    //  DrawSphere(collision, 1, YELLOW);
-    //}
 
     EndMode3D();
   }

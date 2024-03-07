@@ -27,7 +27,7 @@ namespace game
     void draw(bool drawWires);
 
     void resetToPosition(vec3 position, quat rotation);
-    bool traceRay(vec3 origin, vec3 direction, float distance, vec3* collision, vec3* normal) const;
+    bool traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* normal) const;
 
   private:
     const Terrain* terrain{};

@@ -18,49 +18,6 @@ namespace game
       UnloadTexture(texture);
   }
 
-  float Terrain::getHeight(float x, float y) const
-  {
-    x = clamp(x + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);
-    y = clamp(y + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);
-
-    x = x / TERRAIN_SIZE * (HEIGHT_MAP_SIZE - 1);
-    y = y / TERRAIN_SIZE * (HEIGHT_MAP_SIZE - 1);
-    int x00 = clamp(int(x), 0, HEIGHT_MAP_SIZE - 2);
-    int y00 = clamp(int(y), 0, HEIGHT_MAP_SIZE - 2);
-    int x01 = x00;
-    int y01 = y00 + 1;
-    int x10 = x00 + 1;
-    int y10 = y00;
-    int x11 = x00 + 1;
-    int y11 = y00 + 1;
-
-    float dx = x - (float)x00;
-    float dy = y - (float)y00;
-
-    float h00 = heightMap2[y00 * HEIGHT_MAP_SIZE + x00];
-    float h01 = heightMap2[y01 * HEIGHT_MAP_SIZE + x01];
-    float h10 = heightMap2[y10 * HEIGHT_MAP_SIZE + x10];
-    float h11 = heightMap2[y11 * HEIGHT_MAP_SIZE + x11];
-
-    float h;
-
-    // Triangles: (0,0) (1,0) (1,1) and (0,0) (0,1) (1,1)
-    if (dx > dy)
-    {
-      h = (h00 * (1 - dx) + h10 * dx) * (1 - dy / dx) + (h00 * (1 - dx) + h11 * dx) * dy / dx;
-    }
-    else if (dy > dx)
-    {
-      h = (h00 * (1 - dy) + h01 * dy) * (1 - dx / dy) + (h00 * (1 - dy) + h11 * dy) * dx / dy;
-    }
-    else
-    {
-      h = h00 * (1 - dx) + h11 * dx;
-    }
-
-    return h * TERRAIN_HEIGHT;
-  }
-
   float Terrain::getHeight(float worldX, float worldZ, vec3* normal) const
   {
     float x = clamp(worldX + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);
@@ -80,106 +37,34 @@ namespace game
     float dx = x - (float)x00;
     float dy = y - (float)y00;
 
-    float h00 = heightMap2[y00 * HEIGHT_MAP_SIZE + x00];
-    float h01 = heightMap2[y01 * HEIGHT_MAP_SIZE + x01];
-    float h10 = heightMap2[y10 * HEIGHT_MAP_SIZE + x10];
-    float h11 = heightMap2[y11 * HEIGHT_MAP_SIZE + x11];
-
-    float h;
+    float h00 = heightMap[y00 * HEIGHT_MAP_SIZE + x00];
+    float h01 = heightMap[y01 * HEIGHT_MAP_SIZE + x01];
+    float h10 = heightMap[y10 * HEIGHT_MAP_SIZE + x10];
+    float h11 = heightMap[y11 * HEIGHT_MAP_SIZE + x11];
 
     // Triangles: (0,0) (1,0) (1,1) and (0,0) (1,1) (0,1) 
-    if (dx > dy)
-    {
-      h = (h00 * (1 - dx) + h10 * dx) * (1 - dy / dx) + (h00 * (1 - dx) + h11 * dx) * dy / dx;
-
-      if (normal)
-        *normal = Vector3Normalize(Vector3CrossProduct({ CELL_SIZE , (h11 - h00) * TERRAIN_HEIGHT, CELL_SIZE }, { CELL_SIZE, (h10 - h00) * TERRAIN_HEIGHT, 0 }));
-    }
-    else if (dy > dx)
-    {
-      h = (h00 * (1 - dy) + h11 * dy) * dx / dy + (h00 * (1 - dy) + h01 * dy) * (1 - dx / dy);
-
-      if (normal)
-        *normal = Vector3Normalize(Vector3CrossProduct({ 0, (h01 - h00) * TERRAIN_HEIGHT, CELL_SIZE }, { CELL_SIZE, (h11 - h00) * TERRAIN_HEIGHT, CELL_SIZE }));
-    }
-    else
-    {
-      h = h00 * (1 - dx) + h11 * dx;
-
-      if (normal)
-        *normal = Vector3Normalize(Vector3CrossProduct({ 0, (h01 - h00) * TERRAIN_HEIGHT, CELL_SIZE }, { CELL_SIZE, (h11 - h00) * TERRAIN_HEIGHT, CELL_SIZE }));
-    }
-
-    return h * TERRAIN_HEIGHT;
-  }
-
-  bool Terrain::trace(vec3 start, vec3 end, vec3* hit, vec3* normal) const
-  {
-    if (start == end)
-      return false;
-
-    vec3 ray = Vector3Subtract(end, start);
-    float rayLength = Vector3Length(ray);
-    float stepLength = 0.1f;
-    const int steps = clamp(int(rayLength / stepLength), 1, 10);
-    vec3 step = ray / (float)steps;
-
-    for (int i = 0; i < steps; i++)
-    {
-      float h = getHeight(start.x, start.z, nullptr);
-
-      if (start.y < h)
-      {
-        float h = getHeight(start.x, start.z, normal);
-
-        return true;
-      }
-
-      start += step;
-    }
-
-    return false;
-  }
-
-  bool Terrain::intersectRayTriangle(const vec3 origin, const vec3 direction, const vec3 v0, const vec3 v1, const vec3 v2, vec3* collision, vec3* normal) const
-  {
-    vec3 edge01 = v1 - v0;
-    vec3 edge12 = v2 - v1;
-    vec3 edge20 = v0 - v2;
-    vec3 norm = (edge01 % edge20).normalized();
-    float originToPlaneDistanceSigned = (v0 - origin) * norm;
-    float cosAngle = direction * norm;
-
-    if (fabsf(cosAngle) < EPSILON)
-      return false;
-
-    float originToHitDistance = (originToPlaneDistanceSigned / cosAngle);
-
-    if (originToHitDistance < 0)
-      return false;
-
-    vec3 hit = origin + direction * originToHitDistance;
-
-    vec3 v0toHit = hit - v0;
-    vec3 v1toHit = hit - v1;
-    vec3 v2toHit = hit - v2;
-
-    if ((edge01 % v0toHit) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
-      return false;
-
-    if ((edge12 % v1toHit) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
-      return false;
-
-    if ((edge20 % v2toHit) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
-      return false;
-
-    if (collision)
-      *collision = hit;
-
     if (normal)
-      *normal = norm;
+    {
+      if (dx > dy)
+      {
+        vec3 edge1 = { CELL_SIZE , (h11 - h00) * TERRAIN_HEIGHT, CELL_SIZE };
+        vec3 edge2 = { CELL_SIZE, (h10 - h00) * TERRAIN_HEIGHT, 0 };
+        *normal = (edge1 % edge2).normalized();
+      }
+      else
+      {
+        vec3 edge1 = { 0, (h01 - h00) * TERRAIN_HEIGHT, CELL_SIZE };
+        vec3 edge2 = { CELL_SIZE, (h11 - h00) * TERRAIN_HEIGHT, CELL_SIZE };
+        *normal = (edge1 % edge2).normalized();
+      }
+    }
 
-    return true;
+    if (dx > dy)
+      return TERRAIN_HEIGHT * ((h00 * (1 - dx) + h10 * dx) * (1 - dy / dx) + (h00 * (1 - dx) + h11 * dx) * dy / dx);
+    else if (dy > dx)
+      return TERRAIN_HEIGHT * ((h00 * (1 - dy) + h11 * dy) * dx / dy + (h00 * (1 - dy) + h01 * dy) * (1 - dx / dy));
+    else
+      return TERRAIN_HEIGHT * (h00 * (1 - dx) + h11 * dx);
   }
 
   std::vector<Terrain::Cell> Terrain::traceGrid2D(vec2 origin, vec2 direction, float distance) const
@@ -238,7 +123,7 @@ namespace game
     return cells;
   }
 
-  bool Terrain::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* collision, vec3* normal) const
+  bool Terrain::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* normal) const
   {
     distance = (distance < 0) ? 9e9f : distance;
 
@@ -248,33 +133,34 @@ namespace game
     float distance2D = (1 - fabsf(directionNormalized.y) < EPSILON) ? EPSILON : distance * sqrtf(1 - directionNormalized.y * directionNormalized.y);
     auto cells = traceGrid2D(origin.xz(), directionNormalized.xz(), distance2D);
     float sqDistance = distance * distance;
-    vec3 collision1, normal1, collision2, normal2;
+    vec3 hitPosition1, normal1, hitPosition2, normal2;
 
     for (const Cell cell : cells)
     {
-      vec3 v00, v01, v10, v11;
-      getTrianglePair(cell.x, cell.y, &v00, &v01, &v10, &v11);
+      TrianglePair tranglePair = getTrianglePair(cell.x, cell.y);
+      Triangle tr1 = tranglePair.getTriangle1();
+      Triangle tr2 = tranglePair.getTriangle2();
 
-      bool isHit1 = intersectRayTriangle(origin, directionNormalized, v00, v10, v11, &collision1, &normal1);
-      bool isHit2 = intersectRayTriangle(origin, directionNormalized, v00, v11, v01, &collision2, &normal2);
+      bool isHit1 = tr1.traceRay(origin, directionNormalized, &hitPosition1, &normal1);
+      bool isHit2 = tr2.traceRay(origin, directionNormalized, &hitPosition2, &normal2);
 
-      float sqDistance1 = isHit1 ? (collision1 - origin).sqLength() : (10 * sqDistance);
-      float sqDistance2 = isHit2 ? (collision2 - origin).sqLength() : (10 * sqDistance);
+      float sqDistance1 = isHit1 ? (hitPosition1 - origin).sqLength() : (10 * sqDistance);
+      float sqDistance2 = isHit2 ? (hitPosition2 - origin).sqLength() : (10 * sqDistance);
 
       if (sqDistance1 <= sqDistance && sqDistance1 < sqDistance2)
       {
-        if (collision)
-          *collision = collision1;
+        if (hitPosition)
+          *hitPosition = hitPosition1;
 
         if (normal)
           *normal = normal1;
 
         return true;
       }
-      else if(sqDistance2 <= sqDistance)
+      else if (sqDistance2 <= sqDistance)
       {
-        if (collision)
-          *collision = collision2;
+        if (hitPosition)
+          *hitPosition = hitPosition2;
 
         if (normal)
           *normal = normal2;
@@ -286,10 +172,10 @@ namespace game
     return false;
   }
 
-  void Terrain::getTriangle(float worldX, float worldY, vec3* v1, vec3* v2, vec3* v3) const
+  Terrain::Triangle Terrain::getTriangle(float worldX, float worldZ) const
   {
     float x = clamp(worldX + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);
-    float y = clamp(worldY + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);
+    float y = clamp(worldZ + TERRAIN_SIZE / 2, 0.0f, TERRAIN_SIZE);
 
     x = x / CELL_SIZE;
     y = y / CELL_SIZE;
@@ -305,10 +191,10 @@ namespace game
     float dx = x - (float)x00;
     float dy = y - (float)y00;
 
-    float h00 = heightMap2[y00 * HEIGHT_MAP_SIZE + x00];
-    float h01 = heightMap2[y01 * HEIGHT_MAP_SIZE + x01];
-    float h10 = heightMap2[y10 * HEIGHT_MAP_SIZE + x10];
-    float h11 = heightMap2[y11 * HEIGHT_MAP_SIZE + x11];
+    float h00 = heightMap[y00 * HEIGHT_MAP_SIZE + x00];
+    float h01 = heightMap[y01 * HEIGHT_MAP_SIZE + x01];
+    float h10 = heightMap[y10 * HEIGHT_MAP_SIZE + x10];
+    float h11 = heightMap[y11 * HEIGHT_MAP_SIZE + x11];
 
     float h;
 
@@ -317,44 +203,40 @@ namespace game
     {
       h = (h00 * (1 - dx) + h10 * dx) * (1 - dy / dx) + (h00 * (1 - dx) + h11 * dx) * dy / dx;
 
-      if (v1)
-        *v1 = { x00 * CELL_SIZE - TERRAIN_SIZE / 2, h00 * TERRAIN_HEIGHT, y00 * CELL_SIZE - TERRAIN_SIZE / 2 };
-
-      if (v2)
-        *v2 = { x11 * CELL_SIZE - TERRAIN_SIZE / 2, h11 * TERRAIN_HEIGHT, y11 * CELL_SIZE - TERRAIN_SIZE / 2 };
-
-      if (v3)
-        *v3 = { x10 * CELL_SIZE - TERRAIN_SIZE / 2, h10 * TERRAIN_HEIGHT, y10 * CELL_SIZE - TERRAIN_SIZE / 2 };
+      return {
+        { x00 * CELL_SIZE - TERRAIN_SIZE / 2, h00 * TERRAIN_HEIGHT, y00 * CELL_SIZE - TERRAIN_SIZE / 2 },
+        { x11 * CELL_SIZE - TERRAIN_SIZE / 2, h11 * TERRAIN_HEIGHT, y11 * CELL_SIZE - TERRAIN_SIZE / 2 },
+        { x10 * CELL_SIZE - TERRAIN_SIZE / 2, h10 * TERRAIN_HEIGHT, y10 * CELL_SIZE - TERRAIN_SIZE / 2 },
+      };
     }
     else
     {
       h = (h00 * (1 - dy) + h01 * dy) * (1 - dx / dy) + (h00 * (1 - dy) + h11 * dy) * dx / dy;
 
-      if (v1)
-        *v1 = { x00 * CELL_SIZE - TERRAIN_SIZE / 2, h00 * TERRAIN_HEIGHT, y00 * CELL_SIZE - TERRAIN_SIZE / 2 };
-
-      if (v2)
-        *v2 = { x01 * CELL_SIZE - TERRAIN_SIZE / 2, h01 * TERRAIN_HEIGHT, y01 * CELL_SIZE - TERRAIN_SIZE / 2 };
-
-      if (v3)
-        *v3 = { x11 * CELL_SIZE - TERRAIN_SIZE / 2, h11 * TERRAIN_HEIGHT, y11 * CELL_SIZE - TERRAIN_SIZE / 2 };
+      return {
+        { x00 * CELL_SIZE - TERRAIN_SIZE / 2, h00 * TERRAIN_HEIGHT, y00 * CELL_SIZE - TERRAIN_SIZE / 2 },
+        { x01 * CELL_SIZE - TERRAIN_SIZE / 2, h01 * TERRAIN_HEIGHT, y01 * CELL_SIZE - TERRAIN_SIZE / 2 },
+        { x11 * CELL_SIZE - TERRAIN_SIZE / 2, h11 * TERRAIN_HEIGHT, y11 * CELL_SIZE - TERRAIN_SIZE / 2 },
+      };
     }
   }
 
-  void Terrain::getTrianglePair(int x, int y, vec3* v00, vec3* v01, vec3* v10, vec3* v11) const
+  Terrain::TrianglePair Terrain::getTrianglePair(int x, int y) const
   {
     float startX = x * CELL_SIZE - TERRAIN_SIZE / 2;
     float startY = y * CELL_SIZE - TERRAIN_SIZE / 2;
 
-    float h00 = heightMap2[y * HEIGHT_MAP_SIZE + x] * TERRAIN_HEIGHT;
-    float h01 = heightMap2[(y + 1) * HEIGHT_MAP_SIZE + x] * TERRAIN_HEIGHT;
-    float h10 = heightMap2[y * HEIGHT_MAP_SIZE + x + 1] * TERRAIN_HEIGHT;
-    float h11 = heightMap2[(y + 1) * HEIGHT_MAP_SIZE + x + 1] * TERRAIN_HEIGHT;
+    float h00 = heightMap[y * HEIGHT_MAP_SIZE + x] * TERRAIN_HEIGHT;
+    float h01 = heightMap[(y + 1) * HEIGHT_MAP_SIZE + x] * TERRAIN_HEIGHT;
+    float h10 = heightMap[y * HEIGHT_MAP_SIZE + x + 1] * TERRAIN_HEIGHT;
+    float h11 = heightMap[(y + 1) * HEIGHT_MAP_SIZE + x + 1] * TERRAIN_HEIGHT;
 
-    *v00 = { startX, h00, startY };
-    *v01 = { startX, h01, startY + CELL_SIZE };
-    *v10 = { startX + CELL_SIZE, h10, startY };
-    *v11 = { startX + CELL_SIZE, h11, startY + CELL_SIZE };
+    return {
+      { startX, h00, startY },
+      { startX, h01, startY + CELL_SIZE },
+      { startX + CELL_SIZE, h10, startY },
+      { startX + CELL_SIZE, h11, startY + CELL_SIZE },
+    };
   }
 
   void Terrain::draw(bool drawWires)
@@ -371,23 +253,23 @@ namespace game
   void Terrain::generate(const char* texturePath, Mode mode)
   {
     unloadResources();
-    heightMap2.resize(HEIGHT_MAP_SIZE * HEIGHT_MAP_SIZE);
+    heightMap.resize(HEIGHT_MAP_SIZE * HEIGHT_MAP_SIZE);
 
     for (int y = 0; y < HEIGHT_MAP_SIZE; y++)
       for (int x = 0; x < HEIGHT_MAP_SIZE; x++)
-        heightMap2[y * HEIGHT_MAP_SIZE + x] = calcHeight(float(x), float(y), mode);
+        heightMap[y * HEIGHT_MAP_SIZE + x] = calcHeight(x, y, mode);
 
     float min_h = 9e9f;
     float max_h = -9e9f;
 
-    for (float h : heightMap2)
+    for (float h : heightMap)
     {
       min_h = std::min(h, min_h);
       max_h = std::max(h, max_h);
     }
 
     if (max_h > min_h)
-      for (float& h : heightMap2)
+      for (float& h : heightMap)
         h = (h - min_h) / (max_h - min_h);
 
     int square_count = (HEIGHT_MAP_SIZE - 1) * (HEIGHT_MAP_SIZE - 1);
@@ -403,10 +285,10 @@ namespace game
     for (int y = 0; y < HEIGHT_MAP_SIZE - 1; y++)
       for (int x = 0; x < HEIGHT_MAP_SIZE - 1; x++)
       {
-        float h00 = heightMap2[y * HEIGHT_MAP_SIZE + x];
-        float h01 = heightMap2[(y + 1) * HEIGHT_MAP_SIZE + x];
-        float h10 = heightMap2[y * HEIGHT_MAP_SIZE + x + 1];
-        float h11 = heightMap2[(y + 1) * HEIGHT_MAP_SIZE + x + 1];
+        float h00 = heightMap[y * HEIGHT_MAP_SIZE + x];
+        float h01 = heightMap[(y + 1) * HEIGHT_MAP_SIZE + x];
+        float h10 = heightMap[y * HEIGHT_MAP_SIZE + x + 1];
+        float h11 = heightMap[(y + 1) * HEIGHT_MAP_SIZE + x + 1];
 
         float scale = TERRAIN_SIZE / (HEIGHT_MAP_SIZE - 1);
 
@@ -521,7 +403,7 @@ namespace game
     model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
   }
 
-  float Terrain::calcHeight(float x, float y, Mode mode) const
+  float Terrain::calcHeight(int x, int y, Mode mode) const
   {
     if (x == 0 || x == HEIGHT_MAP_SIZE - 1 || y == 0 || y == HEIGHT_MAP_SIZE - 1)
       return 1.0f;
@@ -534,10 +416,14 @@ namespace game
       y == HEIGHT_MAP_SIZE - 5 ? 0.0f :
       0.1f;
     else if (mode == Debug2)
-      return fabsf(y - HEIGHT_MAP_SIZE / 2) < HEIGHT_MAP_SIZE / 4 ? 1 - fabsf(y - HEIGHT_MAP_SIZE / 2) : 0.0f;
+      return abs(y - HEIGHT_MAP_SIZE_2) < HEIGHT_MAP_SIZE_4 ? 
+      1 - float(abs(y - HEIGHT_MAP_SIZE_2)) / HEIGHT_MAP_SIZE_4 : 
+      (y - HEIGHT_MAP_SIZE_2) > HEIGHT_MAP_SIZE_4 ?
+      float(y - HEIGHT_MAP_SIZE_2 - HEIGHT_MAP_SIZE_4) / HEIGHT_MAP_SIZE_4 :
+      0.0f;
 
-    x = x / HEIGHT_MAP_SIZE;
-    y = (y + HEIGHT_MAP_SIZE / 2) / HEIGHT_MAP_SIZE;
+    float xf = float(x) / HEIGHT_MAP_SIZE;
+    float yf = float(y + HEIGHT_MAP_SIZE_2) / HEIGHT_MAP_SIZE;
 
     int sz = HEIGHT_MAP_SIZE;
     float ka = 1.0f;
@@ -550,9 +436,9 @@ namespace game
     while (sz)
     {
       h +=
-        kn * k * sinf(2 * float(M_PI) * x * y * ka + add) +
-        kn * k * sinf(2 * float(M_PI) * x * ka + add) +
-        kn * k * sinf(2 * float(M_PI) * y * ka + add);
+        kn * k * sinf(2 * float(M_PI) * xf * yf * ka + add) +
+        kn * k * sinf(2 * float(M_PI) * xf * ka + add) +
+        kn * k * sinf(2 * float(M_PI) * yf * ka + add);
       sz /= 2;
       ka *= 2.0f;
       k /= 2.0f;
@@ -562,5 +448,46 @@ namespace game
     h += 0.5f;
 
     return h;
+  }
+
+  bool Terrain::Triangle::traceRay(vec3 origin, vec3 directionNormalized, vec3* hitPosition, vec3* normal) const
+  {
+    vec3 edge01 = v1 - v0;
+    vec3 edge12 = v2 - v1;
+    vec3 edge20 = v0 - v2;
+    vec3 norm = (edge01 % edge20).normalized();
+    float originToPlaneDistanceSigned = (v0 - origin) * norm;
+    float cosAngle = directionNormalized * norm;
+
+    if (fabsf(cosAngle) < EPSILON)
+      return false;
+
+    float originToHitDistance = (originToPlaneDistanceSigned / cosAngle);
+
+    if (originToHitDistance < 0)
+      return false;
+
+    vec3 hit = origin + directionNormalized * originToHitDistance;
+
+    vec3 v0toHit = hit - v0;
+    vec3 v1toHit = hit - v1;
+    vec3 v2toHit = hit - v2;
+
+    if ((edge01 % v0toHit) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
+      return false;
+
+    if ((edge12 % v1toHit) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
+      return false;
+
+    if ((edge20 % v2toHit) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
+      return false;
+
+    if (hitPosition)
+      *hitPosition = hit;
+
+    if (normal)
+      *normal = norm;
+
+    return true;
   }
 }

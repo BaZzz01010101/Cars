@@ -14,6 +14,8 @@ namespace game
 		};
 
 		inline static const int HEIGHT_MAP_SIZE = 101;
+		inline static const int HEIGHT_MAP_SIZE_2 = HEIGHT_MAP_SIZE / 2;
+		inline static const int HEIGHT_MAP_SIZE_4 = HEIGHT_MAP_SIZE / 4;
 		inline static const float TERRAIN_SIZE = 100.0f;
 		inline static const float TERRAIN_HEIGHT = 10.0f;
 		inline static const float CELL_SIZE = TERRAIN_SIZE / (HEIGHT_MAP_SIZE - 1);
@@ -23,20 +25,10 @@ namespace game
 		~Terrain();
 		Terrain& operator=(Terrain&) = delete;
 
-		void unloadResources();
-
-		float getHeight(float x, float y) const;
-		float getHeight(float worldX, float worldY, vec3* normal) const;
+		float getHeight(float worldX, float worldY, vec3* normal = nullptr) const;
 		void generate(const char* texturePath, Mode mode);
-		bool trace(vec3 start, vec3 end, vec3* hit, vec3* normal) const;
-		bool intersectRayTriangle(const vec3 origin, const vec3 direction, const vec3 v0, const vec3 v1, const vec3 v2, vec3* collision, vec3* normal) const;
-		void getTriangle(float worldX, float worldY, vec3* v1, vec3* v2, vec3* v3) const;
-		void getTrianglePair(int x, int y, vec3* v00, vec3* v01, vec3* v10, vec3* v11) const;
+		bool traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* normal) const;
 		void draw(bool drawWires);
-
-		// TODO: Rename collision to hitPosition
-		// TODO: Rename direction to directionNormalized
-		bool traceRay(vec3 origin, vec3 direction, float distance, vec3* collision, vec3* normal) const;
 
 	private:
 		struct Cell
@@ -45,19 +37,39 @@ namespace game
 			int y;
 		};
 
+		struct Triangle
+		{
+      vec3 v0;
+      vec3 v1;
+      vec3 v2;
+
+			bool traceRay(vec3 origin, vec3 directionNormalized, vec3* hitPosition, vec3* normal) const;
+    };
+
+		struct TrianglePair
+		{
+			vec3 v00;
+			vec3 v10;
+			vec3 v01;
+      vec3 v11;
+
+			Triangle getTriangle1() const { return { v00, v10, v11 }; }
+			Triangle getTriangle2() const { return { v00, v11, v01 }; }
+		};
+
 		Mode mode = Mode::Normal;
-		int heightMapWidth{};
-		int heightMapHeight{};
 		vec3 terrainDimensions{};
-		std::vector<uint8_t> heightMap;
-		std::vector<float> heightMap2;
+		std::vector<float> heightMap;
 		Mesh mesh{};
 		Model model{};
 		Texture texture{};
 		bool modelLoaded = false;
 		bool textureLoaded = false;
 
-		float calcHeight(float x, float y, Mode mode) const;
+		void unloadResources();
+		float calcHeight(int x, int y, Mode mode) const;
+		Triangle getTriangle(float worldX, float worldZ) const;
+		TrianglePair getTrianglePair(int x, int y) const;
 		std::vector<Cell> traceGrid2D(vec2 origin, vec2 direction, float distance) const;
 	};
 

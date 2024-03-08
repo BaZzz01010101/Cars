@@ -7,7 +7,7 @@ namespace game
   Car::Car()
   {}
 
-  void Car::init(Config config, Model carModel, Model wheelModel, Model gunModel, Model cannonModel, const Terrain& terrain, const CustomCamera& camera)
+  void Car::init(const Config& config, Model carModel, Model wheelModel, Model gunModel, Model cannonModel, const Terrain& terrain, const CustomCamera& camera)
   {
     this->terrain = &terrain;
     this->camera = &camera;
@@ -16,13 +16,13 @@ namespace game
     carConfig = config.physics.car;
     vec3 size = { 2.04f, 2.32f, 4.56f };
 
-    gunConnectionPoint = { 0, 0.45f, -0.2f };
-    cannonConnectionPoint = { 0, 0.55f, -1.6f };
+    vec3 gunConnectionPoint = { 0, 0.45f, -0.2f };
+    vec3 cannonConnectionPoint = { 0, 0.55f, -1.6f };
 
-    frontLeftWheelConnectionPoint = { 0.97f, -0.36f, 1.34f };
-    frontRightWheelConnectionPoint = { -0.97f, -0.36f, 1.34f };
-    rearLeftWheelConnectionPoint = { 0.97f, -0.536f, -1.20f };
-    rearRightWheelConnectionPoint = { -0.97f, -0.536f, -1.20f };
+    vec3 frontLeftWheelConnectionPoint = { 0.97f, -0.36f, 1.34f };
+    vec3 frontRightWheelConnectionPoint = { -0.97f, -0.36f, 1.34f };
+    vec3 rearLeftWheelConnectionPoint = { 0.97f, -0.536f, -1.20f };
+    vec3 rearRightWheelConnectionPoint = { -0.97f, -0.536f, -1.20f };
 
     gun.init(config.physics.gun, gunModel, terrain, *this, gunConnectionPoint, 1);
     cannon.init(config.physics.cannon, cannonModel, terrain, *this, cannonConnectionPoint, 2);
@@ -55,10 +55,6 @@ namespace game
     frontRightWheel.reset();
     rearLeftWheel.reset();
     rearRightWheel.reset();
-    frontLeftWheelForce = vec3::zero;
-    frontRightWheelForce = vec3::zero;
-    rearLeftWheelForce = vec3::zero;
-    rearRightWheelForce = vec3::zero;
   }
 
   bool Car::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* normal) const
@@ -68,7 +64,6 @@ namespace game
 
   void Car::update(float dt)
   {
-    lastForce = force;
     resetForces();
     applyGravity();
 
@@ -84,21 +79,11 @@ namespace game
     updateControl(dt);
 
     quat wheelRotation = rotation * quat::fromEuler(steeringAngle, 0, 0);
-    float frontPower = 1.5;
-    float rearPower = 1.5;
-    float contactsCount = std::max(1.0f, float(frontLeftWheel.isGrounded + frontRightWheel.isGrounded + rearLeftWheel.isGrounded + rearRightWheel.isGrounded));
-    float sharedMass = mass / contactsCount;
-    frontLeftWheelForce = frontLeftWheel.getForce(dt, sharedMass, frontPower * enginePower, brakePower, false);
-    frontRightWheelForce = frontRightWheel.getForce(dt, sharedMass, frontPower * enginePower, brakePower, false);
-    rearLeftWheelForce = rearLeftWheel.getForce(dt, sharedMass, rearPower * enginePower, brakePower, handBreaked);
-    rearRightWheelForce = rearRightWheel.getForce(dt, sharedMass, rearPower * enginePower, brakePower, handBreaked);
 
-    vec3 nForce = frontLeftWheel.nForce + frontRightWheel.nForce + rearLeftWheel.nForce + rearRightWheel.nForce;
-
-    applyGlobalForceAtLocalPoint(frontLeftWheelForce, frontLeftWheelConnectionPoint);
-    applyGlobalForceAtLocalPoint(frontRightWheelForce, frontRightWheelConnectionPoint);
-    applyGlobalForceAtLocalPoint(rearLeftWheelForce, rearLeftWheelConnectionPoint);
-    applyGlobalForceAtLocalPoint(rearRightWheelForce, rearRightWheelConnectionPoint);
+    applyGlobalForceAtLocalPoint(frontLeftWheel.force, frontLeftWheel.connectionPoint);
+    applyGlobalForceAtLocalPoint(frontRightWheel.force, frontRightWheel.connectionPoint);
+    applyGlobalForceAtLocalPoint(rearLeftWheel.force, rearLeftWheel.connectionPoint);
+    applyGlobalForceAtLocalPoint(rearRightWheel.force, rearRightWheel.connectionPoint);
 
     updateCollisions(dt);
 
@@ -109,15 +94,20 @@ namespace game
 
   void Car::updateWheels(float dt)
   {
-    float maxCorrectionAngle = (frontLeftWheelConnectionPoint - 0.5f * (rearLeftWheelConnectionPoint + rearRightWheelConnectionPoint)).getYAngle();
+    float maxCorrectionAngle = (frontLeftWheel.connectionPoint - 0.5f * (rearLeftWheel.connectionPoint + rearRightWheel.connectionPoint)).getYAngle();
     float correctionAngle = fabs(mapRangeClamped(steeringAngle, -PI / 2, PI / 2, -maxCorrectionAngle, maxCorrectionAngle));
 
-    frontLeftWheel.steeringAngle = steeringAngle + correctionAngle;
-    frontRightWheel.steeringAngle = steeringAngle - correctionAngle;
-    frontLeftWheel.update(dt);
-    frontRightWheel.update(dt);
-    rearLeftWheel.update(dt);
-    rearRightWheel.update(dt);
+    float frontPower = 1.0;
+    float rearPower = 1.0;
+    float contactsCount = std::max(1.0f, float(frontLeftWheel.isGrounded + frontRightWheel.isGrounded + rearLeftWheel.isGrounded + rearRightWheel.isGrounded));
+    float sharedMass = mass / contactsCount;
+
+    float frontLeftSteeringAngle = steeringAngle + correctionAngle;
+    float frontRightSteeringAngle = steeringAngle - correctionAngle;
+    frontLeftWheel.update(dt, frontLeftSteeringAngle, sharedMass, rearPower * enginePower, brakePower, handBreaked);
+    frontRightWheel.update(dt, frontLeftSteeringAngle, sharedMass, rearPower * enginePower, brakePower, handBreaked);
+    rearLeftWheel.update(dt, 0, sharedMass, rearPower * enginePower, brakePower, handBreaked);
+    rearRightWheel.update(dt, 0, sharedMass, rearPower * enginePower, brakePower, handBreaked);
   }
 
   void Car::updateTurrets(float dt)

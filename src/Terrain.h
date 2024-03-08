@@ -59,7 +59,6 @@ namespace game
     };
 
     Mode mode = Mode::Normal;
-    vec3 terrainDimensions{};
     std::vector<float> heightMap;
     Mesh mesh{};
     Model model{};

@@ -8,35 +8,33 @@ namespace game
 {
   class Wheel : public Renderable, public Object
   {
+    friend class Hud;
+
   public:
     bool isGrounded{};
-    vec3 normal{};
-    vec3 nForce{};
-    vec3 carDampingForce{};
-    float wheelRotationSpeed{};
-    vec3 frictionForce{};
     vec3 force{};
-    float steeringAngle{};
+    vec3 connectionPoint{};
 
-    void init(const Config::Physics::Wheels& config, const Model& model, const Terrain& terrain, const PhysicalObject& parent, vec3 parentConnectionPoint, const char* debugName, float gravity);
-    vec3 getForce(float dt, float sharedMass, float enginePower, float brakePower, bool handBreaked);
-    void update(float dt);
+    void init(const Config::Physics::Wheels& config, const Model& model, const Terrain& terrain, const DynamicObject& parent, vec3 connectionPoint, const char* debugName, float gravity);
+    void update(float dt, float steeringAngle, float sharedMass, float enginePower, float brakePower, bool handBreaked);
     void reset();
     void draw(bool drawWires);
 
   private:
+    Config::Physics::Wheels wheelConfig{};
     const Terrain* terrain{};
     const DynamicObject* parent{};
-    vec3 parentConnectionPoint{};
     float gravity{};
-    vec3 velocity{};
     float momentOfInertia{};
-    Config::Physics::Wheels wheelConfig{};
 
+    vec3 nForce{};
+    vec3 velocity{};
+    vec3 frictionForce{};
+    vec3 frictionVelocity{};
     float suspensionOffset{};
     float suspensionSpeed{};
+    float wheelRotationSpeed{};
     quat wheelRotation = quat::identity;
-    vec3 frictionVelocity{};
     const char* debugName = "UNKNOWN";
 
     void drawDebug();

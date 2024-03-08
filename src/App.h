@@ -8,23 +8,22 @@ namespace game
   class App
   {
   public:
+    void initialize();
+    void run();
+    void shutdown();
+
+  private:
     Config config{};
     Scene scene{};
     Hud hud{};
 
-    void initialize();
-    void run();
-    void shutdown();
-    void update(float dt);
-    void draw();
-
-    void togglePaused();
-
-  private:
     bool paused{};
 
-    void drawDebug();
+    void togglePaused();
+    void update(float dt);
     void updateShortcuts();
+    void draw();
+    void drawDebug();
   };
 
 }

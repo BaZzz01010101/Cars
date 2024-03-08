@@ -11,6 +11,8 @@ namespace game
 {
   class Car : public Renderable, public PhysicalObject
   {
+    friend class Hud;
+
   public:
     Turret gun{};
     Turret cannon{};
@@ -19,10 +21,9 @@ namespace game
     Wheel frontRightWheel{};
     Wheel rearLeftWheel{};
     Wheel rearRightWheel{};
-    float enginePower{};
 
     Car();
-    void init(Config config, Model carModel, Model wheelModel, Model gunModel, Model cannonModel, const Terrain& terrain, const CustomCamera& camera);
+    void init(const Config& config, Model carModel, Model wheelModel, Model gunModel, Model cannonModel, const Terrain& terrain, const CustomCamera& camera);
     void update(float dt);
     void draw(bool drawWires);
 
@@ -30,30 +31,15 @@ namespace game
     bool traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* normal) const;
 
   private:
+    Config::Physics::Car carConfig{};
     const Terrain* terrain{};
     const CustomCamera* camera{};
 
-    vec3 gunConnectionPoint{};
-    vec3 cannonConnectionPoint{};
-
-    vec3 frontLeftWheelConnectionPoint{};
-    vec3 frontRightWheelConnectionPoint{};
-    vec3 rearLeftWheelConnectionPoint{};
-    vec3 rearRightWheelConnectionPoint{};
-
-    Config::Physics::Car carConfig{};
-
+    float enginePower{};
     float brakePower{};
     bool handBreaked{};
     float steeringSpeed{};
     float steeringAngle{};
-
-    vec3 frontLeftWheelForce{};
-    vec3 frontRightWheelForce{};
-    vec3 rearLeftWheelForce{};
-    vec3 rearRightWheelForce{};
-
-    vec3 lastForce{};
 
     void updateControl(float dt);
     void updateWheels(float dt);

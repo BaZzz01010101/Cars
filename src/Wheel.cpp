@@ -4,12 +4,12 @@
 
 namespace game
 {
-  void Wheel::init(const Config::Physics::Wheels& config, const Model& model, const Terrain& terrain, const PhysicalObject& parent, vec3 parentConnectionPoint, const char* debugName, float gravity)
+  void Wheel::init(const Config::Physics::Wheels& config, const Model& model, const Terrain& terrain, const DynamicObject& parent, vec3 connectionPoint, const char* debugName, float gravity)
   {
     wheelConfig = config;
     this->terrain = &terrain;
     this->parent = &parent;
-    this->parentConnectionPoint = parentConnectionPoint;
+    this->connectionPoint = connectionPoint;
     this->debugName = debugName;
     this->gravity = gravity;
     this->momentOfInertia = 0.5f * wheelConfig.mass * sqr(wheelConfig.radius);
@@ -17,55 +17,45 @@ namespace game
     Renderable::init(model);
   }
   
-  void Wheel::update(float dt)
+  void Wheel::update(float dt, float steeringAngle, float sharedMass, float enginePower, float brakePower, bool handBreaked)
   {
-    vec3 globalConnectionPoint = parentConnectionPoint.rotatedBy(parent->rotation);
+    vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent->rotation);
     position = parent->position + globalConnectionPoint;
     rotation = parent->rotation * quat::fromYAngle(steeringAngle);
     velocity = parent->velocity + parent->angularVelocity.rotatedBy(rotation) % globalConnectionPoint;
+    force = vec3::zero;
 
-    float springForce = -suspensionOffset * wheelConfig.suspensionStiffness;
-    suspensionSpeed += springForce / wheelConfig.mass * dt;
+    float springForce = sqr(suspensionOffset) * wheelConfig.suspensionStiffness;
+    float springForceSigned = springForce * sign(-suspensionOffset);
+    suspensionSpeed += springForceSigned / wheelConfig.mass * dt;
     float dampingForce = -suspensionSpeed * wheelConfig.mass / dt * wheelConfig.suspensionDamping;
     suspensionSpeed += dampingForce / wheelConfig.mass * dt;
     suspensionOffset += suspensionSpeed * dt;
 
+    wheelRotationSpeed += enginePower / momentOfInertia * dt;
+    wheelRotationSpeed = moveTo(wheelRotationSpeed, 0, std::max(wheelRotationSpeed * wheelConfig.rollingFriction, 0.01f));
+    float maxRPS = float(!handBreaked) * (20 + 4 * velocity.length());
+    wheelRotationSpeed = clamp(wheelRotationSpeed, -maxRPS, maxRPS);
+
+    vec3 normal;
     float terrainY = terrain->getHeight(position.x, position.z, &normal);
     float bottomY = position.y + suspensionOffset - wheelConfig.radius;
     float penetration = terrainY - bottomY;
     isGrounded = penetration > 0;
 
+    vec3 lastFrictionForce = frictionForce;
+    frictionForce = vec3::zero;
+
     if (isGrounded)
     {
+      vec3 frictionUp = normal;
+      vec3 frictionForward = vec3::forward.rotatedBy(rotation).projectedOnPlane(normal).normalized();
+      vec3 frictionLeft = frictionUp % frictionForward;
+
       suspensionOffset += penetration;
       suspensionSpeed = -velocity * vec3::up;
-    }
 
-    suspensionOffset = clamp(suspensionOffset, -wheelConfig.maxSuspensionOffset, wheelConfig.maxSuspensionOffset);
-    wheelRotation.rotateByXAngle(wheelRotationSpeed * dt);
-  }
-
-  vec3 Wheel::getForce(float dt, float sharedMass, float enginePower, float brakePower, bool handBreaked)
-  {
-    vec3 force = vec3::zero;
-
-    vec3 suspensionUp = vec3::up.rotatedBy(rotation);
-    vec3 suspensionForward = vec3::forward.rotatedBy(rotation);
-    vec3 suspensionLeft = vec3::left.rotatedBy(rotation);
-
-    vec3 frictionUp = normal;
-    vec3 frictionForward = suspensionForward.rotatedOnPlane(normal);
-    vec3 frictionLeft = frictionUp % frictionForward;
-
-    wheelRotationSpeed += enginePower / momentOfInertia * dt;
-    wheelRotationSpeed = moveTo(wheelRotationSpeed, 0, std::max(wheelRotationSpeed * wheelConfig.rollingFriction, 0.01f));
-    /*float maxRPS = float(!handBreaked) * (20 + 4 * velocity.length());
-    wheelRotationSpeed = clamp(wheelRotationSpeed, -maxRPS, maxRPS);*/
-
-    if (isGrounded)
-    {
-      float nForceScalar = sqr(suspensionOffset) * wheelConfig.suspensionStiffness;
-      nForce = nForceScalar * normal;
+      nForce = springForce * normal;
       force += nForce;
 
       float parentNormalSpeed = velocity * normal;
@@ -77,22 +67,20 @@ namespace game
       }
 
       float frictionSpeed = (velocity.projectedOnPlane(normal) - wheelRotationSpeed * wheelConfig.radius * frictionForward).length();
-      float frictionKoef = wheelConfig.tireFriction + mapRangeClamped(frictionSpeed, 5, 30, 0.0f, -0.1f);
-      float maxFrictionForce = std::min(nForceScalar * frictionKoef, sharedMass * 100);
-
-      vec3 lastFrictionForce = frictionForce;
+      float frictionKoef = wheelConfig.tireFriction + mapRangeClamped(frictionSpeed, 5, 30, 0.2f, -0.1f);
+      float maxFrictionForce = std::min(springForce * frictionKoef, sharedMass * 100);
 
       vec3 gravityVelocity = handBreaked ?
         vec3{ 0, -gravity * dt, 0 }.projectedOnPlane(normal) :
         vec3{ 0, -gravity * dt, 0 }.projectedOnVector(frictionLeft);
 
       vec3 frictionVelocityForecast = velocity + gravityVelocity - wheelRotationSpeed * wheelConfig.radius * frictionForward;
-      frictionForce = -frictionVelocityForecast.projectedOnPlane(normal) * sharedMass / dt; 
+      frictionForce = -frictionVelocityForecast.projectedOnPlane(normal) * sharedMass / dt;
 
       if (frictionForce.sqLength() > sqr(maxFrictionForce))
         frictionForce = frictionForce.normalized() * maxFrictionForce;
 
-      frictionForce = 0.5 * frictionForce + 0.5 * lastFrictionForce;
+      frictionForce = 0.5 * (frictionForce + lastFrictionForce);
 
       force += frictionForce;
 
@@ -101,10 +89,10 @@ namespace game
       wheelRotationSpeed = moveTo(wheelRotationSpeed, targetWheelRotationSpeed, step);
 
       frictionVelocity = velocity.projectedOnPlane(normal) - wheelRotationSpeed * wheelConfig.radius * frictionForward;
-      this->force = force;
     }
 
-    return force;
+    suspensionOffset = clamp(suspensionOffset, -wheelConfig.maxSuspensionOffset, wheelConfig.maxSuspensionOffset);
+    wheelRotation.rotateByXAngle(wheelRotationSpeed * dt);
   }
 
   void Wheel::reset()

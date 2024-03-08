@@ -23,9 +23,11 @@ namespace game
     inline static const float CELL_SIZE = TERRAIN_SIZE / GRID_SIZE;
 
     Terrain() = default;
-    Terrain(Terrain&) = delete;
     ~Terrain();
+    Terrain(Terrain&) = delete;
+    Terrain(Terrain&&) = delete;
     Terrain& operator=(Terrain&) = delete;
+    Terrain& operator=(Terrain&&) = delete;
 
     float getHeight(float worldX, float worldY, vec3* normal = nullptr) const;
     void generate(const char* texturePath, Mode mode);

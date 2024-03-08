@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "Renderable.h"
 
-void Renderable::init(const Model& model)
+Renderable::Renderable(const Model& model) :
+  model(model)
 {
-  this->model = model;
 }
 
 void Renderable::draw(Matrix transform, bool drawWires)

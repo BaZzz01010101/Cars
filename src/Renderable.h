@@ -2,9 +2,10 @@
 class Renderable
 {
 public:
-  void init(const Model& model);
+  Renderable(const Model& model);
+
   void draw(Matrix transform, bool drawWires);
 
 private:
-  Model model{};
+  const Model& model{};
 };

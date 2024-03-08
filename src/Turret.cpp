@@ -4,15 +4,13 @@
 
 namespace game
 {
-  void Turret::init(const Config::Physics::Turret& config, const Model& model, const Terrain& terrain, const Object& parent, vec3 parentConnectionPoint, float scale)
+  Turret::Turret(const Config::Physics::Turret& config, const Model& model, const Terrain& terrain, vec3 connectionPoint, float scale) :
+    config(config),
+    Renderable(model),
+    terrain(terrain),
+    connectionPoint(connectionPoint),
+    scale(scale)
   {
-    turretConfig = config;
-    this->terrain = &terrain;
-    this->parent = &parent;
-    this->parentConnectionPoint = parentConnectionPoint;
-    this->scale = scale;
-
-    Renderable::init(model);
   }
 
   void Turret::reset()
@@ -25,30 +23,28 @@ namespace game
 
   vec3 Turret::barrelPosition() const
   {
-    return position + turretConfig.barrelPosition.rotatedBy(rotation);
+    return position + config.barrelPosition.rotatedBy(rotation);
   }
 
-  void Turret::update(float dt)
+  void Turret::update(float dt, const Object& parent)
   {
-    _ASSERT(parent != nullptr);
+    //rotation = parent.rotation;// .rotatedByXAngle(pitch).rotatedByYAngle(yaw);
 
-    //rotation = parent->rotation;// .rotatedByXAngle(pitch).rotatedByYAngle(yaw);
-    
     float targetYaw, targetPitch;
-    target.rotatedBy(parent->rotation.inverted()).yawPitch(&targetYaw, &targetPitch);
+    target.rotatedBy(parent.rotation.inverted()).yawPitch(&targetYaw, &targetPitch);
 
-    yaw = moveTo(yaw, targetYaw, turretConfig.rotationSpeed * dt);
-    pitch = moveTo(pitch, targetPitch, turretConfig.rotationSpeed * dt);
+    yaw = moveTo(yaw, targetYaw, config.rotationSpeed * dt);
+    pitch = moveTo(pitch, targetPitch, config.rotationSpeed * dt);
 
-    yaw = clamp(yaw, turretConfig.minYaw, turretConfig.maxYaw);
-    pitch = clamp(pitch, turretConfig.minPitch, turretConfig.maxPitch);
+    yaw = clamp(yaw, config.minYaw, config.maxYaw);
+    pitch = clamp(pitch, config.minPitch, config.maxPitch);
 
-    vec3 globalConnectionPoint = parentConnectionPoint.rotatedBy(parent->rotation);
-    position = parent->position + globalConnectionPoint;
-    rotation = parent->rotation * quat::identity.rotatedByXAngle(pitch).rotatedByYAngle(yaw);
+    vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
+    position = parent.position + globalConnectionPoint;
+    rotation = parent.rotation * quat::identity.rotatedByXAngle(pitch).rotatedByYAngle(yaw);
     rotation.normalize();
 
-    isRayHit = terrain->traceRay(barrelPosition(), forward(), -1, &rayHitPosition, nullptr);
+    isRayHit = terrain.traceRay(barrelPosition(), forward(), -1, &rayHitPosition, nullptr);
   }
 
   void Turret::draw(bool drawWires)
@@ -59,7 +55,6 @@ namespace game
   }
 
   void Turret::drawDebug()
-  {
-  }
+  {}
 
 }

@@ -3,16 +3,18 @@
 
 namespace game
 {
-  void Hud::init(const Config& config)
+  Hud::Hud(const Config& config) :
+    config(config)
+  {}
+
+  void Hud::init()
   {
-    hudConfig = config.graphics.hud;
-    screenConfig = config.graphics.screen;
-    font = LoadFontEx(config.graphics.resources.fontPath, hudConfig.fontSize, 0, 0);
+    font = LoadFontEx(config.graphics.resources.fontPath, config.graphics.hud.fontSize, 0, 0);
     crosshairsTexture = LoadTexture(config.graphics.resources.crosshairsTexturePath);
     lastColor = WHITE;
-    lastPosX = hudConfig.screenMargins;
-    lastPosY = hudConfig.screenMargins;
-    lastFontSize = hudConfig.fontSize;
+    lastPosX = config.graphics.hud.screenMargins;
+    lastPosY = config.graphics.hud.screenMargins;
+    lastFontSize = config.graphics.hud.fontSize;
   }
 
   void Hud::print(const char* text)
@@ -155,10 +157,13 @@ namespace game
 
   void Hud::drawCrosshairs(const Scene& scene)
   {
-    Vector2 cameraCrosshairPosition{ float(screenConfig.width) / 2, float(screenConfig.height) / 2 };
+    float screenWidth = (float)config.graphics.screen.width;
+    float screenHeight = (float)config.graphics.screen.height;
+
+    Vector2 cameraCrosshairPosition{ screenWidth / 2, screenHeight / 2 };
     float crosshairSrcSize = (float)crosshairsTexture.height;
-    float crosshairDstSize = (float)std::min(screenConfig.width, screenConfig.height) / 16;
-    DrawTexturePro(crosshairsTexture, { 0, 0, crosshairSrcSize, crosshairSrcSize }, { float(screenConfig.width / 2 - crosshairDstSize / 2), float(screenConfig.height / 2 - crosshairDstSize / 2), crosshairDstSize, crosshairDstSize }, { 0, 0 }, 0, { 255, 255, 255, 196 });
+    float crosshairDstSize = std::min(screenWidth, screenHeight) / 16;
+    DrawTexturePro(crosshairsTexture, { 0, 0, crosshairSrcSize, crosshairSrcSize }, { screenWidth / 2 - crosshairDstSize / 2, screenHeight / 2 - crosshairDstSize / 2, crosshairDstSize, crosshairDstSize }, { 0, 0 }, 0, { 255, 255, 255, 196 });
 
     const Turret& cannon = scene.getPlayer().cannon;
     vec3 cannonDirection = cannon.forward();

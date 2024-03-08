@@ -24,6 +24,24 @@ namespace game
         float bodyFriction;
         float aerodynamicKoef;
         float speedSteeringDrop;
+
+        struct
+        {
+          struct
+          {
+            vec3 frontLeft;
+            vec3 frontRight;
+            vec3 rearLeft;
+            vec3 rearRight;
+          } wheels;
+
+          struct
+          {
+            vec3 gun;
+            vec3 cannon;
+          } weapon;
+
+        } connectionPoints;
       } car;
 
       struct Wheels
@@ -110,6 +128,7 @@ namespace game
         const char* crosshairsTexturePath;
       } resources;
     } graphics;
-  };
 
+    static Config DEFAULT;
+  };
 }

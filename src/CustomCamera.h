@@ -12,14 +12,19 @@ namespace game
     vec3 position{};
     vec3 direction{};
 
-    void init(const Config::Graphics& config);
+    CustomCamera(const Config& config);
+    CustomCamera(CustomCamera&) = delete;
+    CustomCamera(CustomCamera&&) = delete;
+    CustomCamera& operator=(CustomCamera&) = delete;
+    CustomCamera& operator=(CustomCamera&&) = delete;
+
     void update(float dt, const Terrain& terrain, vec3 playerPosition);
     void reset(vec3 playerPosition);
 
     operator Camera() const { return camera; }
 
   private:
-    Config::Graphics graphicsConfig{};
+    const Config& config{};
 
     float yaw{};
     float pitch{};

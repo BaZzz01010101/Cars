@@ -4,9 +4,9 @@
 
 namespace game
 {
-  void CustomCamera::init(const Config::Graphics& config)
+  CustomCamera::CustomCamera(const Config& config) :
+    config(config)
   {
-    graphicsConfig = config;
     camera.fovy = 90;
     camera.projection = CAMERA_PERSPECTIVE;
   }
@@ -14,17 +14,18 @@ namespace game
   void CustomCamera::update(float dt, const Terrain& terrain, vec3 playerPosition)
   {
     Vector2 mouseDelta = GetMouseDelta();
+    const Config::Graphics::Camera cameraConfig = config.graphics.camera;
 
-    yaw -= mouseDelta.x * graphicsConfig.camera.horzSensitivity * 0.001f;
+    yaw -= mouseDelta.x * cameraConfig.horzSensitivity * 0.001f;
     yaw = normalizeAngle(yaw);
 
-    pitch -= mouseDelta.y * graphicsConfig.camera.vertSensitivity * 0.001f * (1 - 2 * graphicsConfig.camera.invertY);
-    pitch = std::clamp(pitch, -graphicsConfig.camera.maxPitch, graphicsConfig.camera.maxPitch);
+    pitch -= mouseDelta.y * cameraConfig.vertSensitivity * 0.001f * (1 - 2 * cameraConfig.invertY);
+    pitch = std::clamp(pitch, -cameraConfig.maxPitch, cameraConfig.maxPitch);
 
     quat rotation = quat::fromYAngle(yaw) * quat::fromXAngle(pitch);
 
-    vec3 focusPoint = playerPosition + vec3{ 0, graphicsConfig.camera.focusElevation, 0 };
-    position = focusPoint + vec3{ 0, 0, graphicsConfig.camera.minDistance }.rotatedBy(rotation);
+    vec3 focusPoint = playerPosition + vec3{ 0, cameraConfig.focusElevation, 0 };
+    position = focusPoint + vec3{ 0, 0, cameraConfig.minDistance }.rotatedBy(rotation);
     float minYPosition = terrain.getHeight(position.x, position.z) + 0.5f;
     position.y = std::max(position.y, minYPosition);
 
@@ -42,7 +43,7 @@ namespace game
     camera.up = vec3::up;
 
     HideCursor();
-    SetMousePosition(graphicsConfig.screen.width / 2, graphicsConfig.screen.height / 2);
+    SetMousePosition(config.graphics.screen.width / 2, config.graphics.screen.height / 2);
     UpdateCamera(&camera, CAMERA_CUSTOM);
   }
 

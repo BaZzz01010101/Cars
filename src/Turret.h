@@ -13,19 +13,23 @@ namespace game
     vec3 rayHitPosition{};
     bool isRayHit{};
 
-    void init(const Config::Physics::Turret& config, const Model& model, const Terrain& terrain, const Object& parent, vec3 parentConnectionPoint, float scale);
+    Turret(const Config::Physics::Turret& config, const Model& model, const Terrain& terrain, vec3 parentConnectionPoint, float scale);
+    Turret(Turret&) = delete;
+    Turret(Turret&&) = delete;
+    Turret& operator=(Turret&) = delete;
+    Turret& operator=(Turret&&) = delete;
+
     void reset();
     vec3 barrelPosition() const;
 
-    void update(float dt);
+    void update(float dt, const Object& parent);
     void draw(bool drawWires);
 
   private:
-    Config::Physics::Turret turretConfig{};
-    const Terrain* terrain;
-    const Object* parent;
+    const Config::Physics::Turret& config{};
+    const Terrain& terrain;
     float scale{};
-    vec3 parentConnectionPoint{};
+    vec3 connectionPoint{};
 
     float yaw{};
     float pitch{};

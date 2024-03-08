@@ -8,14 +8,16 @@ namespace game
   class App
   {
   public:
+    App();
+
     void initialize();
     void run();
     void shutdown();
 
   private:
     Config config{};
-    Scene scene{};
-    Hud hud{};
+    Scene scene;
+    Hud hud;
 
     bool paused{};
 

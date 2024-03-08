@@ -15,16 +15,20 @@ namespace game
     vec3 force{};
     vec3 connectionPoint{};
 
-    void init(const Config::Physics::Wheels& config, const Model& model, const Terrain& terrain, const DynamicObject& parent, vec3 connectionPoint, const char* debugName, float gravity);
-    void update(float dt, float steeringAngle, float sharedMass, float enginePower, float brakePower, bool handBreaked);
+    Wheel(const Config& config, bool isFrontWheel, const Model& model, const Terrain& terrain, vec3 connectionPoint, const char* debugName);
+    Wheel(Wheel&) = delete;
+    Wheel(Wheel&&) = delete;
+    Wheel& operator=(Wheel&) = delete;
+    Wheel& operator=(Wheel&&) = delete;
+
+    void update(float dt, const DynamicObject& parent, float steeringAngle, float sharedMass, float enginePower, float brakePower, bool handBreaked);
     void reset();
     void draw(bool drawWires);
 
   private:
-    Config::Physics::Wheels wheelConfig{};
-    const Terrain* terrain{};
-    const DynamicObject* parent{};
-    float gravity{};
+    const Config& config{};
+    const Config::Physics::Wheels& wheelConfig{};
+    const Terrain& terrain{};
     float momentOfInertia{};
 
     vec3 nForce{};

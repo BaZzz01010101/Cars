@@ -14,16 +14,20 @@ namespace game
     friend class Hud;
 
   public:
-    Turret gun{};
-    Turret cannon{};
+    Turret gun;
+    Turret cannon;
 
-    Wheel frontLeftWheel{};
-    Wheel frontRightWheel{};
-    Wheel rearLeftWheel{};
-    Wheel rearRightWheel{};
+    Wheel frontLeftWheel;
+    Wheel frontRightWheel;
+    Wheel rearLeftWheel;
+    Wheel rearRightWheel;
 
-    Car();
-    void init(const Config& config, Model carModel, Model wheelModel, Model gunModel, Model cannonModel, const Terrain& terrain, const CustomCamera& camera);
+    Car(const Config& config, const Model& carModel, const Model& wheelModel, const Model& gunModel, const Model& cannonModel, const Terrain& terrain, const CustomCamera& camera);
+    Car(Car&) = delete;
+    Car(Car&&) = delete;
+    Car& operator=(Car&) = delete;
+    Car& operator=(Car&&) = delete;
+
     void update(float dt);
     void draw(bool drawWires);
 
@@ -32,8 +36,8 @@ namespace game
 
   private:
     Config::Physics::Car carConfig{};
-    const Terrain* terrain{};
-    const CustomCamera* camera{};
+    const Terrain& terrain{};
+    const CustomCamera& camera;
 
     float enginePower{};
     float brakePower{};

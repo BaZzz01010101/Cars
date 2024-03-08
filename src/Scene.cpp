@@ -4,29 +4,20 @@
 
 namespace game
 {
-  Scene::Scene()
-  {}
+  Scene::Scene(const Config& config) :
+    config(config),
+    camera(config)
+  {
+  }
 
   Scene::~Scene()
   {
-    if (carModelLoaded)
-      UnloadModel(carModel);
-
-    if (wheelModelLoaded)
-      UnloadModel(wheelModel);
-
-    if (gunModelLoaded)
-      UnloadModel(gunModel);
-
-    if (cannonModelLoaded)
-      UnloadModel(cannonModel);
+    void unloadResources();
   }
 
-  void Scene::init(const Config& config)
+  void Scene::init()
   {
     SetTargetFPS(60);
-
-    this->config = config;
 
     carModel = LoadModel(config.graphics.resources.carModelPath);
     carModelLoaded = true;
@@ -42,13 +33,10 @@ namespace game
 
     terrain.generate(config.graphics.resources.terrainTexturePath, Terrain::Mode::Normal);
 
-    playerIndex = cars.tryAdd();
+    playerIndex = cars.tryAdd(config, carModel, wheelModel, gunModel, cannonModel, terrain, camera);
     Car& player = cars.get(playerIndex);
     float h = terrain.getHeight(0, 0);
     player.position = { 0, h + 2, 0 };
-    player.init(config, carModel, wheelModel, gunModel, cannonModel, terrain, camera);
-
-    camera.init(config.graphics);
   }
 
   void Scene::update(float dt)
@@ -209,6 +197,21 @@ namespace game
       ));
   }
 
+  void Scene::unloadResources()
+  {
+    if (carModelLoaded)
+      UnloadModel(carModel);
+
+    if (wheelModelLoaded)
+      UnloadModel(wheelModel);
+
+    if (gunModelLoaded)
+      UnloadModel(gunModel);
+
+    if (cannonModelLoaded)
+      UnloadModel(cannonModel);
+  }
+
   void Scene::draw()
   {
     BeginMode3D(camera);
@@ -244,16 +247,6 @@ namespace game
     terrain.generate(texturePath, mode);
     Car& player = cars.get(playerIndex);
     reset(player.position, player.rotation);
-  }
-
-  void Scene::toggleDrawWires()
-  {
-    drawWires = !drawWires;
-  }
-
-  void Scene::toggleSlowMotion()
-  {
-    slowMotion = !slowMotion;
   }
 
   void Scene::reset(vec3 playerPosition, quat playerRotation)

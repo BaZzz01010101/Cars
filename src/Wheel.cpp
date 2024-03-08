@@ -4,25 +4,23 @@
 
 namespace game
 {
-  void Wheel::init(const Config::Physics::Wheels& config, const Model& model, const Terrain& terrain, const DynamicObject& parent, vec3 connectionPoint, const char* debugName, float gravity)
+  Wheel::Wheel(const Config& config, bool isFrontWheel, const Model& model, const Terrain& terrain, vec3 connectionPoint, const char* debugName) :
+    config(config),
+    wheelConfig(isFrontWheel ? config.physics.frontWheels : config.physics.rearWheels),
+    Renderable(model),
+    terrain(terrain),
+    connectionPoint(connectionPoint),
+    debugName(debugName)
   {
-    wheelConfig = config;
-    this->terrain = &terrain;
-    this->parent = &parent;
-    this->connectionPoint = connectionPoint;
-    this->debugName = debugName;
-    this->gravity = gravity;
-    this->momentOfInertia = 0.5f * wheelConfig.mass * sqr(wheelConfig.radius);
-
-    Renderable::init(model);
+    momentOfInertia = 0.5f * wheelConfig.mass * sqr(wheelConfig.radius);
   }
-  
-  void Wheel::update(float dt, float steeringAngle, float sharedMass, float enginePower, float brakePower, bool handBreaked)
+
+  void Wheel::update(float dt, const DynamicObject& parent, float steeringAngle, float sharedMass, float enginePower, float brakePower, bool handBreaked)
   {
-    vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent->rotation);
-    position = parent->position + globalConnectionPoint;
-    rotation = parent->rotation * quat::fromYAngle(steeringAngle);
-    velocity = parent->velocity + parent->angularVelocity.rotatedBy(rotation) % globalConnectionPoint;
+    vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
+    position = parent.position + globalConnectionPoint;
+    rotation = parent.rotation * quat::fromYAngle(steeringAngle);
+    velocity = parent.velocity + parent.angularVelocity.rotatedBy(rotation) % globalConnectionPoint;
     force = vec3::zero;
 
     float springForce = sqr(suspensionOffset) * wheelConfig.suspensionStiffness;
@@ -38,7 +36,7 @@ namespace game
     wheelRotationSpeed = clamp(wheelRotationSpeed, -maxRPS, maxRPS);
 
     vec3 normal;
-    float terrainY = terrain->getHeight(position.x, position.z, &normal);
+    float terrainY = terrain.getHeight(position.x, position.z, &normal);
     float bottomY = position.y + suspensionOffset - wheelConfig.radius;
     float penetration = terrainY - bottomY;
     isGrounded = penetration > 0;
@@ -69,6 +67,7 @@ namespace game
       float frictionSpeed = (velocity.projectedOnPlane(normal) - wheelRotationSpeed * wheelConfig.radius * frictionForward).length();
       float frictionKoef = wheelConfig.tireFriction + mapRangeClamped(frictionSpeed, 5, 30, 0.2f, -0.1f);
       float maxFrictionForce = std::min(springForce * frictionKoef, sharedMass * 100);
+      float gravity = config.physics.gravity;
 
       vec3 gravityVelocity = handBreaked ?
         vec3{ 0, -gravity * dt, 0 }.projectedOnPlane(normal) :

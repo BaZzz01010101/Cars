@@ -7,11 +7,19 @@ namespace game
   {
   public:
     Pool(int capacity) :
-      objects(capacity),
+      //objects(capacity),
       alive(capacity, false),
       capacity(capacity),
       count(0)
-    {}
+    {
+      objects = static_cast<T*>(malloc(sizeof(T) * capacity));
+    }
+
+    ~Pool()
+    {
+      clear();
+      free(objects);
+    }
 
     template <typename... Args>
     int tryAdd(Args&&... args)
@@ -80,16 +88,18 @@ namespace game
     void clear()
     {
       for (int i = 0; i < capacity; i++)
-      {
-        objects[i].~T();
-        alive[i] = false;
-      }
+        if (alive[i])
+        {
+          objects[i].~T();
+          alive[i] = false;
+        }
 
       count = 0;
     }
 
   private:
-    std::vector<T> objects;
+    //std::vector<T> objects;
+    T* objects;
     std::vector<bool> alive;
     int count{};
     int capacity{};

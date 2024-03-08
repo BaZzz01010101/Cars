@@ -9,8 +9,15 @@ namespace game
   class Hud
   {
   public:
-    void init(const Config& config);
-    inline void setPaused(bool paused) { this->paused = paused; }
+    bool paused{};
+
+    Hud(const Config& config);
+    Hud(Hud&) = delete;
+    Hud(Hud&&) = delete;
+    Hud& operator=(Hud&) = delete;
+    Hud& operator=(Hud&&) = delete;
+
+    void init();
 
     void print(const char* text);
     void print(const char* text, Color color);
@@ -41,15 +48,13 @@ namespace game
     void drawCrosshairs(const Scene& scene);
 
   private:
-    Config::Graphics::Hud hudConfig{};
-    Config::Graphics::Screen screenConfig{};
-    Font font;
+    const Config& config{};
+    Font font{};
     Texture crosshairsTexture{};
     Color lastColor{};
     int lastPosX{};
     int lastPosY{};
     int lastFontSize{};
-    bool paused{};
     DebugGraphs debugGraphs{};
 
     void drawDebug(const Scene& scene);

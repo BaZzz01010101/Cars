@@ -3,9 +3,9 @@
 
 namespace game
 {
-  void PhysicalObject::init(const Config::Physics& physicsConfig)
+  PhysicalObject::PhysicalObject(const Config::Physics& physicsConfig) :
+    physicsConfig(physicsConfig)
   {
-    this->physicsConfig = physicsConfig;
   }
 
   void PhysicalObject::update(float dt)

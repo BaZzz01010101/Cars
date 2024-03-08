@@ -4,39 +4,23 @@
 
 namespace game
 {
-  Car::Car()
-  {}
-
-  void Car::init(const Config& config, Model carModel, Model wheelModel, Model gunModel, Model cannonModel, const Terrain& terrain, const CustomCamera& camera)
+  Car::Car(const Config& config, const Model& carModel, const Model& wheelModel, const Model& gunModel, const Model& cannonModel, const Terrain& terrain, const CustomCamera& camera) :
+    carConfig(config.physics.car),
+    Renderable(carModel),
+    PhysicalObject(config.physics),
+    gun(config.physics.gun, gunModel, terrain, config.physics.car.connectionPoints.weapon.gun, 1),
+    cannon(config.physics.cannon, gunModel, terrain, config.physics.car.connectionPoints.weapon.cannon, 2),
+    frontLeftWheel(config, true, wheelModel, terrain, config.physics.car.connectionPoints.wheels.frontLeft, "FrontLeftWheel"),
+    frontRightWheel(config, true, wheelModel, terrain, config.physics.car.connectionPoints.wheels.frontRight, "FrontRightWheel"),
+    rearLeftWheel(config, false, wheelModel, terrain, config.physics.car.connectionPoints.wheels.rearLeft, "RearLeftWheel"),
+    rearRightWheel(config, false, wheelModel, terrain, config.physics.car.connectionPoints.wheels.rearRight, "RearRightWheel"),
+    terrain(terrain),
+    camera(camera)
   {
-    this->terrain = &terrain;
-    this->camera = &camera;
-
     mass = config.physics.car.mass;
-    carConfig = config.physics.car;
     vec3 size = { 2.04f, 2.32f, 4.56f };
-
-    vec3 gunConnectionPoint = { 0, 0.45f, -0.2f };
-    vec3 cannonConnectionPoint = { 0, 0.55f, -1.6f };
-
-    vec3 frontLeftWheelConnectionPoint = { 0.97f, -0.36f, 1.34f };
-    vec3 frontRightWheelConnectionPoint = { -0.97f, -0.36f, 1.34f };
-    vec3 rearLeftWheelConnectionPoint = { 0.97f, -0.536f, -1.20f };
-    vec3 rearRightWheelConnectionPoint = { -0.97f, -0.536f, -1.20f };
-
-    gun.init(config.physics.gun, gunModel, terrain, *this, gunConnectionPoint, 1);
-    cannon.init(config.physics.cannon, cannonModel, terrain, *this, cannonConnectionPoint, 2);
-
-    frontLeftWheel.init(config.physics.frontWheels, wheelModel, terrain, *this, frontLeftWheelConnectionPoint, "FrontLeftWheel", config.physics.gravity);
-    frontRightWheel.init(config.physics.frontWheels, wheelModel, terrain, *this, frontRightWheelConnectionPoint, "FrontRightWheel", config.physics.gravity);
-    rearLeftWheel.init(config.physics.rearWheels, wheelModel, terrain, *this, rearLeftWheelConnectionPoint, "RearLeftWheel", config.physics.gravity);
-    rearRightWheel.init(config.physics.rearWheels, wheelModel, terrain, *this, rearRightWheelConnectionPoint, "RearRightWheel", config.physics.gravity);
-
     float radius = (size.x + size.y + size.z) / 6;
     momentOfInertia = 0.5f * mass * sqr(radius);
-
-    Renderable::init(carModel);
-    PhysicalObject::init(config.physics);
   }
 
   void Car::resetToPosition(vec3 position, quat rotation)
@@ -104,23 +88,23 @@ namespace game
 
     float frontLeftSteeringAngle = steeringAngle + correctionAngle;
     float frontRightSteeringAngle = steeringAngle - correctionAngle;
-    frontLeftWheel.update(dt, frontLeftSteeringAngle, sharedMass, rearPower * enginePower, brakePower, handBreaked);
-    frontRightWheel.update(dt, frontLeftSteeringAngle, sharedMass, rearPower * enginePower, brakePower, handBreaked);
-    rearLeftWheel.update(dt, 0, sharedMass, rearPower * enginePower, brakePower, handBreaked);
-    rearRightWheel.update(dt, 0, sharedMass, rearPower * enginePower, brakePower, handBreaked);
+    frontLeftWheel.update(dt, *this, frontLeftSteeringAngle, sharedMass, rearPower * enginePower, brakePower, handBreaked);
+    frontRightWheel.update(dt, *this, frontLeftSteeringAngle, sharedMass, rearPower * enginePower, brakePower, handBreaked);
+    rearLeftWheel.update(dt, *this, 0, sharedMass, rearPower * enginePower, brakePower, handBreaked);
+    rearRightWheel.update(dt, *this, 0, sharedMass, rearPower * enginePower, brakePower, handBreaked);
   }
 
   void Car::updateTurrets(float dt)
   {
     vec3 targetCollisionPosition;
-    bool isHit = terrain->traceRay(camera->position, camera->direction, -1, &targetCollisionPosition, nullptr);
+    bool isHit = terrain.traceRay(camera.position, camera.direction, -1, &targetCollisionPosition, nullptr);
     vec3 gunPosition = gun.position + 0.35f * up();
     vec3 cannonPosition = cannon.position + 0.75f * up();
 
-    gun.target = isHit ? (targetCollisionPosition - gunPosition) : camera->direction;
-    cannon.target = isHit ? (targetCollisionPosition - cannonPosition) : camera->direction;
-    gun.update(dt);
-    cannon.update(dt);
+    gun.target = isHit ? (targetCollisionPosition - gunPosition) : camera.direction;
+    cannon.target = isHit ? (targetCollisionPosition - cannonPosition) : camera.direction;
+    gun.update(dt, *this);
+    cannon.update(dt, *this);
   }
 
   void Car::updateCollisions(float dt)
@@ -153,7 +137,7 @@ namespace game
       vec3 ptRotated = pt.rotatedBy(rotation);
       vec3 ptGlobal = ptRotated + position;
       vec3 normal;
-      float terrainY = terrain->getHeight(ptGlobal.x, ptGlobal.z, &normal);
+      float terrainY = terrain.getHeight(ptGlobal.x, ptGlobal.z, &normal);
       const float MAX_PENETRATION = 0.1f;
       float penetration = std::max(terrainY - ptGlobal.y, 0.0f) / MAX_PENETRATION;
       vec3 ptRotationfVelocity = (angularVelocity % pt).rotatedBy(rotation);

@@ -12,39 +12,35 @@ namespace game
   class Scene
   {
   public:
+    bool paused{};
+    bool drawWires{};
+    bool slowMotion{};
     bool gunFiring{};
     bool cannonFiring{};
-    CustomCamera camera{};
+    CustomCamera camera;
     Terrain terrain{};
     vec3 gunRayHit{};
     vec3 cannonRayHit{};
 
-    Scene();
-    Scene(Scene&) = delete;
+    Scene(const Config& config);
     ~Scene();
+    Scene(Scene&) = delete;
     Scene& operator=(Scene&) = delete;
 
-    void init(const Config& config);
+    void init();
     void update(float dt);
     void draw();
     void regenerateTerrain(const char* texturePath, Terrain::Mode mode);
-    inline void setPaused(bool paused) { this->paused = paused; }
-    void toggleDrawWires();
-    void toggleSlowMotion();
     void reset(vec3 playerPosition, quat playerRotation);
     const Car& getPlayer() const { return cars.get(playerIndex); }
     Car& getPlayer() { return cars.get(playerIndex); }
 
   private:
-    Config config{};
+    const Config& config{};
     int playerIndex{};
     Pool<Car> cars{ 1 };
     Pool<Projectile> projectiles{ 1000 };
     Pool<ExplosionParticle> explosionParticles{ 10000 };
-
-    bool paused{};
-    bool drawWires{};
-    bool slowMotion{};
 
     Model carModel{};
     Model wheelModel{};
@@ -62,6 +58,7 @@ namespace game
     void updateGameObjects(float dt);
     void updateFiring(float dt);
     void createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position);
+    void unloadResources();
   };
 
 }

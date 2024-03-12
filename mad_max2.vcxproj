@@ -100,7 +100,6 @@
     <ClCompile Include="src\App.cpp" />
     <ClCompile Include="src\ExplosionParticle.cpp" />
     <ClCompile Include="src\Projectile.cpp" />
-    <ClCompile Include="src\Pool.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\CustomCamera.cpp" />
     <ClCompile Include="src\DebugGraphs.cpp" />
@@ -124,7 +123,7 @@
     <ClInclude Include="src\App.h" />
     <ClInclude Include="src\ExplosionParticle.h" />
     <ClInclude Include="src\Projectile.h" />
-    <ClInclude Include="src\Pool.h" />
+    <ClInclude Include="src\Pool.hpp" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\CustomCamera.h" />
     <ClInclude Include="src\DebugGraphs.h" />

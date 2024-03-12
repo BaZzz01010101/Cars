@@ -14,6 +14,13 @@ namespace game
     friend class Hud;
 
   public:
+    float enginePower{};
+    float brakePower{};
+    bool handBreaked{};
+    float steeringDirection{};
+    float enginePowerDirection{};
+    float verticalTrust{};
+
     Turret gun;
     Turret cannon;
 
@@ -35,13 +42,12 @@ namespace game
     bool traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* normal) const;
 
   private:
+    Config config{};
     Config::Physics::Car carConfig{};
+    const float& gravity{};
     const Terrain& terrain{};
     const CustomCamera& camera;
 
-    float enginePower{};
-    float brakePower{};
-    bool handBreaked{};
     float steeringSpeed{};
     float steeringAngle{};
 

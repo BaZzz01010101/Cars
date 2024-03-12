@@ -3,9 +3,8 @@
 namespace game
 {
 
-  class Object
+  struct Object
   {
-  public:
     vec3 position{};
     quat rotation = quat::identity;
 

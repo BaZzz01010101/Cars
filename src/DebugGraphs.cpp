@@ -156,6 +156,10 @@ namespace game
 
   void DebugGraphs::updateControl()
   {
+    // TODO: Fix potential incorrect controls
+    // getting key state inside update can lead to incorrect calculations due to the multiple
+    // accounting of the same key press in recurcive update calls in App::update because RayLib
+    // seems updating input state once per frame
     if (IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB))
     {
       if ((IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)))

@@ -13,6 +13,10 @@ namespace game
 
   void CustomCamera::update(float dt, const Terrain& terrain, vec3 playerPosition)
   {
+    // TODO: Fix potential incorrect calculations of camera position
+    // getting mouse delta inside update can lead to incorrect calculations due to the multiple
+    // accounting of the same mouse delta in recurcive update calls in App::update because RayLib
+    // seems updating input state once per frame
     Vector2 mouseDelta = GetMouseDelta();
     const Config::Graphics::Camera cameraConfig = config.graphics.camera;
 

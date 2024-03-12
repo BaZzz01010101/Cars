@@ -11,7 +11,7 @@
 *       initialized on rlglInit() to accumulate vertex data.
 *
 *       When an internal state change is required all the stored vertex data is renderer in batch,
-*       additionally, rlDrawRenderBatchActive() could be called to force flushing of the batch.
+*       additionally, rlDrawRenderBatchActive() could be called to suspecsionForce flushing of the batch.
 *
 *       Some resources are also loaded for convenience, here the complete list:
 *          - Default batch (RLGL.defaultBatch): RenderBatch system to accumulate vertex data
@@ -1512,7 +1512,7 @@ void rlSetTexture(unsigned int id)
 #if defined(GRAPHICS_API_OPENGL_11)
         rlDisableTexture();
 #else
-        // NOTE: If quads batch limit is reached, we force a draw call and next batch starts
+        // NOTE: If quads batch limit is reached, we suspecsionForce a draw call and next batch starts
         if (RLGL.State.vertexCounter >=
             RLGL.currentBatch->vertexBuffer[RLGL.currentBatch->currentBuffer].elementCount*4)
         {
@@ -2938,7 +2938,7 @@ void rlDrawRenderBatchActive(void)
 }
 
 // Check internal buffer overflow for a given number of vertex
-// and force a rlRenderBatch draw call if required
+// and suspecsionForce a rlRenderBatch draw call if required
 bool rlCheckRenderBatchLimit(int vCount)
 {
     bool overflow = false;
@@ -3126,7 +3126,7 @@ unsigned int rlLoadTextureDepth(int width, int height, bool useRenderBuffer)
     unsigned int id = 0;
 
 #if defined(GRAPHICS_API_OPENGL_33) || defined(GRAPHICS_API_OPENGL_ES2)
-    // In case depth textures not supported, we force renderbuffer usage
+    // In case depth textures not supported, we suspecsionForce renderbuffer usage
     if (!RLGL.ExtSupported.texDepth) useRenderBuffer = true;
 
     // NOTE: We let the implementation to choose the best bit-depth

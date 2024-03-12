@@ -12,7 +12,7 @@ namespace game
 
   public:
     bool isGrounded{};
-    vec3 force{};
+    vec3 suspecsionForce{};
     vec3 connectionPoint{};
 
     Wheel(const Config& config, bool isFrontWheel, const Model& model, const Terrain& terrain, vec3 connectionPoint, const char* debugName);

@@ -4,9 +4,8 @@
 namespace game
 {
 
-  class DynamicObject : public Object
+  struct DynamicObject : public Object
   {
-  public:
     vec3 velocity{};
     vec3 angularVelocity{};
 

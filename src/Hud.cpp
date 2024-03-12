@@ -7,10 +7,17 @@ namespace game
     config(config)
   {}
 
+  Hud::~Hud()
+  {
+    if (crosshairsTextureLoaded)
+      UnloadTexture(crosshairsTexture);
+  }
+
   void Hud::init()
   {
     font = LoadFontEx(config.graphics.resources.fontPath, config.graphics.hud.fontSize, 0, 0);
     crosshairsTexture = LoadTexture(config.graphics.resources.crosshairsTexturePath);
+    crosshairsTextureLoaded = true;
     lastColor = WHITE;
     lastPosX = config.graphics.hud.screenMargins;
     lastPosY = config.graphics.hud.screenMargins;
@@ -151,39 +158,42 @@ namespace game
 
   void Hud::draw(const Scene& scene)
   {
-    drawCrosshairs(scene);
+    drawCrossHairs(scene);
     drawDebug(scene);
   }
 
-  void Hud::drawCrosshairs(const Scene& scene)
+  void Hud::drawCrossHairs(const Scene& scene)
   {
-    float screenWidth = (float)config.graphics.screen.width;
-    float screenHeight = (float)config.graphics.screen.height;
+    int screenWidth = config.graphics.screen.width;
+    int screenHeight = config.graphics.screen.height;
+    float srcSize = (float)crosshairsTexture.height;
+    float dstSize = float(std::min(screenWidth, screenHeight) / 16);
+    Color color = { 255, 255, 255, 196 };
 
-    Vector2 cameraCrosshairPosition{ screenWidth / 2, screenHeight / 2 };
-    float crosshairSrcSize = (float)crosshairsTexture.height;
-    float crosshairDstSize = std::min(screenWidth, screenHeight) / 16;
-    DrawTexturePro(crosshairsTexture, { 0, 0, crosshairSrcSize, crosshairSrcSize }, { screenWidth / 2 - crosshairDstSize / 2, screenHeight / 2 - crosshairDstSize / 2, crosshairDstSize, crosshairDstSize }, { 0, 0 }, 0, { 255, 255, 255, 196 });
+    // camera cross hair
+    vec2 center = { float(screenWidth / 2), float(screenHeight / 2) };
+    drawCrossHair(center, 0, srcSize, dstSize, color);
 
-    const Turret& cannon = scene.getPlayer().cannon;
-    vec3 cannonDirection = cannon.forward();
-    if (scene.camera.direction * cannonDirection > 0)
+    const Car& player = scene.getPlayer();
+
+    drawTurretCrossHair(scene.camera, player.cannon, 1, srcSize, dstSize, color);
+    drawTurretCrossHair(scene.camera, player.gun, 2, srcSize, dstSize, color);
+  }
+
+  void Hud::drawTurretCrossHair(const CustomCamera& camera, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color)
+  {
+    if (camera.direction * turret.forward() > 0)
     {
-      vec3 targetPosition = cannon.isRayHit ? cannon.rayHitPosition : cannon.position + 1000.0f * cannonDirection;
-      vec2 crosshairPosition = GetWorldToScreen(targetPosition, scene.camera);
-      DrawTexturePro(crosshairsTexture, { crosshairSrcSize, crosshairSrcSize, crosshairSrcSize, crosshairSrcSize }, { float(crosshairPosition.x - crosshairDstSize / 2), float(crosshairPosition.y - crosshairDstSize / 2), crosshairDstSize, crosshairDstSize }, { 0, 0 }, 0, { 255, 255, 255, 196 });
-    }
-
-    const Turret& gun = scene.getPlayer().gun;
-    vec3 gunDirection = gun.forward();
-    if (scene.camera.direction * gunDirection > 0)
-    {
-      vec3 targetPosition = gun.isRayHit ? gun.rayHitPosition : gun.position + 1000.0f * gunDirection;
-      vec2 crosshairPosition = GetWorldToScreen(targetPosition, scene.camera);
-      DrawTexturePro(crosshairsTexture, { crosshairSrcSize * 2, crosshairSrcSize * 2, crosshairSrcSize, crosshairSrcSize }, { float(crosshairPosition.x - crosshairDstSize / 2), float(crosshairPosition.y - crosshairDstSize / 2), crosshairDstSize, crosshairDstSize }, { 0, 0 }, 0, { 255, 255, 255, 196 });
+      vec2 position = GetWorldToScreen(turret.currentTarget, camera);
+      drawCrossHair(position, textureIndex, srcSize, dstSize, color);
     }
   }
 
+  void Hud::drawCrossHair(vec2 position, int textureIndex, float srcSize, float dstSize, Color color)
+  {
+    DrawTexturePro(crosshairsTexture, { srcSize * textureIndex, srcSize * textureIndex, srcSize, srcSize }, { float(position.x - 0.5f * dstSize), float(position.y - 0.5f * dstSize), dstSize, dstSize }, { 0, 0 }, 0, color);
+  }
+    
   void Hud::drawDebug(const Scene& scene)
   {
     if (paused)

@@ -9,9 +9,8 @@ namespace game
   class Turret : public Renderable, public Object
   {
   public:
-    vec3 target{};
-    vec3 rayHitPosition{};
-    bool isRayHit{};
+    vec3 expectedTarget{};
+    vec3 currentTarget{};
 
     Turret(const Config::Physics::Turret& config, const Model& model, const Terrain& terrain, vec3 parentConnectionPoint, float scale);
     Turret(Turret&) = delete;

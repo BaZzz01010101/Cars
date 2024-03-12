@@ -1,6 +1,5 @@
 #pragma once
 #include "Config.h"
-#include "Pool.h"
 
 namespace game
 {
@@ -16,7 +15,6 @@ namespace game
     float lifeTime{};
     float gravity{};
     vec3 vertices[3]{};
-
 
     void update(float dt);
     void draw() const;

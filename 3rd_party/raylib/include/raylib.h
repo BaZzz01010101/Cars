@@ -314,7 +314,7 @@ typedef struct Font {
 // Camera, defines position/orientation in 3d space
 typedef struct Camera3D {
     Vector3 position;       // Camera position
-    Vector3 target;         // Camera target it looks-at
+    Vector3 target;         // Camera expectedTarget it looks-at
     Vector3 up;             // Camera up vector (rotation over its axis)
     float fovy;             // Camera field-of-view aperture in Y (degrees) in perspective, used as near plane width in orthographic
     int projection;         // Camera projection: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
@@ -324,8 +324,8 @@ typedef Camera3D Camera;    // Camera type fallback, defaults to Camera3D
 
 // Camera2D, defines position/orientation in 2d space
 typedef struct Camera2D {
-    Vector2 offset;         // Camera offset (displacement from target)
-    Vector2 target;         // Camera target (rotation and zoom begin)
+    Vector2 offset;         // Camera offset (displacement from expectedTarget)
+    Vector2 target;         // Camera expectedTarget (rotation and zoom begin)
     float rotation;         // Camera rotation in degrees
     float zoom;             // Camera zoom (scaling), should be 1.0f by default
 } Camera2D;
@@ -1054,7 +1054,7 @@ RLAPI Vector2 GetWorldToScreenEx(Vector3 position, Camera camera, int width, int
 RLAPI Vector2 GetWorldToScreen2D(Vector2 position, Camera2D camera); // Get the screen space position for a 2d camera world space position
 
 // Timing-related functions
-RLAPI void SetTargetFPS(int fps);                                 // Set target FPS (maximum)
+RLAPI void SetTargetFPS(int fps);                                 // Set expectedTarget FPS (maximum)
 RLAPI float GetFrameTime(void);                                   // Get time in seconds for last frame drawn (delta time)
 RLAPI double GetTime(void);                                       // Get elapsed time in seconds since InitWindow()
 RLAPI int GetFPS(void);                                           // Get current FPS

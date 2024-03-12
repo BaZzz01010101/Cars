@@ -14,6 +14,7 @@ namespace game
     static quat fromEuler(float yaw, float pitch, float roll);
     static quat fromVectorToVector(vec3 v0, vec3 v1);
     static quat random();
+
     quat() = default;
     quat(Quaternion q);
     quat(float x, float y, float z, float w);

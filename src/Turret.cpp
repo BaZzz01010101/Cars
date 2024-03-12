@@ -31,7 +31,7 @@ namespace game
     //rotation = parent.rotation;// .rotatedByXAngle(pitch).rotatedByYAngle(yaw);
 
     float targetYaw, targetPitch;
-    target.rotatedBy(parent.rotation.inverted()).yawPitch(&targetYaw, &targetPitch);
+    (expectedTarget - position).rotatedBy(parent.rotation.inverted()).yawPitch(&targetYaw, &targetPitch);
 
     yaw = moveTo(yaw, targetYaw, config.rotationSpeed * dt);
     pitch = moveTo(pitch, targetPitch, config.rotationSpeed * dt);
@@ -44,7 +44,11 @@ namespace game
     rotation = parent.rotation * quat::identity.rotatedByXAngle(pitch).rotatedByYAngle(yaw);
     rotation.normalize();
 
-    isRayHit = terrain.traceRay(barrelPosition(), forward(), -1, &rayHitPosition, nullptr);
+    // TODO: Consider better targeting method
+    // In current implementation the cross hair sometimes behaves unpreditably
+    // when tracing not hit the terrain
+    if(!terrain.traceRay(barrelPosition(), forward(), -1, &currentTarget, nullptr))
+      currentTarget = position + 1000.0f * forward();
   }
 
   void Turret::draw(bool drawWires)
@@ -55,6 +59,7 @@ namespace game
   }
 
   void Turret::drawDebug()
-  {}
+  {
+  }
 
 }

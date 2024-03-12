@@ -66,16 +66,6 @@ namespace game
     return a;
   }
 
-  //quadratic extrapolation
-  inline vec3 extrapolate(vec3 v0, vec3 v1, vec3 v2, float k)
-    {
-      vec3 d1 = v1 - v0;
-      vec3 d2 = v2 - v1;
-      vec3 d3 = d2 - d1;
-
-      return v2 + k * d2 + 0*d3 / 2;
-    }
-
   inline void drawVector(vec3 pos, vec3 vec, Color color)
   {
     DrawLine3D(pos, pos + vec, color);

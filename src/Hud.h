@@ -12,6 +12,7 @@ namespace game
     bool paused{};
 
     Hud(const Config& config);
+    ~Hud();
     Hud(Hud&) = delete;
     Hud(Hud&&) = delete;
     Hud& operator=(Hud&) = delete;
@@ -45,17 +46,22 @@ namespace game
 
     void update();
     void draw(const Scene& scene);
-    void drawCrosshairs(const Scene& scene);
+    void drawCrossHairs(const Scene& scene);
+
+    void drawTurretCrossHair(const CustomCamera& camera, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color);
 
   private:
     const Config& config{};
     Font font{};
     Texture crosshairsTexture{};
+    bool crosshairsTextureLoaded{};
     Color lastColor{};
     int lastPosX{};
     int lastPosY{};
     int lastFontSize{};
     DebugGraphs debugGraphs{};
+
+    void drawCrossHair(vec2 position, int textureIndex, float srcSize, float dstSize, Color color);
 
     void drawDebug(const Scene& scene);
   };

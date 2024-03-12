@@ -3,11 +3,6 @@
 
 namespace game
 {
-  PhysicalObject::PhysicalObject(const Config::Physics& physicsConfig) :
-    physicsConfig(physicsConfig)
-  {
-  }
-
   void PhysicalObject::update(float dt)
   {
     velocity += force / mass * dt;
@@ -57,10 +52,5 @@ namespace game
   void PhysicalObject::applyMoment(const vec3 moment)
   {
     this->moment += moment;
-  }
-
-  void PhysicalObject::applyGravity()
-  {
-    applyGlobalForceAtCenterOfMass(mass * vec3{ 0, -physicsConfig.gravity, 0 });
   }
 }

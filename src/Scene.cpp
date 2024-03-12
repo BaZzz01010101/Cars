@@ -15,10 +15,23 @@ namespace game
     void unloadResources();
   }
 
+  void Scene::unloadResources()
+  {
+    if (carModelLoaded)
+      UnloadModel(carModel);
+
+    if (wheelModelLoaded)
+      UnloadModel(wheelModel);
+
+    if (gunModelLoaded)
+      UnloadModel(gunModel);
+
+    if (cannonModelLoaded)
+      UnloadModel(cannonModel);
+  }
+
   void Scene::init()
   {
-    SetTargetFPS(60);
-
     carModel = LoadModel(config.graphics.resources.carModelPath);
     carModelLoaded = true;
 
@@ -41,19 +54,8 @@ namespace game
 
   void Scene::update(float dt)
   {
-    const float speed = 5 * dt;
-
-    vec3 camera_movement{
-      speed * (IsKeyDown(KEY_HOME) - IsKeyDown(KEY_END)),
-      speed * (IsKeyDown(KEY_LEFT_SHIFT) - IsKeyDown(KEY_LEFT_CONTROL)),
-      speed * (IsKeyDown(KEY_PAGE_DOWN) - IsKeyDown(KEY_DELETE)),
-    };
-
-    vec3 player_movement{
-      speed * (IsKeyDown(KEY_W) - IsKeyDown(KEY_S)),
-      speed * (IsKeyDown(KEY_D) - IsKeyDown(KEY_A)),
-      speed * (IsKeyDown(KEY_LEFT_SHIFT) - IsKeyDown(KEY_LEFT_CONTROL)),
-    };
+    updatePlayerControl(dt);
+    updateFiring(dt);
 
     thread_local int slowMoCounter = 0;
     const int slowMoCounterMax = 40;
@@ -64,8 +66,6 @@ namespace game
 
     Car& player = cars.get(playerIndex);
     camera.update(dt, terrain, player.position);
-
-    updateFiring(dt);
   }
 
   void Scene::updateGameObjects(float dt)
@@ -197,19 +197,15 @@ namespace game
       ));
   }
 
-  void Scene::unloadResources()
+  void Scene::updatePlayerControl(float dt)
   {
-    if (carModelLoaded)
-      UnloadModel(carModel);
+    Car& player = getPlayer();
+    const Config::Physics::Car& carConfig = config.physics.car;
 
-    if (wheelModelLoaded)
-      UnloadModel(wheelModel);
-
-    if (gunModelLoaded)
-      UnloadModel(gunModel);
-
-    if (cannonModelLoaded)
-      UnloadModel(cannonModel);
+    player.verticalTrust = player.mass * 20 * float(IsKeyDown(KEY_LEFT_SHIFT)),
+    player.handBreaked = IsKeyDown(KEY_SPACE);
+    player.enginePowerDirection = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S));
+    player.steeringDirection = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D));
   }
 
   void Scene::draw()
@@ -257,12 +253,5 @@ namespace game
     player.resetToPosition(playerPosition, playerRotation);
     camera.reset(playerPosition);
   }
-
-  vec3 lastNForce{};
-  vec3 lastMoment{};
-  vec3 lastForce{};
-  vec3 lastFrictionForce{};
-  vec3 lastContactSpotVelocityProjected{};
-  vec3 lastVelocity{};
 
 }

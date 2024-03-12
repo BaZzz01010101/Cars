@@ -3,9 +3,6 @@
 
 namespace game
 {
-  // min2 can be greater than max2
-  // min1 can be greater than max1
-  // min1 can be equal to max1
   float mapRangeClamped(float value, float min1, float max1, float min2, float max2)
   {
     if (min1 == max1)

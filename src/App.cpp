@@ -5,6 +5,10 @@
 
 namespace game
 {
+  // TODO: Consider saving only required config parameters in dependent types
+  // Saving the reference to Config in every instance can lead to serious multithreading issues
+  // if config will be changed from different thread
+
   App::App() :
     config(Config::DEFAULT),
     scene(config),
@@ -15,6 +19,7 @@ namespace game
   void App::initialize()
   {
     InitWindow(config.graphics.screen.width, config.graphics.screen.height, config.graphics.screen.title);
+    SetTargetFPS(60);
 
     scene.init();
     hud.init();

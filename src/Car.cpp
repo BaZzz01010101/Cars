@@ -5,9 +5,10 @@
 namespace game
 {
   Car::Car(const Config& config, const Model& carModel, const Model& wheelModel, const Model& gunModel, const Model& cannonModel, const Terrain& terrain, const CustomCamera& camera) :
+    config(config),
     carConfig(config.physics.car),
+    gravity(config.physics.gravity),
     Renderable(carModel),
-    PhysicalObject(config.physics),
     gun(config.physics.gun, gunModel, terrain, config.physics.car.connectionPoints.weapon.gun, 1),
     cannon(config.physics.cannon, gunModel, terrain, config.physics.car.connectionPoints.weapon.cannon, 2),
     frontLeftWheel(config, true, wheelModel, terrain, config.physics.car.connectionPoints.wheels.frontLeft, "FrontLeftWheel"),
@@ -49,7 +50,7 @@ namespace game
   void Car::update(float dt)
   {
     resetForces();
-    applyGravity();
+    applyGlobalForceAtCenterOfMass({0, -gravity * mass, 0});
 
     float aerodinamicForce = carConfig.aerodynamicKoef * velocity.sqLength();
     applyGlobalForceAtCenterOfMass(-aerodinamicForce * up());
@@ -64,10 +65,10 @@ namespace game
 
     quat wheelRotation = rotation * quat::fromEuler(steeringAngle, 0, 0);
 
-    applyGlobalForceAtLocalPoint(frontLeftWheel.force, frontLeftWheel.connectionPoint);
-    applyGlobalForceAtLocalPoint(frontRightWheel.force, frontRightWheel.connectionPoint);
-    applyGlobalForceAtLocalPoint(rearLeftWheel.force, rearLeftWheel.connectionPoint);
-    applyGlobalForceAtLocalPoint(rearRightWheel.force, rearRightWheel.connectionPoint);
+    applyGlobalForceAtLocalPoint(frontLeftWheel.suspecsionForce, frontLeftWheel.connectionPoint);
+    applyGlobalForceAtLocalPoint(frontRightWheel.suspecsionForce, frontRightWheel.connectionPoint);
+    applyGlobalForceAtLocalPoint(rearLeftWheel.suspecsionForce, rearLeftWheel.connectionPoint);
+    applyGlobalForceAtLocalPoint(rearRightWheel.suspecsionForce, rearRightWheel.connectionPoint);
 
     updateCollisions(dt);
 
@@ -96,13 +97,16 @@ namespace game
 
   void Car::updateTurrets(float dt)
   {
+    // TODO: Consider better targeting method
+    // In current implementation the cross hair sometimes behaves unpreditably
+    // when tracing not hit the terrain
     vec3 targetCollisionPosition;
+    vec3 gunPosition = gun.position + config.physics.gun.barrelPosition.y * up();
+    vec3 cannonPosition = cannon.position + config.physics.cannon.barrelPosition.y * up();
     bool isHit = terrain.traceRay(camera.position, camera.direction, -1, &targetCollisionPosition, nullptr);
-    vec3 gunPosition = gun.position + 0.35f * up();
-    vec3 cannonPosition = cannon.position + 0.75f * up();
 
-    gun.target = isHit ? (targetCollisionPosition - gunPosition) : camera.direction;
-    cannon.target = isHit ? (targetCollisionPosition - cannonPosition) : camera.direction;
+    gun.expectedTarget = isHit ? targetCollisionPosition : camera.position + 1000 * camera.direction;
+    cannon.expectedTarget = isHit ? targetCollisionPosition : camera.position + 1000 * camera.direction;
     gun.update(dt, *this);
     cannon.update(dt, *this);
   }
@@ -198,25 +202,16 @@ namespace game
 
   void Car::updateControl(float dt)
   {
-    vec3 thrust = {
-      0,
-      mass * 20 * float(IsKeyDown(KEY_LEFT_SHIFT)),
-      0
-    };
-
-    handBreaked = IsKeyDown(KEY_SPACE);
-
-    float step = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S)) == sign(enginePower) ? carConfig.enginePower * dt : carConfig.enginePower * 4 * dt;
-    float maxForwardEnginePower = mapRangeClamped(velocity * forward(), 0, carConfig.maxSpeed, carConfig.enginePower, 0);
-    float maxBackwardEnginePower = mapRangeClamped(velocity * forward(), -carConfig.maxSpeed, 0, 0, carConfig.enginePower);
-    enginePower = moveTo(enginePower, maxForwardEnginePower * float(IsKeyDown(KEY_W)) - maxBackwardEnginePower * float(IsKeyDown(KEY_S)), step);
-    //brakePower = carConfig.brakePower * float(IsKeyDown(KEY_END));
-
-    applyGlobalForceAtCenterOfMass(thrust);
-
-    float steeringDirection = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D));
     float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0, carConfig.maxSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
     float steeringTarget;
+
+    applyGlobalForceAtCenterOfMass({ 0, verticalTrust, 0 });
+
+    float step = (sign(enginePowerDirection) == sign(enginePower)) ? carConfig.enginePower * dt : carConfig.enginePower * 4 * dt;
+    float maxForwardEnginePower = mapRangeClamped(velocity * forward(), 0, carConfig.maxSpeed, carConfig.enginePower, 0);
+    float maxBackwardEnginePower = mapRangeClamped(velocity * forward(), -carConfig.maxSpeed, 0, 0, carConfig.enginePower);
+    enginePower = moveTo(enginePower, maxForwardEnginePower * float(enginePowerDirection > 0) - maxBackwardEnginePower * float(enginePowerDirection < 0), step);
+    //brakePower = carConfig.brakePower * float(IsKeyDown(KEY_END));
 
     if (steeringDirection == 0.0f)
     {
@@ -253,7 +248,7 @@ namespace game
     //drawVector(position, 3 * left(), LIGHTGRAY);
     //drawVector(position, 3 * up(), DARKGRAY);
 
-    //drawVector(position, 0.001f * force, RED);
+    //drawVector(position, 0.001f * suspecsionForce, RED);
     //drawVector(position, 0.5f * moment.logarithmic(), BLUE);
     drawVector(position, 5 * vec3::forward, WHITE);
     drawVector(position, 5 * vec3::left, LIGHTGRAY);

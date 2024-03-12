@@ -3,12 +3,17 @@
 
 using namespace game;
 
+static App* app = nullptr;
+
 int main()
 {
-  App app{};
-  app.initialize();
-  app.run();
-  app.shutdown();
+  app = new App();
+
+  app->initialize();
+  app->run();
+  app->shutdown();
+
+  delete app;
 
   return 0;
 }

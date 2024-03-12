@@ -5,7 +5,7 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mad_max2", "mad_max2.vcxproj", "{1931600C-4FB4-4491-92B0-8689726BE2A5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tests", "C:\DEV\!Gaijin\mad_max2\tests.vcxproj", "{15463F17-178A-4FE0-A4FE-E3F6C5DDCD8E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tests", "tests.vcxproj", "{15463F17-178A-4FE0-A4FE-E3F6C5DDCD8E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{22444B98-12A8-4326-A10E-726E84223E10}"
 	ProjectSection(SolutionItems) = preProject

@@ -28,8 +28,6 @@ namespace game
 
   void Turret::update(float dt, const Object& parent)
   {
-    //rotation = parent.rotation;// .rotatedByXAngle(pitch).rotatedByYAngle(yaw);
-
     float targetYaw, targetPitch;
     (expectedTarget - position).rotatedBy(parent.rotation.inverted()).yawPitch(&targetYaw, &targetPitch);
 

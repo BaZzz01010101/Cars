@@ -3,20 +3,10 @@
 #include "Terrain.h"
 #include "Helpers.h"
 #include <functional>
-//#include "../3rd_party/catch2/catch.hpp"
-
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace game;
 using namespace std;
-
-//TEST_CASE("Factorials are computed", "[factorial]")
-//{
-//  REQUIRE(1 == 1);
-//  REQUIRE(2 == 2);
-//  REQUIRE(3 == 6);
-//  REQUIRE((10) == 3628800);
-//}
 
 namespace math_tests
 {

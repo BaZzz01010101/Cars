@@ -54,39 +54,11 @@ namespace game
     return quat{ x, y, z, w }.normalized();
   }
 
-  //quat::quat(const quat& q) :
-  //  Quaternion{ q }
-  //{}
-
-  //quat::quat(const quat&& q) noexcept :
-  //  Quaternion{ q }
-  //{}
-
   quat::quat(Quaternion q) : Quaternion{ q }
   {}
 
   quat::quat(float x, float y, float z, float w) : Quaternion{ x, y, z, w }
   {}
-
-  //quat& quat::operator=(const quat& q)
-  //{
-  //  x = q.x;
-  //  y = q.y;
-  //  z = q.z;
-  //  w = q.w;
-
-  //  return *this;
-  //}
-
-  //quat& quat::operator=(const quat&& q) noexcept
-  //{
-  //  x = q.x;
-  //  y = q.y;
-  //  z = q.z;
-  //  w = q.w;
-
-  //  return *this;
-  //}
 
   quat quat::operator*(quat q) const
   {
@@ -176,15 +148,6 @@ namespace game
   {
     QuaternionToAxisAngle(*this, axis, angle);
   }
-
-  //void quat::toEuler(float* yaw, float* pitch, float* roll) const
-  //{
-  //  vec3 euler = QuaternionToEuler(*this);
-
-  //  if (yaw) *yaw = normalizeAngle(euler.y);
-  //  if (pitch) *pitch = normalizeAngle(euler.z);
-  //  if (roll) *roll = normalizeAngle(euler.x);
-  //}
 
   void quat::toEuler(float* yaw, float* pitch, float* roll) const
   {

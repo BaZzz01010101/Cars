@@ -6,22 +6,23 @@ namespace game
   class bool_array
   {
   private:
-    char buf[Capacity / 8 + 1];
+    static int constexpr BUF_SIZE = (Capacity + 31) / 32;
+    uint32_t buf[BUF_SIZE] = { 0 };
 
   public:
-    bool_array() 
+    bool_array(bool initValue)
     {
-      memset(buf, 0, sizeof(buf));
+      std::fill_n(buf, BUF_SIZE, initValue * 0xFFFFFFFF);
     }
 
     struct reference
     {
-      char& ref;
-      char index = 0;
+      uint32_t& ref;
+      int index = 0;
 
       reference& operator=(bool val)
       {
-        const char mask = 1 << index;
+        const uint32_t mask = 1 << index;
         ref &= ~(1 << index);
         ref |= (val << index);
 
@@ -36,23 +37,21 @@ namespace game
 
     reference operator[](int index)
     {
-      return reference{ buf[index / 8], index % 8 };
+      return reference { buf[index / 32], index % 32 };
     }
 
     const reference operator[](int index) const
     {
-      return reference{ const_cast<char&>(buf[index / 8]), index % 8};
+      return reference { const_cast<uint32_t&>(buf[index / 32]), index % 32 };
     }
   };
 
   template <class Type, int Capacity>
   class Pool
   {
-  public:
-    Pool() :
-      aliveCount(0)
-    {}
+    static constexpr int BUF_SIZE = sizeof(Type) * Capacity;
 
+  public:
     ~Pool()
     {
       clear();
@@ -131,8 +130,8 @@ namespace game
     }
 
   private:
-    char buf[sizeof(Type) * Capacity];
-    bool_array<Capacity> alive;
+    char buf[sizeof(Type) * Capacity] { 0 };
+    bool_array<Capacity> alive { false };
     int aliveCount = 0;
 
     const Type& object(int index) const

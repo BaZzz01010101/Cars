@@ -146,7 +146,7 @@ namespace game
           .type = Projectile::Type::Bullet,
           });
 
-        timeToNextGunFire = gunConfig.fireInterval;
+        timeToNextGunFire += gunConfig.fireInterval;
       }
     }
     else

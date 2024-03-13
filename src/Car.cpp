@@ -50,7 +50,7 @@ namespace game
   void Car::update(float dt)
   {
     resetForces();
-    applyGlobalForceAtCenterOfMass({0, -gravity * mass, 0});
+    applyGlobalForceAtCenterOfMass({ 0, -gravity * mass, 0 });
 
     float aerodinamicForce = carConfig.aerodynamicKoef * velocity.sqLength();
     applyGlobalForceAtCenterOfMass(-aerodinamicForce * up());

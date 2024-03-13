@@ -27,11 +27,11 @@ namespace game
 
     quat normalized() const;
     void normalize();
-    
+
     quat rotatedByXAngle(float angle) const;
     quat rotatedByYAngle(float angle) const;
     quat rotatedByZAngle(float angle) const;
-    
+
     void rotateByXAngle(float angle);
     void rotateByYAngle(float angle);
     void rotateByZAngle(float angle);

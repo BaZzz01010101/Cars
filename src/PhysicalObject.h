@@ -7,11 +7,11 @@ namespace game
 
   struct PhysicalObject : public DynamicObject
   {
-    float mass{};
-    float momentOfInertia{};
+    float mass = 0;
+    float momentOfInertia = 0;
 
-    vec3 force{};
-    vec3 moment{};
+    vec3 force = vec3::zero;
+    vec3 moment = vec3::zero;
 
     void update(float dt);
 

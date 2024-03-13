@@ -9,8 +9,8 @@ namespace game
   class Turret : public Renderable, public Object
   {
   public:
-    vec3 expectedTarget{};
-    vec3 currentTarget{};
+    vec3 expectedTarget = vec3::zero;
+    vec3 currentTarget = vec3::zero;
 
     Turret(const Config::Physics::Turret& config, const Model& model, const Terrain& terrain, vec3 parentConnectionPoint, float scale);
     Turret(Turret&) = delete;
@@ -25,13 +25,13 @@ namespace game
     void draw(bool drawWires);
 
   private:
-    const Config::Physics::Turret& config{};
+    const Config::Physics::Turret& config {};
     const Terrain& terrain;
-    float scale{};
-    vec3 connectionPoint{};
+    float scale = 0;
+    vec3 connectionPoint = vec3::zero;
 
-    float yaw{};
-    float pitch{};
+    float yaw = 0;
+    float pitch = 0;
 
     void drawDebug();
   };

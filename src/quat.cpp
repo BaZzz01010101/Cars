@@ -9,17 +9,17 @@ namespace game
 
   quat quat::fromXAngle(float angle)
   {
-    return quat{ sinf(0.5f * angle), 0, 0, cosf(0.5f * angle) };
+    return quat { sinf(0.5f * angle), 0, 0, cosf(0.5f * angle) };
   }
 
   quat quat::fromYAngle(float angle)
   {
-    return quat{ 0, sinf(0.5f * angle), 0, cosf(0.5f * angle) };
+    return quat { 0, sinf(0.5f * angle), 0, cosf(0.5f * angle) };
   }
 
   quat quat::fromZAngle(float angle)
   {
-    return quat{ 0, 0, sinf(0.5f * angle), cosf(0.5f * angle) };
+    return quat { 0, 0, sinf(0.5f * angle), cosf(0.5f * angle) };
   }
 
   quat quat::fromAxisAngle(const vec3& axis, float angle)
@@ -51,13 +51,13 @@ namespace game
       w = randf(-1, 1);
     } while (x * x + y * y + z * z + w * w > 1);
 
-    return quat{ x, y, z, w }.normalized();
+    return quat { x, y, z, w }.normalized();
   }
 
-  quat::quat(Quaternion q) : Quaternion{ q }
+  quat::quat(Quaternion q) : Quaternion { q }
   {}
 
-  quat::quat(float x, float y, float z, float w) : Quaternion{ x, y, z, w }
+  quat::quat(float x, float y, float z, float w) : Quaternion { x, y, z, w }
   {}
 
   quat quat::operator*(quat q) const
@@ -100,7 +100,7 @@ namespace game
     float ny = cosha * y - sinha * z;
     float nz = cosha * z + sinha * y;
 
-    return quat{ nx, ny, nz, nw };
+    return quat { nx, ny, nz, nw };
   }
 
   quat quat::rotatedByYAngle(float angle) const
@@ -113,7 +113,7 @@ namespace game
     float ny = cosha * y + sinha * w;
     float nz = cosha * z - sinha * x;
 
-    return quat{ nx, ny, nz, nw };
+    return quat { nx, ny, nz, nw };
   }
 
   quat quat::rotatedByZAngle(float angle) const
@@ -126,7 +126,7 @@ namespace game
     float ny = cosha * y - sinha * x;
     float nz = cosha * z - sinha * w;
 
-    return quat{ nx, ny, nz, nw };
+    return quat { nx, ny, nz, nw };
   }
 
   void quat::rotateByXAngle(float angle)

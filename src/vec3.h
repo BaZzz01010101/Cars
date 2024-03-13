@@ -11,6 +11,7 @@ namespace game
     static const vec3 forward;
     static const vec3 up;
     static const vec3 left;
+
     static vec3 randomInSphere(float radius);
     static vec3 randomOnSphereSurface(float radius);
     static vec3 randomInHollowSphere(float innerRadius, float outerRadius);

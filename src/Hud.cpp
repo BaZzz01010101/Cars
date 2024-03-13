@@ -193,7 +193,7 @@ namespace game
   {
     DrawTexturePro(crosshairsTexture, { srcSize * textureIndex, srcSize * textureIndex, srcSize, srcSize }, { float(position.x - 0.5f * dstSize), float(position.y - 0.5f * dstSize), dstSize, dstSize }, { 0, 0 }, 0, color);
   }
-    
+
   void Hud::drawDebug(const Scene& scene)
   {
     if (paused)
@@ -217,8 +217,8 @@ namespace game
     print("Wheel 3 fr.force", player.rearLeftWheel.frictionForce.length(), LIGHTGRAY);
     print("Wheel 4 fr.force", player.rearRightWheel.frictionForce.length(), LIGHTGRAY);
 
-    print("Cars: ", (float)scene.cars.aliveCount(), GREEN);
-    print("Projectiles: ", (float)scene.projectiles.aliveCount(), GREEN);
-    print("Explosion particles: ", (float)scene.explosionParticles.aliveCount(), GREEN);
+    print("Cars: ", (float)scene.cars.count(), GREEN);
+    print("Projectiles: ", (float)scene.projectiles.count(), GREEN);
+    print("Explosion particles: ", (float)scene.explosionParticles.count(), GREEN);
   }
 }

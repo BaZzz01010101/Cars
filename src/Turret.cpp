@@ -10,8 +10,7 @@ namespace game
     terrain(terrain),
     connectionPoint(connectionPoint),
     scale(scale)
-  {
-  }
+  {}
 
   void Turret::reset()
   {
@@ -45,7 +44,7 @@ namespace game
     // TODO: Consider better targeting method
     // In current implementation the cross hair sometimes behaves unpreditably
     // when tracing not hit the terrain
-    if(!terrain.traceRay(barrelPosition(), forward(), -1, &currentTarget, nullptr))
+    if (!terrain.traceRay(barrelPosition(), forward(), -1, &currentTarget, nullptr))
       currentTarget = position + 1000.0f * forward();
   }
 
@@ -57,7 +56,6 @@ namespace game
   }
 
   void Turret::drawDebug()
-  {
-  }
+  {}
 
 }

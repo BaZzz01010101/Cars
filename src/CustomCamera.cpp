@@ -28,8 +28,8 @@ namespace game
 
     quat rotation = quat::fromYAngle(yaw) * quat::fromXAngle(pitch);
 
-    vec3 focusPoint = playerPosition + vec3{ 0, cameraConfig.focusElevation, 0 };
-    position = focusPoint + vec3{ 0, 0, cameraConfig.minDistance }.rotatedBy(rotation);
+    vec3 focusPoint = playerPosition + vec3 { 0, cameraConfig.focusElevation, 0 };
+    position = focusPoint + vec3 { 0, 0, cameraConfig.minDistance }.rotatedBy(rotation);
     float minYPosition = terrain.getHeight(position.x, position.z) + 0.5f;
     position.y = std::max(position.y, minYPosition);
 
@@ -37,7 +37,7 @@ namespace game
     float dy = dPos.y;
     float dxz = sqrt(sqr(dPos.x) + sqr(dPos.z));
 
-    if(dy > 0 && dxz > 0)
+    if (dy > 0 && dxz > 0)
       pitch = std::atan2(dy, dxz);
 
     direction = (focusPoint - position).normalized();
@@ -53,7 +53,7 @@ namespace game
 
   void CustomCamera::reset(vec3 playerPosition)
   {
-    camera.position = playerPosition + vec3{ -4, 1, 0 };
+    camera.position = playerPosition + vec3 { -4, 1, 0 };
     camera.target = playerPosition;
     camera.up = { 0, 1, 0 };
   }

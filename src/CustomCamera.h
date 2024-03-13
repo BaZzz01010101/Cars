@@ -8,9 +8,9 @@ namespace game
   class CustomCamera
   {
   public:
-    Camera camera{};
-    vec3 position{};
-    vec3 direction{};
+    Camera camera {};
+    vec3 position = vec3::zero;
+    vec3 direction = vec3::zero;
 
     CustomCamera(const Config& config);
     CustomCamera(CustomCamera&) = delete;
@@ -24,10 +24,10 @@ namespace game
     operator Camera() const { return camera; }
 
   private:
-    const Config& config{};
+    const Config& config {};
 
-    float yaw{};
-    float pitch{};
+    float yaw = 0;
+    float pitch = 0;
   };
 
 }

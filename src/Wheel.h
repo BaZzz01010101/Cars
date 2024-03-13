@@ -11,9 +11,9 @@ namespace game
     friend class Hud;
 
   public:
-    bool isGrounded{};
-    vec3 suspecsionForce{};
-    vec3 connectionPoint{};
+    bool isGrounded = false;
+    vec3 suspecsionForce = vec3::zero;
+    vec3 connectionPoint = vec3::zero;
 
     Wheel(const Config& config, bool isFrontWheel, const Model& model, const Terrain& terrain, vec3 connectionPoint, const char* debugName);
     Wheel(Wheel&) = delete;
@@ -29,15 +29,15 @@ namespace game
     const Config& config{};
     const Config::Physics::Wheels& wheelConfig{};
     const Terrain& terrain{};
-    float momentOfInertia{};
+    float momentOfInertia = 0;
 
-    vec3 nForce{};
-    vec3 velocity{};
-    vec3 frictionForce{};
-    vec3 frictionVelocity{};
-    float suspensionOffset{};
-    float suspensionSpeed{};
-    float wheelRotationSpeed{};
+    vec3 nForce = vec3::zero;
+    vec3 velocity = vec3::zero;
+    vec3 frictionForce = vec3::zero;
+    vec3 frictionVelocity = vec3::zero;
+    float suspensionOffset = 0;
+    float suspensionSpeed = 0;
+    float wheelRotationSpeed = 0;
     quat wheelRotation = quat::identity;
     const char* debugName = "UNKNOWN";
 

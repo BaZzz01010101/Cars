@@ -92,7 +92,7 @@ namespace game
       EPSILON :
       distance * sqrtf(1 - directionNormalized.y * directionNormalized.y);
 
-    vec2 current = (origin2D + vec2{ TERRAIN_SIZE_2, TERRAIN_SIZE_2 }) / CELL_SIZE;
+    vec2 current = (origin2D + vec2 { TERRAIN_SIZE_2, TERRAIN_SIZE_2 }) / CELL_SIZE;
     distance2D += CELL_SIZE * float(M_SQRT2);
 
     int x = (int)current.x;
@@ -110,9 +110,9 @@ namespace game
       // diagonal step
       if (nx != x && ny != y)
       {
-        vec2 gridPoint = vec2{ float(std::min(x, nx) + 1), float(std::min(y, ny) + 1) };
+        vec2 gridPoint = vec2 { float(std::min(x, nx) + 1), float(std::min(y, ny) + 1) };
         vec2 toGridPoint = gridPoint - current;
-        vec2 right = vec2{ toGridPoint.y, -toGridPoint.x };
+        vec2 right = vec2 { toGridPoint.y, -toGridPoint.x };
         float k = direction2D * right * sign(step.x) * sign(step.y);
 
         if (k > 0 && nx >= 0 && nx < GRID_SIZE)

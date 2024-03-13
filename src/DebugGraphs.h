@@ -5,7 +5,7 @@ namespace game
 
   struct DebugGraph
   {
-    static const int GRAPH_SIZE = 256;
+    static constexpr int GRAPH_SIZE = 256;
     std::string name;
     std::vector<float> graph;
     Color color = WHITE;

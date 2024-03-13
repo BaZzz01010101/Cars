@@ -12,20 +12,23 @@ namespace game
   class Scene
   {
     friend class Hud;
+
   public:
-    bool paused{};
-    bool drawWires{};
-    bool slowMotion{};
-    bool gunFiring{};
-    bool cannonFiring{};
+    bool paused = false;
+    bool drawWires = false;
+    bool slowMotion = false;
+    bool gunFiring = false;
+    bool cannonFiring = false;
     CustomCamera camera;
-    vec3 gunRayHit{};
-    vec3 cannonRayHit{};
+    vec3 gunRayHit = vec3::zero;
+    vec3 cannonRayHit = vec3::zero;
 
     Scene(const Config& config);
     ~Scene();
     Scene(Scene&) = delete;
+    Scene(Scene&&) = delete;
     Scene& operator=(Scene&) = delete;
+    Scene& operator=(Scene&&) = delete;
 
     void init();
     void update(float dt);
@@ -36,25 +39,25 @@ namespace game
     Car& getPlayer() { return cars.get(playerIndex); }
 
   private:
-    const Config& config{};
-    Terrain terrain{};
-    int playerIndex{};
-    Pool<Car, 1> cars{};
-    Pool<Projectile, 1000> projectiles{};
-    Pool<ExplosionParticle, 10000> explosionParticles{};
+    const Config& config {};
+    Terrain terrain {};
+    int playerIndex = 0;
+    Pool<Car, 1> cars {};
+    Pool<Projectile, 1000> projectiles {};
+    Pool<ExplosionParticle, 10000> explosionParticles {};
 
-    Model carModel{};
-    Model wheelModel{};
-    Model gunModel{};
-    Model cannonModel{};
+    Model carModel {};
+    Model wheelModel {};
+    Model gunModel {};
+    Model cannonModel {};
 
-    bool carModelLoaded{};
-    bool wheelModelLoaded{};
-    bool gunModelLoaded{};
-    bool cannonModelLoaded{};
+    bool carModelLoaded = false;
+    bool wheelModelLoaded = false;
+    bool gunModelLoaded = false;
+    bool cannonModelLoaded = false;
 
-    float timeToNextGunFire{};
-    float timeToNextCannonFire{};
+    float timeToNextGunFire = 0;
+    float timeToNextCannonFire = 0;
 
     void updateGameObjects(float dt);
     void updateFiring(float dt);

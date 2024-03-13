@@ -7,8 +7,7 @@ namespace game
   Scene::Scene(const Config& config) :
     config(config),
     camera(config)
-  {
-  }
+  {}
 
   Scene::~Scene()
   {
@@ -70,13 +69,13 @@ namespace game
 
   void Scene::updateGameObjects(float dt)
   {
-    for (int i = 0; i < cars.size(); i++)
+    for (int i = 0; i < cars.capacity(); i++)
     {
       Car& car = cars.get(i);
       car.update(dt);
     }
 
-    for (int i = 0; i < projectiles.size(); i++)
+    for (int i = 0; i < projectiles.capacity(); i++)
       if (projectiles.isAlive(i))
       {
         Projectile& projectile = projectiles.get(i);
@@ -89,8 +88,8 @@ namespace game
         {
           projectiles.remove(i);
 
-          Config::Graphics::ExplosionParticles explosionConfig = projectile.type == Projectile::Bullet ? 
-            config.graphics.bulletExplosionParticles : 
+          Config::Graphics::ExplosionParticles explosionConfig = projectile.type == Projectile::Bullet ?
+            config.graphics.bulletExplosionParticles :
             config.graphics.shellExplosionParticles;
 
           createExplosion(explosionConfig, hitPosition);
@@ -100,7 +99,7 @@ namespace game
           projectiles.remove(i);
       }
 
-    for (int i = 0; i < explosionParticles.size(); i++)
+    for (int i = 0; i < explosionParticles.capacity(); i++)
       if (explosionParticles.isAlive(i))
       {
         ExplosionParticle& particle = explosionParticles.get(i);
@@ -125,7 +124,7 @@ namespace game
         vec3 bulletPosition = gun.barrelPosition() + gun.forward() * bulletOffsetfix;
         vec3 barrelOffset = 0.2f * gun.left();
 
-        projectiles.tryAdd(Projectile{
+        projectiles.tryAdd(Projectile {
           .position = bulletPosition + barrelOffset,
           .velocity = player.velocity + gun.forward() * gunConfig.projectileSpeed,
           .gravity = config.physics.gravity,
@@ -136,7 +135,7 @@ namespace game
           .type = Projectile::Type::Bullet,
           });
 
-        projectiles.tryAdd(Projectile{
+        projectiles.tryAdd(Projectile {
           .position = bulletPosition - barrelOffset,
           .velocity = player.velocity + gun.forward() * gunConfig.projectileSpeed,
           .gravity = config.physics.gravity,
@@ -161,7 +160,7 @@ namespace game
         const Car& player = cars.get(playerIndex);
         const Turret& cannon = player.cannon;
 
-        projectiles.tryAdd(Projectile{
+        projectiles.tryAdd(Projectile {
           .position = cannon.barrelPosition(),
           .velocity = player.velocity + cannon.forward() * cannonConfig.projectileSpeed,
           .gravity = config.physics.gravity,
@@ -203,7 +202,7 @@ namespace game
     const Config::Physics::Car& carConfig = config.physics.car;
 
     player.verticalTrust = player.mass * 20 * float(IsKeyDown(KEY_LEFT_SHIFT)),
-    player.handBreaked = IsKeyDown(KEY_SPACE);
+      player.handBreaked = IsKeyDown(KEY_SPACE);
     player.enginePowerDirection = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S));
     player.steeringDirection = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D));
   }
@@ -215,20 +214,20 @@ namespace game
     Car& player = cars.get(playerIndex);
     terrain.draw(drawWires);
 
-    for (int i = 0; i < cars.size(); i++)
+    for (int i = 0; i < cars.capacity(); i++)
     {
       Car& car = cars.get(i);
       car.draw(drawWires);
     }
 
-    for (int i = 0; i < projectiles.size(); i++)
+    for (int i = 0; i < projectiles.capacity(); i++)
       if (projectiles.isAlive(i))
       {
         Projectile& bullet = projectiles.get(i);
         bullet.draw();
       }
 
-    for (int i = 0; i < explosionParticles.size(); i++)
+    for (int i = 0; i < explosionParticles.capacity(); i++)
       if (explosionParticles.isAlive(i))
       {
         ExplosionParticle& particle = explosionParticles.get(i);

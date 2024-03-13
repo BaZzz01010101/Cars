@@ -17,7 +17,7 @@ namespace game
     struct reference
     {
       char& ref;
-      char index;
+      char index = 0;
 
       reference& operator=(bool val)
       {
@@ -50,8 +50,7 @@ namespace game
   {
   public:
     Pool() :
-      capacity(Capacity),
-      count(0)
+      aliveCount(0)
     {}
 
     ~Pool()
@@ -62,13 +61,13 @@ namespace game
     template <typename... Args>
     int tryAdd(Args&&... args)
     {
-      if (count < Capacity)
-        for (int i = 0; i < capacity; i++)
+      if (aliveCount < Capacity)
+        for (int i = 0; i < Capacity; i++)
           if (!alive[i])
           {
             new (&object(i)) Type(std::forward<Args>(args)...);
             alive[i] = true;
-            count++;
+            aliveCount++;
 
             return i;
           }
@@ -78,17 +77,17 @@ namespace game
 
     void remove(int index)
     {
-      _ASSERT(index >= 0 && index < capacity);
+      _ASSERT(index >= 0 && index < Capacity);
       _ASSERT(alive[index]);
 
       object(index).~Type();
       alive[index] = false;
-      count--;
+      aliveCount--;
     }
 
     Type& get(int index)
     {
-      _ASSERT(index >= 0 && index < capacity);
+      _ASSERT(index >= 0 && index < Capacity);
       _ASSERT(alive[index]);
 
       return object(index);
@@ -96,7 +95,7 @@ namespace game
 
     const Type& get(int index) const
     {
-      _ASSERT(index >= 0 && index < capacity);
+      _ASSERT(index >= 0 && index < Capacity);
       _ASSERT(alive[index]);
 
       return const_cast<const Type&>(object(index));
@@ -104,38 +103,37 @@ namespace game
 
     bool isAlive(int index) const
     {
-      _ASSERT(index >= 0 && index < capacity);
+      _ASSERT(index >= 0 && index < Capacity);
 
       return alive[index];
     }
 
-    int size() const
+    int capacity() const
     {
-      return capacity;
+      return Capacity;
     }
 
-    int aliveCount() const
+    int count() const
     {
-      return count;
+      return aliveCount;
     }
 
     void clear()
     {
-      for (int i = 0; i < capacity; i++)
+      for (int i = 0; i < Capacity; i++)
         if (alive[i])
         {
           object(i).~Type();
           alive[i] = false;
         }
 
-      count = 0;
+      aliveCount = 0;
     }
 
   private:
     char buf[sizeof(Type) * Capacity];
     bool_array<Capacity> alive;
-    int count{};
-    int capacity{};
+    int aliveCount = 0;
 
     const Type& object(int index) const
     {

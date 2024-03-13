@@ -13,8 +13,7 @@ namespace game
     config(Config::DEFAULT),
     scene(config),
     hud(config)
-  {
-  }
+  {}
 
   void App::initialize()
   {
@@ -83,8 +82,7 @@ namespace game
   }
 
   void App::drawDebug()
-  {
-  }
+  {}
 
   void App::updateShortcuts()
   {

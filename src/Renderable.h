@@ -7,5 +7,5 @@ public:
   void draw(Matrix transform, bool drawWires);
 
 private:
-  const Model& model{};
+  const Model& model {};
 };

@@ -70,8 +70,8 @@ namespace game
       float gravity = config.physics.gravity;
 
       vec3 gravityVelocity = handBreaked ?
-        vec3{ 0, -gravity * dt, 0 }.projectedOnPlane(normal) :
-        vec3{ 0, -gravity * dt, 0 }.projectedOnVector(frictionLeft);
+        vec3 { 0, -gravity * dt, 0 }.projectedOnPlane(normal) :
+        vec3 { 0, -gravity * dt, 0 }.projectedOnVector(frictionLeft);
 
       vec3 frictionVelocityForecast = velocity + gravityVelocity - wheelRotationSpeed * wheelConfig.radius * frictionForward;
       frictionForce = -frictionVelocityForecast.projectedOnPlane(normal) * sharedMass / dt;
@@ -119,7 +119,7 @@ namespace game
   {
     if (isGrounded)
     {
-      vec3 bottom = position + vec3{ 0, -wheelConfig.radius + 0.2f, 0 };
+      vec3 bottom = position + vec3 { 0, -wheelConfig.radius + 0.2f, 0 };
       //DrawSphere(bottom, 0.3f, ORANGE);
 
       //drawVector(bottom, velocity, LIME);

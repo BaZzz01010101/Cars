@@ -48,7 +48,7 @@ namespace game
 
   inline float randf(float max)
   {
-    return float(double(max) * fastRand() / FAST_RAND_MAX); 
+    return float(double(max) * fastRand() / FAST_RAND_MAX);
   }
 
   inline float randf(float min, float max)

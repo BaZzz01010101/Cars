@@ -8,6 +8,7 @@ namespace game
     static const vec2 zero;
     static const vec2 xAxis;
     static const vec2 yAxis;
+
     static vec2 randomInCircle(float radius);
     static vec2 randomOnCircleSurface(float radius);
     static vec2 randomInRing(float innerRadius, float outerRadius);

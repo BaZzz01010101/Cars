@@ -65,10 +65,10 @@ namespace game
     };
   }
 
-  vec2::vec2(Vector2 v) : Vector2{ v }
+  vec2::vec2(Vector2 v) : Vector2 { v }
   {}
 
-  vec2::vec2(float x, float y) : Vector2{ x, y }
+  vec2::vec2(float x, float y) : Vector2 { x, y }
   {}
 
   vec2 vec2::operator+(vec2 v) const
@@ -260,17 +260,17 @@ namespace game
 
   vec3 vec2::intoYZWithX(float x) const
   {
-    return vec3{ x, this->x, y };
+    return vec3 { x, this->x, y };
   }
 
   vec3 vec2::intoXZWithY(float y) const
   {
-    return vec3{ x, y, this->y };
+    return vec3 { x, y, this->y };
   }
 
   vec3 vec2::intoXYWithZ(float z) const
   {
-    return vec3{ x, y, z };
+    return vec3 { x, y, z };
   }
 
   vec2 operator*(float f, const vec2& v)

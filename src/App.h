@@ -15,11 +15,11 @@ namespace game
     void shutdown();
 
   private:
-    Config config{};
+    Config config {};
     Scene scene;
     Hud hud;
 
-    bool paused{};
+    bool paused = false;
 
     void togglePaused();
     void update(float dt);

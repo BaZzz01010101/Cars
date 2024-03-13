@@ -67,10 +67,10 @@ namespace game
     };
   }
 
-  vec3::vec3(Vector3 v) : Vector3{ v }
+  vec3::vec3(Vector3 v) : Vector3 { v }
   {}
 
-  vec3::vec3(float x, float y, float z) : Vector3{ x, y, z }
+  vec3::vec3(float x, float y, float z) : Vector3 { x, y, z }
   {}
 
   vec3 vec3::operator+(vec3 v) const
@@ -351,7 +351,7 @@ namespace game
 
   vec2 vec3::xy() const
   {
-    return vec2{ x, y };
+    return vec2 { x, y };
   }
 
   vec2 vec3::yz() const

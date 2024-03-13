@@ -48,7 +48,6 @@ namespace game
 
     HideCursor();
     SetMousePosition(config.graphics.screen.width / 2, config.graphics.screen.height / 2);
-    UpdateCamera(&camera, CAMERA_CUSTOM);
   }
 
   void CustomCamera::reset(vec3 playerPosition)

@@ -121,6 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.h" />
+    <ClInclude Include="src\BoolArray.hpp" />
     <ClInclude Include="src\ExplosionParticle.h" />
     <ClInclude Include="src\Projectile.h" />
     <ClInclude Include="src\Pool.hpp" />

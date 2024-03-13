@@ -11,7 +11,7 @@ namespace game
       .gravity = 9.8f,
       .car = {
         .mass = 1500,
-        .enginePower = 350,
+        .enginePower = 100,
         .brakePower = 10000,
         .handBrakePower = 100000,
         .maxSpeed = 50,
@@ -40,7 +40,7 @@ namespace game
         .suspensionStiffness = 100000,
         .suspensionDamping = 0.2f,
         .maxSuspensionOffset = 0.5f,
-        .tireFriction = 1.5f,
+        .tireFriction = 0.9f,
         .rollingFriction = 0.01f,
       },
       .rearWheels = {
@@ -49,7 +49,7 @@ namespace game
         .suspensionStiffness = 200000,
         .suspensionDamping = 0.2f,
         .maxSuspensionOffset = 0.25f,
-        .tireFriction = 1.5f,
+        .tireFriction = 0.9f,
         .rollingFriction = 0.01f,
       },
       .gun = {

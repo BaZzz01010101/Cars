@@ -216,5 +216,9 @@ namespace game
     print("Wheel 2 fr.force", player.frontRightWheel.frictionForce.length(), LIGHTGRAY);
     print("Wheel 3 fr.force", player.rearLeftWheel.frictionForce.length(), LIGHTGRAY);
     print("Wheel 4 fr.force", player.rearRightWheel.frictionForce.length(), LIGHTGRAY);
+
+    print("Cars: ", (float)scene.cars.aliveCount(), GREEN);
+    print("Projectiles: ", (float)scene.projectiles.aliveCount(), GREEN);
+    print("Explosion particles: ", (float)scene.explosionParticles.aliveCount(), GREEN);
   }
 }

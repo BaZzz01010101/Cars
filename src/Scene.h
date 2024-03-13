@@ -11,6 +11,7 @@ namespace game
 {
   class Scene
   {
+    friend class Hud;
   public:
     bool paused{};
     bool drawWires{};
@@ -38,9 +39,9 @@ namespace game
     const Config& config{};
     Terrain terrain{};
     int playerIndex{};
-    Pool<Car> cars{ 1 };
-    Pool<Projectile> projectiles{ 1000 };
-    Pool<ExplosionParticle> explosionParticles{ 10000 };
+    Pool<Car, 1> cars{};
+    Pool<Projectile, 1000> projectiles{};
+    Pool<ExplosionParticle, 10000> explosionParticles{};
 
     Model carModel{};
     Model wheelModel{};

@@ -2,42 +2,76 @@
 
 namespace game
 {
-  template <class T>
+  template <int Capacity>
+  class bool_array
+  {
+  private:
+    char buf[Capacity / 8 + 1];
+
+  public:
+    bool_array() 
+    {
+      memset(buf, 0, sizeof(buf));
+    }
+
+    struct reference
+    {
+      char& ref;
+      char index;
+
+      reference& operator=(bool val)
+      {
+        const char mask = 1 << index;
+        ref &= ~(1 << index);
+        ref |= (val << index);
+
+        return *this;
+      }
+
+      operator bool() const
+      {
+        return (ref >> index) & 1;
+      }
+    };
+
+    reference operator[](int index)
+    {
+      return reference{ buf[index / 8], index % 8 };
+    }
+
+    const reference operator[](int index) const
+    {
+      return reference{ const_cast<char&>(buf[index / 8]), index % 8};
+    }
+  };
+
+  template <class Type, int Capacity>
   class Pool
   {
   public:
-    Pool(int capacity) :
-      //objects(capacity),
-      alive(capacity, false),
-      capacity(capacity),
+    Pool() :
+      capacity(Capacity),
       count(0)
-    {
-      objects = static_cast<T*>(malloc(sizeof(T) * capacity));
-    }
+    {}
 
     ~Pool()
     {
       clear();
-      free(objects);
     }
 
     template <typename... Args>
     int tryAdd(Args&&... args)
     {
-      _ASSERT(count < capacity);
-
-      if (count < capacity)
+      if (count < Capacity)
         for (int i = 0; i < capacity; i++)
           if (!alive[i])
           {
-            new (&objects[i]) T(std::forward<Args>(args)...);
+            new (&object(i)) Type(std::forward<Args>(args)...);
             alive[i] = true;
             count++;
 
             return i;
           }
-
-      _ASSERT(false);
 
       return -1;
     }
@@ -47,25 +81,25 @@ namespace game
       _ASSERT(index >= 0 && index < capacity);
       _ASSERT(alive[index]);
 
-      objects[index].~T();
+      object(index).~Type();
       alive[index] = false;
       count--;
     }
 
-    T& get(int index)
+    Type& get(int index)
     {
       _ASSERT(index >= 0 && index < capacity);
       _ASSERT(alive[index]);
 
-      return objects[index];
+      return object(index);
     }
 
-    const T& get(int index) const
+    const Type& get(int index) const
     {
       _ASSERT(index >= 0 && index < capacity);
       _ASSERT(alive[index]);
 
-      return objects[index];
+      return const_cast<const Type&>(object(index));
     }
 
     bool isAlive(int index) const
@@ -90,7 +124,7 @@ namespace game
       for (int i = 0; i < capacity; i++)
         if (alive[i])
         {
-          objects[i].~T();
+          object(i).~Type();
           alive[i] = false;
         }
 
@@ -98,11 +132,20 @@ namespace game
     }
 
   private:
-    //std::vector<T> objects;
-    T* objects;
-    std::vector<bool> alive;
+    char buf[sizeof(Type) * Capacity];
+    bool_array<Capacity> alive;
     int count{};
     int capacity{};
+
+    const Type& object(int index) const
+    {
+      return reinterpret_cast<const Type*>(buf)[index];
+    }
+
+    Type& object(int index)
+    {
+      return reinterpret_cast<Type*>(buf)[index];
+    }
   };
 
 }

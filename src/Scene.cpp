@@ -84,7 +84,9 @@ namespace game
         vec3 end = projectile.position;
         vec3 hitPosition, normal;
 
-        if (terrain.traceRay(begin, (end - begin).normalized(), (end - begin).length(), &hitPosition, &normal))
+        if (projectile.lifeTime < 0)
+          projectiles.remove(i);
+        else if (terrain.traceRay(begin, (end - begin).normalized(), (end - begin).length(), &hitPosition, &normal))
         {
           projectiles.remove(i);
 
@@ -94,9 +96,6 @@ namespace game
 
           createExplosion(explosionConfig, hitPosition);
         }
-
-        if (projectile.lifeTime < 0)
-          projectiles.remove(i);
       }
 
     for (int i = 0; i < explosionParticles.capacity(); i++)

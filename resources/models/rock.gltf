@@ -15,35 +15,19 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"Rock_1_",
-			"rotation":[
-				0,
-				-0.7997953295707703,
-				0,
-				0.6002727746963501
-			],
-			"scale":[
-				0.2840808629989624,
-				0.43807676434516907,
-				0.2840808629989624
-			],
-			"translation":[
-				-0.0029306411743164062,
-				0.0001263245940208435,
-				-0.00040018558502197266
-			]
+			"name":"Rock_1_"
 		}
 	],
 	"materials":[
 		{
 			"doubleSided":true,
-			"name":"Rock_1_",
+			"name":"Rock_1_.001",
 			"pbrMetallicRoughness":{}
 		}
 	],
 	"meshes":[
 		{
-			"name":"Cube.005",
+			"name":"Cube.002",
 			"primitives":[
 				{
 					"attributes":{

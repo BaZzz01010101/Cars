@@ -5,6 +5,7 @@
 namespace game
 {
   Scene::Scene(const Config& config) :
+    terrain(terrainTexture, tree1Model, tree2Model, rockModel),
     config(config),
     camera(config)
   {}
@@ -27,6 +28,39 @@ namespace game
 
     if (cannonModelLoaded)
       UnloadModel(cannonModel);
+
+    if (tree1ModelLoaded)
+      UnloadModel(tree1Model);
+
+    if (tree2ModelLoaded)
+      UnloadModel(tree2Model);
+
+    if (rockModelLoaded)
+      UnloadModel(rockModel);
+
+    if (terrainTextureLoaded)
+      UnloadTexture(terrainTexture);
+
+    if (tree1TextureLoaded)
+      UnloadTexture(tree1Texture);
+
+    if (tree2TextureLoaded)
+      UnloadTexture(tree2Texture);
+
+    if (rockTextureLoaded)
+      UnloadTexture(rockTexture);
+ 
+    carModelLoaded = true;
+    wheelModelLoaded = true;
+    gunModelLoaded = true;
+    cannonModelLoaded = true;
+    tree1ModelLoaded = true;
+    tree2ModelLoaded = true;
+    rockModelLoaded = true;
+    terrainTextureLoaded = true;
+    tree1TextureLoaded = true;
+    tree2TextureLoaded = true;
+    rockTextureLoaded = true;
   }
 
   void Scene::init()
@@ -43,7 +77,37 @@ namespace game
     cannonModel = LoadModel(config.graphics.resources.cannonModelPath);
     cannonModelLoaded = true;
 
-    terrain.generate(config.graphics.resources.terrainTexturePath, Terrain::Mode::Normal);
+    tree1Model = LoadModel(config.graphics.resources.tree1ModelPath);
+    tree1ModelLoaded = true;
+
+    tree2Model = LoadModel(config.graphics.resources.tree2ModelPath);
+    tree2ModelLoaded = true;
+
+    rockModel = LoadModel(config.graphics.resources.rockModelPath);
+    rockModelLoaded = true;
+
+    terrainTexture = LoadTexture(config.graphics.resources.terrainTexturePath);
+    terrainTextureLoaded = true;
+
+    tree1Texture = LoadTexture(config.graphics.resources.tree1TexturePath);
+    tree1TextureLoaded = true;
+
+    tree2Texture = LoadTexture(config.graphics.resources.tree2TexturePath);
+    tree2TextureLoaded = true;
+
+    rockTexture = LoadTexture(config.graphics.resources.rockTexturePath);
+    rockTextureLoaded = true;
+
+    tree1Model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = tree1Texture;
+    tree1Model.meshMaterial[0] = 0;
+
+    tree2Model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = tree2Texture;
+    tree2Model.meshMaterial[0] = 0;
+
+    rockModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = rockTexture;
+    rockModel.meshMaterial[0] = 0;
+
+    terrain.generate(Terrain::Mode::Normal);
 
     playerIndex = cars.tryAdd(config, carModel, wheelModel, gunModel, cannonModel, terrain, camera);
     Car& player = cars.get(playerIndex);
@@ -236,9 +300,9 @@ namespace game
     EndMode3D();
   }
 
-  void Scene::regenerateTerrain(const char* texturePath, Terrain::Mode mode)
+  void Scene::regenerateTerrain(Terrain::Mode mode)
   {
-    terrain.generate(texturePath, mode);
+    terrain.generate(mode);
     Car& player = cars.get(playerIndex);
     reset(player.position, player.rotation);
   }

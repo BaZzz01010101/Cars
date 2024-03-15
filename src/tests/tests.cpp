@@ -185,7 +185,7 @@ namespace math_tests
   public:
     TEST_CLASS_INITIALIZE(initClass)
     {
-      terrain.generate(nullptr, Terrain::Normal);
+      terrain.generate(Terrain::Normal);
     }
 
     TEST_METHOD(traceRay_random)
@@ -385,5 +385,10 @@ namespace math_tests
 
   };
 
-  Terrain TerrainTest::terrain;
+  Texture terrainTexture {};
+  Model tree1Model {};
+  Model tree2Model {};
+  Model rockModel {};
+
+  Terrain TerrainTest::terrain(terrainTexture, tree1Model, tree2Model, rockModel);
 }

@@ -7,6 +7,8 @@
     <ClCompile Include="src\vec3.cpp" />
     <ClCompile Include="src\Terrain.cpp" />
     <ClCompile Include="src\quat.cpp" />
+    <ClCompile Include="src\TerrainObject.cpp" />
+    <ClCompile Include="src\Renderable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Helpers.h" />
@@ -14,5 +16,7 @@
     <ClInclude Include="src\vec3.h" />
     <ClInclude Include="src\Terrain.h" />
     <ClInclude Include="src\quat.h" />
+    <ClInclude Include="src\TerrainObject.h" />
+    <ClInclude Include="src\Renderable.h" />
   </ItemGroup>
 </Project>

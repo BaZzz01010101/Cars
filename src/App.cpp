@@ -104,13 +104,13 @@ namespace game
       player.rotation = player.rotation * quat::fromEuler(PI / 2, 0, 0);
 
     if (IsKeyPressed(KEY_ZERO))
-      scene.regenerateTerrain(config.graphics.resources.terrainTexturePath, Terrain::Normal);
+      scene.regenerateTerrain(Terrain::Normal);
 
     if (IsKeyPressed(KEY_ONE))
-      scene.regenerateTerrain(config.graphics.resources.terrainTexturePath, Terrain::Debug1);
+      scene.regenerateTerrain(Terrain::Debug1);
 
     if (IsKeyPressed(KEY_TWO))
-      scene.regenerateTerrain(config.graphics.resources.terrainTexturePath, Terrain::Debug2);
+      scene.regenerateTerrain(Terrain::Debug2);
 
     if (IsKeyPressed(KEY_F1))
       scene.reset(vec3::zero, quat::identity);

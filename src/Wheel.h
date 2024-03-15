@@ -28,7 +28,7 @@ namespace game
   private:
     const Config& config{};
     const Config::Physics::Wheels& wheelConfig{};
-    const Terrain& terrain{};
+    const Terrain& terrain;
     float momentOfInertia = 0;
 
     vec3 nForce = vec3::zero;

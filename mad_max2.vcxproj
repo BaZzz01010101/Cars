@@ -113,6 +113,7 @@
     <ClCompile Include="src\quat.cpp" />
     <ClCompile Include="src\Renderable.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\TerrainObject.cpp" />
     <ClCompile Include="src\Terrain.cpp" />
     <ClCompile Include="src\Turret.cpp" />
     <ClCompile Include="src\vec2.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="src\quat.h" />
     <ClInclude Include="src\Renderable.h" />
     <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\TerrainObject.h" />
     <ClInclude Include="src\Terrain.h" />
     <ClInclude Include="src\Turret.h" />
     <ClInclude Include="src\vec2.h" />

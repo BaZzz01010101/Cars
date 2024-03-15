@@ -128,10 +128,16 @@ namespace game
       .resources = {
         .fontPath = "resources/fonts/JetBrainsMono-Bold.ttf",
         .terrainTexturePath = "resources/textures/terrain.png",
+        .tree1TexturePath = "resources/textures/tree1.png",
+        .tree2TexturePath = "resources/textures/tree2.png",
+        .rockTexturePath = "resources/textures/rock.png",
         .carModelPath = "resources/models/jeep.gltf",
         .wheelModelPath = "resources/models/wheel.gltf",
         .gunModelPath = "resources/models/gun.gltf",
         .cannonModelPath = "resources/models/cannon.gltf",
+        .tree1ModelPath = "resources/models/tree1.gltf",
+        .tree2ModelPath = "resources/models/tree2.gltf",
+        .rockModelPath = "resources/models/rock.gltf",
         .crosshairsTexturePath = "resources/textures/crosshairs_white.png",
       },
     }

@@ -33,14 +33,14 @@ namespace game
     void init();
     void update(float dt);
     void draw();
-    void regenerateTerrain(const char* texturePath, Terrain::Mode mode);
+    void regenerateTerrain(Terrain::Mode mode);
     void reset(vec3 playerPosition, quat playerRotation);
     const Car& getPlayer() const { return cars.get(playerIndex); }
     Car& getPlayer() { return cars.get(playerIndex); }
 
   private:
     const Config& config {};
-    Terrain terrain {};
+    Terrain terrain;
     int playerIndex = 0;
     Pool<Car, 1> cars {};
     Pool<Projectile, 1000> projectiles {};
@@ -50,11 +50,27 @@ namespace game
     Model wheelModel {};
     Model gunModel {};
     Model cannonModel {};
+    Model tree1Model {};
+    Model tree2Model {};
+    Model rockModel {};
+
+    Texture terrainTexture {};
+    Texture tree1Texture {};
+    Texture tree2Texture {};
+    Texture rockTexture {};
 
     bool carModelLoaded = false;
     bool wheelModelLoaded = false;
     bool gunModelLoaded = false;
     bool cannonModelLoaded = false;
+    bool tree1ModelLoaded = false;
+    bool tree2ModelLoaded = false;
+    bool rockModelLoaded = false;
+
+    bool terrainTextureLoaded = false;
+    bool tree1TextureLoaded = false;
+    bool tree2TextureLoaded = false;
+    bool rockTextureLoaded = false;
 
     float timeToNextGunFire = 0;
     float timeToNextCannonFire = 0;

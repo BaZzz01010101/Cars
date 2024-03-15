@@ -172,7 +172,9 @@
   <ItemGroup>
     <ClCompile Include="src\Helpers.cpp" />
     <ClCompile Include="src\quat.cpp" />
+    <ClCompile Include="src\Renderable.cpp" />
     <ClCompile Include="src\Terrain.cpp" />
+    <ClCompile Include="src\TerrainObject.cpp" />
     <ClCompile Include="src\tests\tests.cpp" />
     <ClCompile Include="src\vec2.cpp" />
     <ClCompile Include="src\vec3.cpp" />
@@ -180,7 +182,9 @@
   <ItemGroup>
     <ClInclude Include="src\Helpers.h" />
     <ClInclude Include="src\quat.h" />
+    <ClInclude Include="src\Renderable.h" />
     <ClInclude Include="src\Terrain.h" />
+    <ClInclude Include="src\TerrainObject.h" />
     <ClInclude Include="src\vec2.h" />
     <ClInclude Include="src\vec3.h" />
   </ItemGroup>

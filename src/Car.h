@@ -45,7 +45,7 @@ namespace game
     const Config& config {};
     const Config::Physics::Car& carConfig {};
     const float& gravity {};
-    const Terrain& terrain {};
+    const Terrain& terrain;
     const CustomCamera& camera;
 
     float steeringSpeed = 0;

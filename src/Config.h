@@ -121,10 +121,16 @@ namespace game
       {
         const char* fontPath;
         const char* terrainTexturePath;
+        const char* tree1TexturePath;
+        const char* tree2TexturePath;
+        const char* rockTexturePath;
         const char* carModelPath;
         const char* wheelModelPath;
         const char* gunModelPath;
         const char* cannonModelPath;
+        const char* tree1ModelPath;
+        const char* tree2ModelPath;
+        const char* rockModelPath;
         const char* crosshairsTexturePath;
       } resources;
     } graphics;

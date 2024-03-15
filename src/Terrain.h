@@ -1,4 +1,6 @@
 #pragma once
+#include "Pool.hpp"
+#include "TerrainObject.h"
 
 namespace game
 {
@@ -21,8 +23,9 @@ namespace game
     static constexpr float TERRAIN_HEIGHT = 10.0f;
     static constexpr int GRID_SIZE = HEIGHT_MAP_SIZE - 1;
     static constexpr float CELL_SIZE = TERRAIN_SIZE / GRID_SIZE;
+    static constexpr int OBJECT_COUNT = int(TERRAIN_SIZE / 5);
 
-    Terrain() = default;
+    Terrain(const Texture& terrainTexture, const Model& tree1Model, const Model& tree2Model, const Model& rockModel);
     ~Terrain();
     Terrain(Terrain&) = delete;
     Terrain(Terrain&&) = delete;
@@ -30,7 +33,7 @@ namespace game
     Terrain& operator=(Terrain&&) = delete;
 
     float getHeight(float worldX, float worldY, vec3* normal = nullptr) const;
-    void generate(const char* texturePath, Mode mode);
+    void generate(Mode mode);
     bool traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* normal) const;
     void draw(bool drawWires);
 
@@ -62,13 +65,20 @@ namespace game
 
     Mode mode = Mode::Normal;
     std::vector<float> heightMap;
+    Pool<TerrainObject, 100> objects {};
     Mesh mesh {};
     Model model {};
-    Texture texture {};
+    const Model& tree1Model {};
+    const Model& tree2Model {};
+    const Model& rockModel {};
+    const Texture& terrainTexture {};
+    const Texture& tree1Texture {};
+    const Texture& tree2Texture {};
+    const Texture& rockTexture {};
     bool modelLoaded = false;
-    bool textureLoaded = false;
 
     void unloadResources();
+    void generateObjects();
     float calcHeight(int x, int y, Mode mode) const;
     Triangle getTriangle(float worldX, float worldZ) const;
     TrianglePair getTrianglePair(int x, int y) const;

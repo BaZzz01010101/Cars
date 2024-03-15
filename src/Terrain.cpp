@@ -4,6 +4,14 @@
 
 namespace game
 {
+  Terrain::Terrain(const Texture& terrainTexture, const Model& tree1Model, const Model& tree2Model, const Model& rockModel) :
+    terrainTexture(terrainTexture),
+    tree1Model(tree1Model),
+    tree2Model(tree2Model),
+    rockModel(rockModel)
+  {
+  }
+
   Terrain::~Terrain()
   {
     unloadResources();
@@ -13,9 +21,6 @@ namespace game
   {
     if (modelLoaded)
       UnloadModel(model);
-
-    if (textureLoaded)
-      UnloadTexture(texture);
   }
 
   float Terrain::getHeight(float worldX, float worldZ, vec3* normal) const
@@ -212,9 +217,16 @@ namespace game
       DrawModel(model, { -TERRAIN_SIZE_2, 0, -TERRAIN_SIZE_2 }, 1, WHITE);
       DrawModelWires(model, { -TERRAIN_SIZE_2, 0.05f, -TERRAIN_SIZE_2 }, 1, BLACK);
     }
+
+    for (int i = 0; i < objects.capacity(); i++)
+      if (objects.isAlive(i))
+      {
+        TerrainObject& obj = objects.get(i);
+        obj.draw(obj.transform, drawWires);
+      }
   }
 
-  void Terrain::generate(const char* texturePath, Mode mode)
+  void Terrain::generate(Mode mode)
   {
     unloadResources();
     heightMap.resize(HEIGHT_MAP_SIZE * HEIGHT_MAP_SIZE);
@@ -358,17 +370,45 @@ namespace game
     model = LoadModelFromMesh(mesh);
     modelLoaded = true;
 
-    if (texturePath)
-    {
-      texture = LoadTexture(texturePath);
-      textureLoaded = true;
-    }
-
     //GenTextureMipmaps(&texture);
     //SetTextureFilter(texture, TEXTURE_FILTER_ANISOTROPIC_16X);
-    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = terrainTexture;
+
+    generateObjects();
 
 #endif // UNIT_TEST
+  }
+
+  void Terrain::generateObjects()
+  {
+    for (int i = 0; i < OBJECT_COUNT; i++)
+    {
+      float x = randf(-TERRAIN_SIZE_2, TERRAIN_SIZE_2);
+      float z = randf(-TERRAIN_SIZE_2, TERRAIN_SIZE_2);
+      float y = getHeight(x, z);
+      int type = randi(100);
+
+      const Model* model;
+      float scale = 0;
+
+      if (type > 80)
+      {
+        model = &rockModel;
+        scale = randf(1, 5);
+      }
+      else if (type > 30)
+      {
+        model = &tree1Model;
+        scale = randf(0.25f, 0.75f);
+      }
+      else
+      {
+        model = &tree2Model;
+        scale = randf(0.15f, 0.25f);
+      };
+
+      objects.tryAdd(*model, vec3 { x, y, z }, randf(2 * PI), scale);
+    }
   }
 
   float Terrain::calcHeight(int x, int y, Mode mode) const

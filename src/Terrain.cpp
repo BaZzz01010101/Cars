@@ -222,7 +222,7 @@ namespace game
       if (objects.isAlive(i))
       {
         TerrainObject& obj = objects.get(i);
-        obj.draw(obj.transform, drawWires);
+        obj.draw(drawWires);
       }
   }
 
@@ -368,11 +368,8 @@ namespace game
     UploadMesh(&mesh, false);
 
     model = LoadModelFromMesh(mesh);
-    modelLoaded = true;
-
-    //GenTextureMipmaps(&texture);
-    //SetTextureFilter(texture, TEXTURE_FILTER_ANISOTROPIC_16X);
     model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = terrainTexture;
+    modelLoaded = true;
 
     generateObjects();
 
@@ -381,32 +378,80 @@ namespace game
 
   void Terrain::generateObjects()
   {
+    objects.clear();
+
+    struct
+    {
+      float x = 0;
+      float z = 0;
+      float radius = 0;
+
+      inline bool collided(float x, float z, float radius) 
+      { 
+        return sqr(x - this->x) + sqr(z - this->z) < sqr(radius + this->radius); 
+      }
+    } objs[OBJECT_COUNT];
+
     for (int i = 0; i < OBJECT_COUNT; i++)
     {
-      float x = randf(-TERRAIN_SIZE_2, TERRAIN_SIZE_2);
-      float z = randf(-TERRAIN_SIZE_2, TERRAIN_SIZE_2);
-      float y = getHeight(x, z);
-      int type = randi(100);
-
-      const Model* model;
+      const Model* model = nullptr;
       float scale = 0;
+      float radius = 0;
+      float dy = 0;
+      float x = 0;
+      float z = 0;
+      const int MAX_ATTEMPTS = 100;
+      int attempts = MAX_ATTEMPTS;
 
-      if (type > 80)
+      while (--attempts >= 0)
       {
-        model = &rockModel;
-        scale = randf(1, 5);
-      }
-      else if (type > 30)
-      {
-        model = &tree1Model;
-        scale = randf(0.25f, 0.75f);
-      }
-      else
-      {
-        model = &tree2Model;
-        scale = randf(0.15f, 0.25f);
-      };
+        if (attempts == MAX_ATTEMPTS - 1 || attempts < MAX_ATTEMPTS / 2)
+        {
+          int type = randi(100);
 
+          if (type > 80)
+          {
+            model = &rockModel;
+            scale = randf(1, 5);
+            dy = TERRAIN_HEIGHT / TERRAIN_SIZE * scale * 10;
+          }
+          else if (type > 30)
+          {
+            model = &tree1Model;
+            scale = randf(0.25f, 0.75f);
+            dy = TERRAIN_HEIGHT / TERRAIN_SIZE * scale * 5;
+          }
+          else
+          {
+            model = &tree2Model;
+            scale = randf(0.15f, 0.5f);
+            dy = TERRAIN_HEIGHT / TERRAIN_SIZE * scale * 5;
+          };
+
+          BoundingBox box = GetModelBoundingBox(*model);
+          radius = std::max(box.max.x - box.min.x, box.max.z - box.min.z) * scale * 0.5f;
+        }
+
+        x = randf(-TERRAIN_SIZE_2 + radius, TERRAIN_SIZE_2 - radius);
+        z = randf(-TERRAIN_SIZE_2 + radius, TERRAIN_SIZE_2 - radius);
+
+        int j = i;
+
+        while(--j >= 0)
+          if (objs[j].collided(x, z, radius))
+            break;
+
+        if(j < 0)
+        {
+          objs[i] = { x, z, radius };
+          break;
+        }
+      }
+
+      if (attempts < 0)
+        break;
+
+      float y = getHeight(x, z) - dy;
       objects.tryAdd(*model, vec3 { x, y, z }, randf(2 * PI), scale);
     }
   }

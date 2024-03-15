@@ -6,6 +6,6 @@ public:
 
   void draw(Matrix transform, bool drawWires);
 
-private:
+protected:
   const Model& model {};
 };

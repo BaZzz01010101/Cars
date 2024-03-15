@@ -13,6 +13,8 @@ namespace game
     TerrainObject& operator=(TerrainObject&) = delete;
     TerrainObject& operator=(TerrainObject&&) = delete;
 
+    void draw(bool drawWires);
+
     Matrix transform;
   };
 

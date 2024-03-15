@@ -23,7 +23,7 @@ namespace game
     static constexpr float TERRAIN_HEIGHT = 10.0f;
     static constexpr int GRID_SIZE = HEIGHT_MAP_SIZE - 1;
     static constexpr float CELL_SIZE = TERRAIN_SIZE / GRID_SIZE;
-    static constexpr int OBJECT_COUNT = int(TERRAIN_SIZE / 5);
+    static constexpr int OBJECT_COUNT = int(TERRAIN_SIZE / 3);
 
     Terrain(const Texture& terrainTexture, const Model& tree1Model, const Model& tree2Model, const Model& rockModel);
     ~Terrain();

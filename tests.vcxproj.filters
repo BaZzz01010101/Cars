@@ -20,5 +20,6 @@
     <ClInclude Include="src\TerrainObject.h" />
     <ClInclude Include="src\Renderable.h" />
     <ClInclude Include="src\CollisionGeometry.h" />
+    <ClInclude Include="src\SemiVector.hpp" />
   </ItemGroup>
 </Project>

@@ -185,6 +185,7 @@
     <ClInclude Include="src\Helpers.h" />
     <ClInclude Include="src\quat.h" />
     <ClInclude Include="src\Renderable.h" />
+    <ClInclude Include="src\SemiVector.hpp" />
     <ClInclude Include="src\Terrain.h" />
     <ClInclude Include="src\TerrainObject.h" />
     <ClInclude Include="src\vec2.h" />

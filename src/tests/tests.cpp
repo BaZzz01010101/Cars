@@ -2,13 +2,13 @@
 #include "CppUnitTest.h"
 #include "Terrain.h"
 #include "Helpers.h"
-#include <functional>
+#include "SemiVector.hpp"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace game;
 using namespace std;
 
-namespace math_tests
+namespace game_tests
 {
   constexpr float TEST_EPSILON = 0.000001f;
 
@@ -94,6 +94,174 @@ namespace math_tests
         Assert::IsTrue(fabsf(fabsf(proj * norm) - proj.length()) < TEST_EPSILON);
       }
     }
+  };
+
+  TEST_CLASS(SemiVectorTest)
+  {
+  public:
+    TEST_METHOD(add_read)
+    {
+      SemiVector<int, 3> sv;
+      sv.add(0);
+      sv.add(1);
+      sv.add(2);
+      sv.add(3);
+      sv.add(4);
+      sv.add(5);
+
+      Assert::AreEqual(6, sv.size());
+      Assert::AreEqual(0, sv[0]);
+      Assert::AreEqual(1, sv[1]);
+      Assert::AreEqual(2, sv[2]);
+      Assert::AreEqual(3, sv[3]);
+      Assert::AreEqual(4, sv[4]);
+      Assert::AreEqual(5, sv[5]);
+    }
+
+    TEST_METHOD(add_clear_add)
+    {
+      SemiVector<int, 3> sv;
+      sv.add(0);
+      sv.add(1);
+      sv.add(2);
+      sv.add(3);
+      sv.add(4);
+      sv.add(5);
+
+      Assert::AreEqual(6, sv.size());
+      sv.clear();
+      Assert::AreEqual(0, sv.size());
+
+      sv.add(6);
+      sv.add(7);
+      sv.add(8);
+      sv.add(9);
+      sv.add(10);
+      sv.add(11);
+
+      Assert::AreEqual(6, sv.size());
+      Assert::AreEqual(6, sv[0]);
+      Assert::AreEqual(7, sv[1]);
+      Assert::AreEqual(8, sv[2]);
+      Assert::AreEqual(9, sv[3]);
+      Assert::AreEqual(10, sv[4]);
+      Assert::AreEqual(11, sv[5]);
+    }
+
+    TEST_METHOD(remove_arr_first)
+    {
+      SemiVector<int, 3> sv;
+      sv.add(0);
+      sv.add(1);
+      sv.add(2);
+      sv.add(3);
+      sv.add(4);
+      sv.add(5);
+
+      sv.remove(0);
+      Assert::AreEqual(5, sv.size());
+      Assert::AreEqual(1, sv[0]);
+      Assert::AreEqual(2, sv[1]);
+      Assert::AreEqual(3, sv[2]);
+      Assert::AreEqual(4, sv[3]);
+      Assert::AreEqual(5, sv[4]);
+    }
+
+    TEST_METHOD(remove_arr_middle)
+    {
+      SemiVector<int, 3> sv;
+      sv.add(0);
+      sv.add(1);
+      sv.add(2);
+      sv.add(3);
+      sv.add(4);
+      sv.add(5);
+
+      sv.remove(1);
+      Assert::AreEqual(5, sv.size());
+      Assert::AreEqual(0, sv[0]);
+      Assert::AreEqual(2, sv[1]);
+      Assert::AreEqual(3, sv[2]);
+      Assert::AreEqual(4, sv[3]);
+      Assert::AreEqual(5, sv[4]);
+    }
+
+    TEST_METHOD(remove_arr_last)
+    {
+      SemiVector<int, 3> sv;
+      sv.add(0);
+      sv.add(1);
+      sv.add(2);
+      sv.add(3);
+      sv.add(4);
+      sv.add(5);
+
+      sv.remove(2);
+      Assert::AreEqual(5, sv.size());
+      Assert::AreEqual(0, sv[0]);
+      Assert::AreEqual(1, sv[1]);
+      Assert::AreEqual(3, sv[2]);
+      Assert::AreEqual(4, sv[3]);
+      Assert::AreEqual(5, sv[4]);
+    }
+
+    TEST_METHOD(remove_vec_first)
+    {
+      SemiVector<int, 3> sv;
+      sv.add(0);
+      sv.add(1);
+      sv.add(2);
+      sv.add(3);
+      sv.add(4);
+      sv.add(5);
+
+      sv.remove(3);
+      Assert::AreEqual(5, sv.size());
+      Assert::AreEqual(0, sv[0]);
+      Assert::AreEqual(1, sv[1]);
+      Assert::AreEqual(2, sv[2]);
+      Assert::AreEqual(4, sv[3]);
+      Assert::AreEqual(5, sv[4]);
+    }
+
+    TEST_METHOD(remove_vec_middle)
+    {
+      SemiVector<int, 3> sv;
+      sv.add(0);
+      sv.add(1);
+      sv.add(2);
+      sv.add(3);
+      sv.add(4);
+      sv.add(5);
+
+      sv.remove(4);
+      Assert::AreEqual(5, sv.size());
+      Assert::AreEqual(0, sv[0]);
+      Assert::AreEqual(1, sv[1]);
+      Assert::AreEqual(2, sv[2]);
+      Assert::AreEqual(3, sv[3]);
+      Assert::AreEqual(5, sv[4]);
+    }
+
+    TEST_METHOD(remove_vec_last)
+    {
+      SemiVector<int, 3> sv;
+      sv.add(0);
+      sv.add(1);
+      sv.add(2);
+      sv.add(3);
+      sv.add(4);
+      sv.add(5);
+
+      sv.remove(5);
+      Assert::AreEqual(5, sv.size());
+      Assert::AreEqual(0, sv[0]);
+      Assert::AreEqual(1, sv[1]);
+      Assert::AreEqual(2, sv[2]);
+      Assert::AreEqual(3, sv[3]);
+      Assert::AreEqual(4, sv[4]);
+    }
+
   };
 
   TEST_CLASS(TerrainTest)

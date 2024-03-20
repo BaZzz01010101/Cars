@@ -1,4 +1,5 @@
 #pragma once
+#include "SemiVector.hpp"
 
 namespace game
 {
@@ -21,8 +22,7 @@ namespace game
     };
 
     static constexpr int STATIC_COUNT = 5;
-    std::array<Sphere, STATIC_COUNT> spheres { };
-    std::vector<Sphere> spheres1;
+    SemiVector<Sphere, STATIC_COUNT> spheres;
   };
 
 }

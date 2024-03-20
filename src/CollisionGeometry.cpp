@@ -6,17 +6,7 @@ namespace game
 {
   void CollisionGeometry::add(vec3 position, float radius)
   {
-    if (spheres1.size() == 0)
-      for (int i = 0; i < STATIC_COUNT; i++)
-        if (spheres[i].radius == 0.0f)
-        {
-          spheres[i].position = position;
-          spheres[i].radius = radius;
-
-          return;
-        }
-
-    spheres1.push_back({ position, radius });
+    spheres.add({ position, radius });
   }
 
   bool CollisionGeometry::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
@@ -28,17 +18,8 @@ namespace game
     float currentDistance = 0;
     vec3 currentHitPosition, currentNormal;
 
-    for (const Sphere& sphere : spheres)
-      if (sphere.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentNormal, &currentDistance))
-        if (currentDistance < closestDistance)
-        {
-          closestDistance = currentDistance;
-          closestHitPosition = currentHitPosition;
-          closestNormal = currentNormal;
-        }
-
-    for (const Sphere& sphere : spheres1)
-      if (sphere.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentNormal, &currentDistance))
+    for (int i = 0; i < spheres.size(); i++)
+      if (spheres[i].traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentNormal, &currentDistance))
         if (currentDistance < closestDistance)
         {
           closestDistance = currentDistance;
@@ -66,22 +47,9 @@ namespace game
     vec3 min = vec3::max;
     vec3 max = vec3::min;
 
-    for (const Sphere& sphere : spheres)
+    for (int i = 0; i < spheres.size(); i++)
     {
-      vec3 position = sphere.position;
-      float radius = sphere.radius;
-
-      min.x = std::min(min.x, position.x - radius);
-      min.y = std::min(min.y, position.y - radius);
-      min.z = std::min(min.z, position.z - radius);
-
-      max.x = std::max(max.x, position.x + radius);
-      max.y = std::max(max.y, position.y + radius);
-      max.z = std::max(max.z, position.z + radius);
-    }
-
-    for (const Sphere& sphere : spheres1)
-    {
+      const Sphere& sphere = spheres[i];
       vec3 position = sphere.position;
       float radius = sphere.radius;
 
@@ -99,11 +67,8 @@ namespace game
 
   void CollisionGeometry::drawDebug() const
   {
-    for (const Sphere& sphere : spheres)
-      DrawSphereWires(sphere.position, sphere.radius, 8, 8, YELLOW);
-
-    for (const Sphere& sphere : spheres1)
-      DrawSphereWires(sphere.position, sphere.radius, 8, 8, YELLOW);
+    for (int i = 0; i < spheres.size(); i++)
+      DrawSphereWires(spheres[i].position, spheres[i].radius, 8, 8, YELLOW);
   }
 
   bool CollisionGeometry::Sphere::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
@@ -120,8 +85,6 @@ namespace game
 
     if (originToClosestRayPointLength < 0)
       return false;
-
-    //vec3 originToClosestRayPoint = originToClosestRayPointLength * directionNormalized;
 
     float originToClosestRayPointSqLength = sqr(originToClosestRayPointLength);
     float centerToClosestRayPointSqLength = originToCenterSqLength - originToClosestRayPointSqLength;

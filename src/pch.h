@@ -12,6 +12,7 @@
 #include <string>
 #include <cmath>
 #include <array>
+#include <functional>
 
 #include "raylib.h"
 #include "raymath.h"

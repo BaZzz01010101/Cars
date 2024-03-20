@@ -98,6 +98,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\App.cpp" />
+    <ClCompile Include="src\CGEditor.cpp" />
+    <ClCompile Include="src\CollisionGeometry.cpp" />
     <ClCompile Include="src\ExplosionParticle.cpp" />
     <ClCompile Include="src\Projectile.cpp" />
     <ClCompile Include="src\Config.cpp" />
@@ -123,6 +125,8 @@
   <ItemGroup>
     <ClInclude Include="src\App.h" />
     <ClInclude Include="src\BoolArray.hpp" />
+    <ClInclude Include="src\CGEditor.h" />
+    <ClInclude Include="src\CollisionGeometry.h" />
     <ClInclude Include="src\ExplosionParticle.h" />
     <ClInclude Include="src\Projectile.h" />
     <ClInclude Include="src\Pool.hpp" />

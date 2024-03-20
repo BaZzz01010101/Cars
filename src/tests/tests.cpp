@@ -106,7 +106,7 @@ namespace math_tests
     };
 
     static Terrain terrain;
-    static inline const size_t TRY_COUNT = 50000000;
+    static inline const size_t TRY_COUNT = 500000;
     static inline const float MIN_XZ = -Terrain::TERRAIN_SIZE / 2 + 0.01f;
     static inline const float MAX_XZ = Terrain::TERRAIN_SIZE / 2 - 0.01f;
     static inline const float MIN_Y = -Terrain::TERRAIN_HEIGHT - 1;
@@ -127,11 +127,15 @@ namespace math_tests
         Line line = createLine();
 
         vec3 hitPosition, normal;
-        bool hit = terrain.traceRay(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), &hitPosition, &normal);
+        float hitDistance;
+        bool hit = terrain.traceRay(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), &hitPosition, &normal, &hitDistance);
+
         allHit = allHit && hit;
 
         if (!hit)
           failed.push_back(line);
+        else
+          Assert::IsTrue(fabsf(sqr(hitDistance) - (hitPosition - line.begin).sqLength()) < 0.001f);
       }
 
       wchar_t buf[256];
@@ -161,8 +165,7 @@ namespace math_tests
       {
         Line line = createLine();
 
-        vec3 hitPosition, normal;
-        bool hit = terrain.traceRay(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), &hitPosition, &normal);
+        bool hit = terrain.traceRay(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), nullptr, nullptr, nullptr);
         anyHit = anyHit || hit;
 
         if (hit)

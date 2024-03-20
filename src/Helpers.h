@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 
 namespace game
 {
@@ -17,6 +18,26 @@ namespace game
     return val * val;
   }
 
+  template <typename T>
+  constexpr T sqrt_helper(T x, T lo, T hi)
+  {
+    if (lo == hi)
+      return lo;
+
+    const T mid = (lo + hi + 1) / 2;
+
+    if (x / mid < mid)
+      return sqrt_helper<T>(x, lo, mid - 1);
+    else
+      return sqrt_helper<T>(x, mid, hi);
+  }
+
+  template <typename T>
+  constexpr T ct_sqrt(T x)
+  {
+    return sqrt_helper<T>(x, 0, x / 2 + 1);
+  }
+  
   // min2 can be greater than max2
   // min1 can be greater than max1
   // min1 can be equal to max1

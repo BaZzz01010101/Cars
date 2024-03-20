@@ -9,6 +9,7 @@
     <ClCompile Include="src\quat.cpp" />
     <ClCompile Include="src\TerrainObject.cpp" />
     <ClCompile Include="src\Renderable.cpp" />
+    <ClCompile Include="src\CollisionGeometry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Helpers.h" />
@@ -18,5 +19,6 @@
     <ClInclude Include="src\quat.h" />
     <ClInclude Include="src\TerrainObject.h" />
     <ClInclude Include="src\Renderable.h" />
+    <ClInclude Include="src\CollisionGeometry.h" />
   </ItemGroup>
 </Project>

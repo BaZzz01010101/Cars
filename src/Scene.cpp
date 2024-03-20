@@ -107,7 +107,7 @@ namespace game
     rockModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = rockTexture;
     rockModel.meshMaterial[0] = 0;
 
-    terrain.generate(Terrain::Mode::Normal);
+    terrain.init();
 
     playerIndex = cars.tryAdd(config, carModel, wheelModel, gunModel, cannonModel, terrain, camera);
     Car& player = cars.get(playerIndex);
@@ -150,7 +150,7 @@ namespace game
 
         if (projectile.lifeTime < 0)
           projectiles.remove(i);
-        else if (terrain.traceRay(begin, (end - begin).normalized(), (end - begin).length(), &hitPosition, &normal))
+        else if (terrain.traceRay(begin, (end - begin).normalized(), (end - begin).length(), &hitPosition, &normal, nullptr))
         {
           projectiles.remove(i);
 
@@ -264,8 +264,8 @@ namespace game
     Car& player = getPlayer();
     const Config::Physics::Car& carConfig = config.physics.car;
 
-    player.verticalTrust = player.mass * 20 * float(IsKeyDown(KEY_LEFT_SHIFT)),
-      player.handBreaked = IsKeyDown(KEY_SPACE);
+    player.verticalTrust = player.mass * 20 * float(IsKeyDown(KEY_LEFT_SHIFT));
+    player.handBreaked = IsKeyDown(KEY_SPACE);
     player.enginePowerDirection = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S));
     player.steeringDirection = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D));
   }

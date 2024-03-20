@@ -12,6 +12,10 @@ namespace game
 
   vec3 const vec3::left = { 1, 0, 0 };
 
+  vec3 const vec3::min = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+
+  vec3 const vec3::max = { FLT_MAX, FLT_MAX, FLT_MAX };
+
   vec3 vec3::randomInSphere(float radius)
   {
     if (radius < EPSILON)

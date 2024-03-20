@@ -4,6 +4,8 @@
 
 namespace game
 {
+  Matrix const Terrain::transform = MatrixTranslate(-TERRAIN_SIZE_2, 0, -TERRAIN_SIZE_2);
+
   Terrain::Terrain(const Texture& terrainTexture, const Model& tree1Model, const Model& tree2Model, const Model& rockModel) :
     terrainTexture(terrainTexture),
     tree1Model(tree1Model),
@@ -21,6 +23,13 @@ namespace game
   {
     if (modelLoaded)
       UnloadModel(model);
+  }
+
+  void Terrain::init()
+  {
+    wiresMaterial = LoadMaterialDefault();
+    wiresMaterial.maps->color = WHITE;
+    generate(Terrain::Mode::Normal);
   }
 
   float Terrain::getHeight(float worldX, float worldZ, vec3* normal) const
@@ -72,9 +81,59 @@ namespace game
       return TERRAIN_HEIGHT * (h00 * (1 - dx) + h11 * dx);
   }
 
-  bool Terrain::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* normal) const
+  bool Terrain::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
   {
-    distance = (distance < 0) ? 9e9f : distance;
+    vec3 currentHitPosition, currentNormal;
+    float currentHitDistance;
+
+    vec3 closestHitPosition, closestNormal;
+    float closestHitDistance = FLT_MAX;
+
+    bool hitTerrain = traceRayWithTerrain(origin, directionNormalized, distance, &currentHitPosition, &currentNormal, &currentHitDistance);
+
+    if (hitTerrain)
+    {
+      closestHitPosition = currentHitPosition;
+      closestNormal = currentNormal;
+      closestHitDistance = currentHitDistance;
+    }
+
+    int ii = CG_GRID_SIZE;
+    // TODO: implement optimized solution by grouping geometries
+    for (int i = 0; i < objectCollisionGeometries.count(); i++)
+      if (objectCollisionGeometries.isAlive(i))
+      {
+        const CollisionGeometry& geometry = objectCollisionGeometries.get(i);
+
+        bool hitObject = geometry.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentNormal, &currentHitDistance);
+        if (hitObject && currentHitDistance < closestHitDistance)
+        {
+          closestHitPosition = currentHitPosition;
+          closestNormal = currentNormal;
+          closestHitDistance = currentHitDistance;
+        }
+      }
+
+    if (closestHitDistance < FLT_MAX)
+    {
+      if (hitPosition)
+        *hitPosition = closestHitPosition;
+
+      if (hitNormal)
+        *hitNormal = closestNormal;
+
+      if (hitDistance)
+        *hitDistance = closestHitDistance;
+
+      return true;
+    }
+
+    return false;
+  }
+
+  bool Terrain::traceRayWithTerrain(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
+  {
+    distance = (distance < 0) ? FLT_MAX : distance;
 
     if (directionNormalized.isZero() || distance < EPSILON)
       return false;
@@ -85,7 +144,7 @@ namespace game
       return getTrianglePair(
         int((origin.x + TERRAIN_SIZE_2) / CELL_SIZE),
         int((origin.z + TERRAIN_SIZE_2) / CELL_SIZE)
-      ).traceRay(origin, directionNormalized, distance, hitPosition, normal);
+      ).traceRay(origin, directionNormalized, distance, hitPosition, hitNormal, hitDistance);
 
     vec2 direction2D = directionNormalized.xz();
     vec2 step = direction2D / maxAxis * 0.999f;
@@ -105,7 +164,7 @@ namespace game
 
     while (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE && distance2D > 0)
     {
-      if (getTrianglePair(x, y).traceRay(origin, directionNormalized, distance, hitPosition, normal))
+      if (getTrianglePair(x, y).traceRay(origin, directionNormalized, distance, hitPosition, hitNormal, hitDistance))
         return true;
 
       vec2 next = current + step;
@@ -122,12 +181,12 @@ namespace game
 
         if (k > 0 && nx >= 0 && nx < GRID_SIZE)
         {
-          if (getTrianglePair(nx, y).traceRay(origin, directionNormalized, distance, hitPosition, normal))
+          if (getTrianglePair(nx, y).traceRay(origin, directionNormalized, distance, hitPosition, hitNormal, hitDistance))
             return true;
         }
         else if (k < 0 && ny >= 0 && ny < GRID_SIZE)
         {
-          if (getTrianglePair(x, ny).traceRay(origin, directionNormalized, distance, hitPosition, normal))
+          if (getTrianglePair(x, ny).traceRay(origin, directionNormalized, distance, hitPosition, hitNormal, hitDistance))
             return true;
         }
       }
@@ -192,6 +251,9 @@ namespace game
 
   Terrain::TrianglePair Terrain::getTrianglePair(int x, int y) const
   {
+    x = clamp(x, 0, GRID_SIZE - 1);
+    y = clamp(y, 0, GRID_SIZE - 1);
+
     float startX = x * CELL_SIZE - TERRAIN_SIZE_2;
     float startY = y * CELL_SIZE - TERRAIN_SIZE_2;
 
@@ -210,12 +272,14 @@ namespace game
 
   void Terrain::draw(bool drawWires)
   {
-    if (drawWires)
-      DrawModelWires(model, { -TERRAIN_SIZE_2, 0, -TERRAIN_SIZE_2 }, 1, WHITE);
-    else
+    for (int i = 0; i < model.meshCount; i++)
     {
-      DrawModel(model, { -TERRAIN_SIZE_2, 0, -TERRAIN_SIZE_2 }, 1, WHITE);
-      DrawModelWires(model, { -TERRAIN_SIZE_2, 0.05f, -TERRAIN_SIZE_2 }, 1, BLACK);
+      if (!drawWires)
+        DrawMesh(model.meshes[i], model.materials[model.meshMaterial[i]], transform);
+
+      rlEnableWireMode();
+      DrawMesh(model.meshes[i], wiresMaterial, transform);
+      rlDisableWireMode();
     }
 
     for (int i = 0; i < objects.capacity(); i++)
@@ -224,6 +288,15 @@ namespace game
         TerrainObject& obj = objects.get(i);
         obj.draw(drawWires);
       }
+
+    //drawDebug();
+  }
+
+  void Terrain::drawDebug() const
+  {
+    for (int i = 0; i < objectCollisionGeometries.count(); i++)
+      if (objectCollisionGeometries.isAlive(i))
+        objectCollisionGeometries.get(i).drawDebug();
   }
 
   void Terrain::generate(Mode mode)
@@ -235,8 +308,8 @@ namespace game
       for (int x = 0; x < HEIGHT_MAP_SIZE; x++)
         heightMap[y * HEIGHT_MAP_SIZE + x] = calcHeight(x, y, mode);
 
-    float min_h = 9e9f;
-    float max_h = -9e9f;
+    float min_h = FLT_MAX;
+    float max_h = -FLT_MAX;
 
     for (float h : heightMap)
     {
@@ -379,6 +452,7 @@ namespace game
   void Terrain::generateObjects()
   {
     objects.clear();
+    objectCollisionGeometries.clear();
 
     struct
     {
@@ -386,14 +460,15 @@ namespace game
       float z = 0;
       float radius = 0;
 
-      inline bool collided(float x, float z, float radius) 
-      { 
-        return sqr(x - this->x) + sqr(z - this->z) < sqr(radius + this->radius); 
+      inline bool collidingWith(float x, float z, float radius)
+      {
+        return sqr(x - this->x) + sqr(z - this->z) < sqr(radius + this->radius);
       }
     } objs[OBJECT_COUNT];
 
     for (int i = 0; i < OBJECT_COUNT; i++)
     {
+      std::function<CollisionGeometry (vec3, float, float)> createCollisionGeometry;
       const Model* model = nullptr;
       float scale = 0;
       float radius = 0;
@@ -411,18 +486,21 @@ namespace game
 
           if (type > 80)
           {
+            createCollisionGeometry = &createRockCollisionGeometry;
             model = &rockModel;
             scale = randf(1, 5);
             dy = TERRAIN_HEIGHT / TERRAIN_SIZE * scale * 10;
           }
           else if (type > 30)
           {
+            createCollisionGeometry = &createTree1CollisionGeometry;
             model = &tree1Model;
             scale = randf(0.25f, 0.75f);
             dy = TERRAIN_HEIGHT / TERRAIN_SIZE * scale * 5;
           }
           else
           {
+            createCollisionGeometry = &createTree2CollisionGeometry;
             model = &tree2Model;
             scale = randf(0.15f, 0.5f);
             dy = TERRAIN_HEIGHT / TERRAIN_SIZE * scale * 5;
@@ -437,11 +515,11 @@ namespace game
 
         int j = i;
 
-        while(--j >= 0)
-          if (objs[j].collided(x, z, radius))
+        while (--j >= 0)
+          if (objs[j].collidingWith(x, z, radius))
             break;
 
-        if(j < 0)
+        if (j < 0)
         {
           objs[i] = { x, z, radius };
           break;
@@ -452,8 +530,81 @@ namespace game
         break;
 
       float y = getHeight(x, z) - dy;
-      objects.tryAdd(*model, vec3 { x, y, z }, randf(2 * PI), scale);
+      vec3 position = { x, y, z };
+      float angle = randf(2 * PI);
+      objects.tryAdd(*model, position, angle, scale);
+      objectCollisionGeometries.tryAdd(createCollisionGeometry(position, angle, scale));
     }
+  }
+
+  CollisionGeometry Terrain::createTree1CollisionGeometry(vec3 position, float angle, float scale)
+  {
+    static std::pair<vec3, float> spheres[] = {
+      {{ 0.000f, -0.330f,  0.000f}, 1.990f},
+      {{ 0.000f,  2.145f,  0.165f}, 1.330f},
+      {{-0.000f,  3.630f,  0.495f}, 1.330f},
+      {{ 0.000f,  5.610f,  0.660f}, 1.495f},
+      {{-0.000f,  8.250f,  0.990f}, 1.660f},
+      {{-3.036f,  7.831f, -1.584f}, 1.957f},
+      {{-4.356f, 10.693f, -0.066f}, 2.848f},
+      {{ 3.498f, 11.383f, -1.386f}, 2.584f},
+      {{ 2.673f, 12.637f,  5.016f}, 3.838f},
+      {{-0.677f, 13.937f,  1.132f}, 5.452f}
+    };
+
+    quat rotation = quat::fromYAngle(angle);
+    CollisionGeometry cg;
+
+    for (auto& p : spheres)
+      cg.add(position + p.first.rotatedBy(rotation) * scale, p.second * scale);
+
+    return cg;
+  }
+
+  CollisionGeometry Terrain::createTree2CollisionGeometry(vec3 position, float angle, float scale)
+  {
+    static std::pair<vec3, float> spheres[] = {
+      {{ 0.000f, -1.650f,  0.000f}, 3.640f},
+      {{-0.165f,  2.310f, -0.165f}, 1.330f},
+      {{-0.000f,  3.960f, -0.330f}, 1.330f},
+      {{ 0.000f,  5.940f, -0.495f}, 1.495f},
+      {{-1.150f,  9.900f,  0.495f}, 4.465f},
+      {{-0.396f, 14.431f,  0.231f}, 5.092f},
+      {{ 3.894f, 12.178f,  0.759f}, 3.673f},
+      {{-0.132f, 16.993f, -4.851f}, 1.924f},
+      {{-2.772f, 19.237f,  1.056f}, 2.188f},
+      {{-3.812f, 21.856f,  2.617f}, 1.162f}
+    };
+
+    quat rotation = quat::fromYAngle(angle);
+    CollisionGeometry cg;
+
+    for (auto& p : spheres)
+      cg.add(position + p.first.rotatedBy(rotation) * scale, p.second * scale);
+
+    return cg;
+  }
+
+  CollisionGeometry Terrain::createRockCollisionGeometry(vec3 position, float angle, float scale)
+  {
+    static std::pair<vec3, float> spheres[] = {
+      {{-0.825f, -0.115f, -3.465f}, 1.825f},
+      {{ 0.000f,  1.040f, -2.310f}, 1.330f},
+      {{-1.155f, -0.115f, -1.320f}, 1.660f},
+      {{-0.990f,  0.380f,  2.310f}, 1.165f},
+      {{-0.495f,  1.205f,  1.320f}, 1.495f},
+      {{ 0.330f,  1.535f, -0.990f}, 1.990f},
+      {{ 0.825f,  1.205f,  0.990f}, 1.165f},
+      {{ 0.495f,  2.525f,  0.825f}, 1.660f},
+    };
+
+    quat rotation = quat::fromYAngle(angle);
+    CollisionGeometry cg;
+
+    for (auto& p : spheres)
+      cg.add(position + p.first.rotatedBy(rotation) * scale, p.second * scale);
+
+    return cg;
   }
 
   float Terrain::calcHeight(int x, int y, Mode mode) const
@@ -503,12 +654,12 @@ namespace game
     return h;
   }
 
-  bool Terrain::Triangle::traceRay(vec3 origin, vec3 directionNormalized, vec3* hitPosition, vec3* normal) const
+  bool Terrain::Triangle::traceRay(vec3 origin, vec3 directionNormalized, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
   {
     vec3 edge01 = v1 - v0;
     vec3 edge12 = v2 - v1;
     vec3 edge20 = v0 - v2;
-    vec3 norm = (edge01 % edge20).normalized();
+    vec3 norm = (edge20 % edge01).normalized();
     float originToPlaneDistanceSigned = (v0 - origin) * norm;
     float cosAngle = directionNormalized * norm;
 
@@ -526,59 +677,66 @@ namespace game
     vec3 v1toHit = hit - v1;
     vec3 v2toHit = hit - v2;
 
-    if ((edge01 % v0toHit) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
+    if ((v0toHit % edge01) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
       return false;
 
-    if ((edge12 % v1toHit) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
+    if ((v1toHit % edge12) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
       return false;
 
-    if ((edge20 % v2toHit) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
+    if ((v2toHit % edge20) / Terrain::CELL_SIZE / Terrain::CELL_SIZE * norm > 0.001f)
       return false;
 
     if (hitPosition)
       *hitPosition = hit;
 
-    if (normal)
-      *normal = norm;
+    if (hitNormal)
+      *hitNormal = norm;
+
+    if (hitDistance)
+      *hitDistance = originToHitDistance;
 
     return true;
   }
 
-  bool Terrain::TrianglePair::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* normal) const
+  bool Terrain::TrianglePair::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
   {
     vec3 hitPosition1, normal1, hitPosition2, normal2;
-    float sqDistance = distance * distance;
+    float hitDistance1 = FLT_MAX, hitDistance2 = FLT_MAX;
 
     Triangle tr1 = { v00, v10, v11 };
     Triangle tr2 = { v00, v11, v01 };
 
-    bool isHit1 = tr1.traceRay(origin, directionNormalized, &hitPosition1, &normal1);
-    bool isHit2 = tr2.traceRay(origin, directionNormalized, &hitPosition2, &normal2);
+    bool isHit1 = tr1.traceRay(origin, directionNormalized, &hitPosition1, &normal1, &hitDistance1);
+    bool isHit2 = tr2.traceRay(origin, directionNormalized, &hitPosition2, &normal2, &hitDistance2);
 
-    float sqDistance1 = isHit1 ? (hitPosition1 - origin).sqLength() : (10 * sqDistance);
-    float sqDistance2 = isHit2 ? (hitPosition2 - origin).sqLength() : (10 * sqDistance);
-
-    if (sqDistance1 <= sqDistance && sqDistance1 < sqDistance2)
+    if (isHit1 && hitDistance1 <= distance && hitDistance1 < hitDistance2)
     {
       if (hitPosition)
         *hitPosition = hitPosition1;
 
-      if (normal)
-        *normal = normal1;
+      if (hitNormal)
+        *hitNormal = normal1;
+
+      if (hitDistance)
+        *hitDistance = hitDistance1;
 
       return true;
     }
-    else if (sqDistance2 <= sqDistance)
+    else if (isHit2 && hitDistance2 <= distance)
     {
       if (hitPosition)
         *hitPosition = hitPosition2;
 
-      if (normal)
-        *normal = normal2;
+      if (hitNormal)
+        *hitNormal = normal2;
+
+      if (hitDistance)
+        *hitDistance = hitDistance2;
 
       return true;
     }
 
     return false;
   }
+
 }

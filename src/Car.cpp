@@ -42,7 +42,7 @@ namespace game
     rearRightWheel.reset();
   }
 
-  bool Car::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* normal) const
+  bool Car::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
   {
     return false;
   }
@@ -103,7 +103,7 @@ namespace game
     vec3 targetCollisionPosition;
     vec3 gunPosition = gun.position + config.physics.gun.barrelPosition.y * up();
     vec3 cannonPosition = cannon.position + config.physics.cannon.barrelPosition.y * up();
-    bool isHit = terrain.traceRay(camera.position, camera.direction, -1, &targetCollisionPosition, nullptr);
+    bool isHit = terrain.traceRay(camera.position, camera.direction, -1, &targetCollisionPosition, nullptr, nullptr);
 
     gun.expectedTarget = isHit ? targetCollisionPosition : camera.position + 1000 * camera.direction;
     cannon.expectedTarget = isHit ? targetCollisionPosition : camera.position + 1000 * camera.direction;
@@ -140,10 +140,23 @@ namespace game
     {
       vec3 ptRotated = pt.rotatedBy(rotation);
       vec3 ptGlobal = ptRotated + position;
+      vec3 traceDirection = ptGlobal - position;
+      float distance = traceDirection.length();
+      traceDirection /= distance;
+      //distance += 0.01f;
       vec3 normal;
-      float terrainY = terrain.getHeight(ptGlobal.x, ptGlobal.z, &normal);
+
       const float MAX_PENETRATION = 0.1f;
+      
+      float terrainY = terrain.getHeight(ptGlobal.x, ptGlobal.z, &normal);
       float penetration = std::max(terrainY - ptGlobal.y, 0.0f) / MAX_PENETRATION;
+      float hitDistance;
+
+      if(terrain.traceRay(position, traceDirection, distance, nullptr, &normal, &hitDistance))
+      {
+        penetration = std::max(distance - hitDistance, 0.0f) / MAX_PENETRATION;
+      }
+
       vec3 ptRotationfVelocity = (angularVelocity % pt).rotatedBy(rotation);
       vec3 ptVelocity = vec3::zero;
       ptVelocity += velocity;
@@ -252,6 +265,18 @@ namespace game
     //drawVector(position, 0.5f * moment.logarithmic(), BLUE);
     drawVector(position, 5 * vec3::forward, WHITE);
     drawVector(position, 5 * vec3::left, LIGHTGRAY);
+
+    vec3 hitPosition, normal;
+    float distance;
+    DrawLine3D(gun.barrelPosition(), gun.barrelPosition() + gun.forward() * 10, BLUE);
+
+    if (terrain.traceRay(gun.barrelPosition(), gun.forward(), 10, &hitPosition, &normal, &distance))
+    {
+      DrawSphere(hitPosition, 0.1f, YELLOW);
+      DrawLine3D(hitPosition, hitPosition + normal * 5, YELLOW);
+      DrawSphere(hitPosition + normal * 5, 0.1f, YELLOW);
+    }
+
   }
 }
 

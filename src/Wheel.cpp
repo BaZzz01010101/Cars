@@ -112,7 +112,7 @@ namespace game
   {
     Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation * wheelRotation), MatrixTranslate(position.x, position.y + suspensionOffset, position.z));
     Renderable::draw(transform, drawWires);
-    drawDebug();
+    //drawDebug();
   }
 
   void Wheel::drawDebug()

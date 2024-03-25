@@ -3,7 +3,7 @@
 
 namespace game
 {
-  static int gSeed = 0;
+  extern int gSeed;
   const int FAST_RAND_MAX = 0x7fffffff;
 
   template<class T>

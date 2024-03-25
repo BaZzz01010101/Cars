@@ -117,6 +117,7 @@ namespace game
 
   void Scene::update(float dt)
   {
+    terrain.traceCount = 0;
     updatePlayerControl(dt);
     updateFiring(dt);
 

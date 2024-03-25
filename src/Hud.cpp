@@ -220,5 +220,7 @@ namespace game
     print("Cars: ", (float)scene.cars.count(), GREEN);
     print("Projectiles: ", (float)scene.projectiles.count(), GREEN);
     print("Explosion particles: ", (float)scene.explosionParticles.count(), GREEN);
+
+    print("Trace count:", (float)scene.terrain.traceCount, WHITE);
   }
 }

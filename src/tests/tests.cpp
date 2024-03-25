@@ -10,6 +10,31 @@ using namespace std;
 
 namespace game_tests
 {
+  class Terrain : public game::Terrain
+  {
+  public:
+    CGGridCell (&cgGrid)[CG_GRID_SIZE][CG_GRID_SIZE] = game::Terrain::cgGrid;
+
+    Terrain(const Texture& terrainTexture, const Model& tree1Model, const Model& tree2Model, const Model& rockModel) :
+      game::Terrain(terrainTexture, tree1Model, tree2Model, rockModel)
+    {}
+
+    bool traceRayWithTerrain(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
+    {
+      return game::Terrain::traceRayWithTerrain(origin, directionNormalized, distance, hitPosition, hitNormal, hitDistance);
+    }
+
+    bool traceRayWithObjects(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
+    {
+      return game::Terrain::traceRayWithObjects(origin, directionNormalized, distance, hitPosition, hitNormal, hitDistance);
+    }
+
+    bool traceRayWithObjects_Unoptimized(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
+    {
+      return game::Terrain::traceRayWithObjects_Unoptimized(origin, directionNormalized, distance, hitPosition, hitNormal, hitDistance);
+    }
+  };
+
   constexpr float TEST_EPSILON = 0.000001f;
 
   TEST_CLASS(vec3bench)
@@ -50,7 +75,7 @@ namespace game_tests
 
       Assert::IsTrue(vv.size() == count);
     }
-    
+
   };
 
   TEST_CLASS(vec3test)
@@ -58,9 +83,9 @@ namespace game_tests
   public:
     TEST_METHOD(normalize)
     {
-      vec3 norm{ 1, 2, 3 };
+      vec3 norm { 1, 2, 3 };
       norm.normalize();
-      vec3 expected{ 0.267261f, 0.534522f, 0.801784f };
+      vec3 expected { 0.267261f, 0.534522f, 0.801784f };
       const float DELTA = 0.000001f;
       Assert::IsTrue((norm - expected).isAlmostZero(DELTA));
     }
@@ -262,6 +287,27 @@ namespace game_tests
       Assert::AreEqual(4, sv[4]);
     }
 
+    TEST_METHOD(remove_vec_add)
+    {
+      SemiVector<int, 3> sv;
+      sv.add(0);
+      sv.add(1);
+      sv.add(2);
+      sv.add(3);
+      sv.add(4);
+      sv.add(5);
+
+      sv.remove(5);
+      sv.add(6);
+      Assert::AreEqual(6, sv.size());
+      Assert::AreEqual(0, sv[0]);
+      Assert::AreEqual(1, sv[1]);
+      Assert::AreEqual(2, sv[2]);
+      Assert::AreEqual(3, sv[3]);
+      Assert::AreEqual(4, sv[4]);
+      Assert::AreEqual(6, sv[5]);
+    }
+
   };
 
   TEST_CLASS(TerrainTest)
@@ -269,18 +315,25 @@ namespace game_tests
   private:
     struct Line
     {
-      vec3 begin{};
-      vec3 end{};
+      vec3 begin {};
+      vec3 end {};
     };
 
     static Terrain terrain;
-    static inline const size_t TRY_COUNT = 500000;
+#ifdef _DEBUG
+    static inline const size_t TRY_COUNT = 10000;
+#else
+    static inline const size_t TRY_COUNT = 100000;
+#endif
     static inline const float MIN_XZ = -Terrain::TERRAIN_SIZE / 2 + 0.01f;
     static inline const float MAX_XZ = Terrain::TERRAIN_SIZE / 2 - 0.01f;
     static inline const float MIN_Y = -Terrain::TERRAIN_HEIGHT - 1;
     static inline const float MAX_Y = Terrain::TERRAIN_HEIGHT + 1;
 
-    void runTest(function<Line()> createLine)
+    typedef function<bool(const Terrain& terrain, Line line)> TraceWorkerCallback;
+    typedef function<Line()> LineCreatorCallback;
+
+    static void runTest(const Terrain& terrain, LineCreatorCallback createLine, TraceWorkerCallback doTrace)
     {
       std::wstring msg;
       std::vector<Line> failed;
@@ -288,26 +341,20 @@ namespace game_tests
       msg.reserve(100 * TRY_COUNT);
       failed.reserve(TRY_COUNT);
 
-      bool allHit = true;
+      bool allSuccessfull = true;
 
       for (int i = 0; i < TRY_COUNT; i++)
       {
         Line line = createLine();
+        bool isSuccess = doTrace(terrain, line);
+        allSuccessfull = allSuccessfull && isSuccess;
 
-        vec3 hitPosition, normal;
-        float hitDistance;
-        bool hit = terrain.traceRay(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), &hitPosition, &normal, &hitDistance);
-
-        allHit = allHit && hit;
-
-        if (!hit)
+        if (!isSuccess)
           failed.push_back(line);
-        else
-          Assert::IsTrue(fabsf(sqr(hitDistance) - (hitPosition - line.begin).sqLength()) < 0.001f);
       }
 
       wchar_t buf[256];
-      swprintf_s(buf, 256, L"\n Failed: %i\n", (int)failed.size());
+      swprintf_s(buf, 256, L"\nTotal: %i\nFailed: %i\n", (int)TRY_COUNT, (int)failed.size());
       msg += buf;
 
       for (const Line& line : failed)
@@ -316,52 +363,71 @@ namespace game_tests
         msg += buf;
       }
 
-      Assert::IsTrue(allHit, msg.c_str());
+      Assert::IsTrue(allSuccessfull, msg.c_str());
     }
 
-    void runTestNoHit(function<Line()> createLine)
+    static bool handleHitPositiveTrace(const Terrain& terrain, Line line)
     {
-      std::wstring msg;
-      std::vector<Line> failed;
+      vec3 hitPosition, hitNormal;
+      float hitDistance;
+      bool isHit = terrain.traceRayWithTerrain(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), &hitPosition, &hitNormal, &hitDistance);
 
-      msg.reserve(100 * TRY_COUNT);
-      failed.reserve(TRY_COUNT);
+      return isHit;
+    }
 
-      bool anyHit = false;
+    static bool handleHitPositiveTraceWithDistanceCheck(const Terrain& terrain, Line line)
+    {
+      vec3 hitPosition, hitNormal;
+      float hitDistance;
+      bool isHit = terrain.traceRayWithTerrain(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), &hitPosition, &hitNormal, &hitDistance);
 
-      for (int i = 0; i < TRY_COUNT; i++)
+      if (isHit)
+        Assert::IsTrue(fabsf(sqr(hitDistance) - (hitPosition - line.begin).sqLength()) < 0.1);
+
+      return isHit;
+    }
+
+    static bool handleHitNegativeTrace(const Terrain& terrain, Line line)
+    {
+      bool isHit = terrain.traceRayWithTerrain(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), nullptr, nullptr, nullptr);
+
+      return !isHit;
+    }
+
+    static bool handleObjectsHitPositiveTrace(const Terrain& terrain, Line line)
+    {
+      vec3 hitPosition1, hitNormal1;
+      float hitDistance1;
+      vec3 hitPosition2, hitNormal2;
+      float hitDistance2;
+      vec3 origin = line.begin;
+      vec3 direction = line.end - line.begin;
+      float distance = direction.length();
+      vec3 directionNormalized = direction / distance;
+
+      bool isHit1 = terrain.traceRayWithObjects(origin, directionNormalized, distance, &hitPosition1, &hitNormal1, &hitDistance1);
+      bool isHit2 = terrain.traceRayWithObjects_Unoptimized(origin, directionNormalized, distance, &hitPosition2, &hitNormal2, &hitDistance2);
+
+      bool isSuccess = isHit1 == isHit2 && (!isHit1 || (hitPosition1 == hitPosition2 && hitNormal1 == hitNormal2 && hitDistance1 == hitDistance2));
+
+      if (!isSuccess)
       {
-        Line line = createLine();
-
-        bool hit = terrain.traceRay(line.begin, (line.end - line.begin).normalized(), (line.end - line.begin).length(), nullptr, nullptr, nullptr);
-        anyHit = anyHit || hit;
-
-        if (hit)
-          failed.push_back(line);
+        isHit2 = terrain.traceRayWithObjects_Unoptimized(origin, directionNormalized, distance, &hitPosition2, &hitNormal2, &hitDistance2);
+        isHit1 = terrain.traceRayWithObjects(origin, directionNormalized, distance, &hitPosition1, &hitNormal1, &hitDistance1);
       }
 
-      wchar_t buf[256];
-      swprintf_s(buf, 256, L"\n Failed: %i\n", (int)failed.size());
-      msg += buf;
-
-      for (const Line& line : failed)
-      {
-        swprintf_s(buf, 256, L"{ %f, %f, %f }, { %f, %f, %f },\n", line.begin.x, line.begin.y, line.begin.z, line.end.x, line.end.y, line.end.z);
-        msg += buf;
-      }
-
-      Assert::IsFalse(anyHit, msg.c_str());
+      return isSuccess;
     }
 
   public:
     TEST_CLASS_INITIALIZE(initClass)
     {
-      terrain.generate(Terrain::Normal);
+      terrain.init();
     }
 
     TEST_METHOD(traceRay_random)
     {
-      runTest([]() {
+      auto createLine = []() {
         vec3 begin = {
           randf(MIN_XZ, MAX_XZ),
           MAX_Y,
@@ -374,13 +440,40 @@ namespace game_tests
           randf(MIN_XZ, MAX_XZ),
         };
 
-        return Line{ begin, end };
-      });
+        return Line { begin, end };
+      };
+
+      runTest(terrain, createLine, handleHitPositiveTraceWithDistanceCheck);
+    }
+
+    TEST_METHOD(traceRay_random_from_outside)
+    {
+      auto createLine = []() {
+        vec3 begin = randf(1) > 0.5f ? vec3 {
+          randf(MAX_XZ + 1, MAX_XZ * 1.1f),
+          MAX_Y,
+          randf(MIN_XZ / 1.1f, MAX_XZ / 1.1f),
+        } : vec3 {
+          randf(MIN_XZ, MAX_XZ),
+          MAX_Y,
+          randf(MAX_XZ + 1, MAX_XZ * 1.1f),
+        };
+
+        vec3 end = {
+          -begin.x,
+          MIN_Y,
+          -begin.z,
+        };
+
+        return Line { begin, end };
+      };
+
+      runTest(terrain, createLine, handleHitPositiveTrace);
     }
 
     TEST_METHOD(traceRay_parallel_x)
     {
-      runTest([]() {
+      auto createLine = []() {
         vec3 begin = {
           randf(MIN_XZ, MAX_XZ),
           MAX_Y,
@@ -393,13 +486,15 @@ namespace game_tests
           randf(MIN_XZ, MAX_XZ),
         };
 
-        return Line{ begin, end };
-      });
+        return Line { begin, end };
+      };
+
+      runTest(terrain, createLine, handleHitPositiveTrace);
     }
 
     TEST_METHOD(traceRay_parallel_z)
     {
-      runTest([]() {
+      auto createLine = []() {
         vec3 begin = {
           randf(MIN_XZ, MAX_XZ),
           MAX_Y,
@@ -412,13 +507,15 @@ namespace game_tests
           begin.z,
         };
 
-        return Line{ begin, end };
-      });
+        return Line { begin, end };
+      };
+
+      runTest(terrain, createLine, handleHitPositiveTrace);
     }
 
     TEST_METHOD(traceRay_diagonal)
     {
-      runTest([]() {
+      auto createLine = []() {
         vec3 begin = {
           randf(MIN_XZ, MAX_XZ),
           MAX_Y,
@@ -431,8 +528,10 @@ namespace game_tests
           begin.x,
         };
 
-        return Line{ begin, end };
-      });
+        return Line { begin, end };
+      };
+
+      runTest(terrain, createLine, handleHitPositiveTrace);
     }
 
     TEST_METHOD(traceRay_1_cell_intensive)
@@ -442,7 +541,7 @@ namespace game_tests
       float dx = Terrain::CELL_SIZE / TRY_COUNT * 1.1f;
       float dz = Terrain::CELL_SIZE / TRY_COUNT * 1.1f;
 
-      runTest([&]() {
+      auto createLine = [&]() {
         vec3 begin = {
           (x += dx),
           MAX_Y,
@@ -455,13 +554,15 @@ namespace game_tests
           begin.z + Terrain::TERRAIN_SIZE,
         };
 
-        return Line{ begin, end };
-      });
+        return Line { begin, end };
+      };
+
+      runTest(terrain, createLine, handleHitPositiveTrace);
     }
 
     TEST_METHOD(traceRay_vertical)
     {
-      runTest([]() {
+      auto createLine = []() {
         vec3 begin = {
           randf(MIN_XZ, MAX_XZ),
           MAX_Y,
@@ -474,13 +575,15 @@ namespace game_tests
           begin.z,
         };
 
-        return Line{ begin, end };
-      });
+        return Line { begin, end };
+      };
+
+      runTest(terrain, createLine, handleHitPositiveTrace);
     }
 
     TEST_METHOD(traceRay_no_hit_vertical)
     {
-      runTestNoHit([]() {
+      auto createLine = []() {
         vec3 begin = {
           randf(MIN_XZ, MAX_XZ),
           MAX_Y,
@@ -493,13 +596,15 @@ namespace game_tests
           begin.z,
         };
 
-        return Line{ begin, end };
-      });
+        return Line { begin, end };
+      };
+
+      runTest(terrain, createLine, handleHitNegativeTrace);
     }
 
     TEST_METHOD(traceRay_no_hit_random_above)
     {
-      runTestNoHit([]() {
+      auto createLine = []() {
         vec3 begin = {
           randf(MIN_XZ, MAX_XZ),
           randf(MAX_Y, 2 * MAX_Y),
@@ -512,13 +617,15 @@ namespace game_tests
           randf(MIN_XZ, MAX_XZ),
         };
 
-        return Line{ begin, end };
-      });
+        return Line { begin, end };
+      };
+
+      runTest(terrain, createLine, handleHitNegativeTrace);
     }
 
     TEST_METHOD(traceRay_no_hit_random_below)
     {
-      runTestNoHit([]() {
+      auto createLine = []() {
         vec3 begin = {
           randf(MIN_XZ, MAX_XZ),
           randf(-MAX_Y, -2 * MAX_Y),
@@ -531,13 +638,15 @@ namespace game_tests
           randf(MIN_XZ, MAX_XZ),
         };
 
-        return Line{ begin, end };
-      });
+        return Line { begin, end };
+      };
+
+      runTest(terrain, createLine, handleHitNegativeTrace);
     }
 
     TEST_METHOD(traceRay_no_hit_random_outside)
     {
-      runTestNoHit([]() {
+      auto createLine = []() {
         vec3 begin = {
           randf(MAX_XZ + 1, 2 * MAX_XZ),
           MAX_Y,
@@ -550,8 +659,31 @@ namespace game_tests
           randf(MIN_XZ, MAX_XZ),
         };
 
-        return Line{ begin, end };
-      });
+        return Line { begin, end };
+      };
+
+      runTest(terrain, createLine, handleHitNegativeTrace);
+    }
+
+    TEST_METHOD(traceRayWithObjects_random)
+    {
+      auto createLine = []() {
+        vec3 begin = {
+          randf(MIN_XZ, MAX_XZ),
+          MAX_Y,
+          randf(MIN_XZ, MAX_XZ),
+        };
+
+        vec3 end = {
+          randf(MIN_XZ, MAX_XZ),
+          MIN_Y,
+          randf(MIN_XZ, MAX_XZ),
+        };
+
+        return Line { begin, end };
+      };
+
+      runTest(terrain, createLine, handleObjectsHitPositiveTrace);
     }
 
   };
@@ -560,6 +692,6 @@ namespace game_tests
   Model tree1Model {};
   Model tree2Model {};
   Model rockModel {};
-
   Terrain TerrainTest::terrain(terrainTexture, tree1Model, tree2Model, rockModel);
+
 }

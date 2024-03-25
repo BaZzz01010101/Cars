@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Terrain.h"
 #include "Helpers.h"
+#include "GridWalker.h"
 
 namespace game
 {
@@ -83,36 +84,30 @@ namespace game
 
   bool Terrain::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
   {
-    vec3 currentHitPosition, currentNormal;
+    vec3 currentHitPosition, currentHitNormal;
     float currentHitDistance;
 
-    vec3 closestHitPosition, closestNormal;
+    vec3 closestHitPosition, closestHitNormal;
     float closestHitDistance = FLT_MAX;
 
-    bool hitTerrain = traceRayWithTerrain(origin, directionNormalized, distance, &currentHitPosition, &currentNormal, &currentHitDistance);
+    bool hitTerrain = traceRayWithTerrain(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance);
 
     if (hitTerrain)
     {
       closestHitPosition = currentHitPosition;
-      closestNormal = currentNormal;
+      closestHitNormal = currentHitNormal;
       closestHitDistance = currentHitDistance;
+      distance = currentHitDistance;
     }
 
-    int ii = CG_GRID_SIZE;
-    // TODO: implement optimized solution by grouping geometries
-    for (int i = 0; i < objectCollisionGeometries.count(); i++)
-      if (objectCollisionGeometries.isAlive(i))
-      {
-        const CollisionGeometry& geometry = objectCollisionGeometries.get(i);
+    bool hitObject = traceRayWithObjects(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance);
 
-        bool hitObject = geometry.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentNormal, &currentHitDistance);
-        if (hitObject && currentHitDistance < closestHitDistance)
-        {
-          closestHitPosition = currentHitPosition;
-          closestNormal = currentNormal;
-          closestHitDistance = currentHitDistance;
-        }
-      }
+    if (hitObject)
+    {
+      closestHitPosition = currentHitPosition;
+      closestHitNormal = currentHitNormal;
+      closestHitDistance = currentHitDistance;
+    }
 
     if (closestHitDistance < FLT_MAX)
     {
@@ -120,7 +115,7 @@ namespace game
         *hitPosition = closestHitPosition;
 
       if (hitNormal)
-        *hitNormal = closestNormal;
+        *hitNormal = closestHitNormal;
 
       if (hitDistance)
         *hitDistance = closestHitDistance;
@@ -133,68 +128,135 @@ namespace game
 
   bool Terrain::traceRayWithTerrain(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
   {
-    distance = (distance < 0) ? FLT_MAX : distance;
+    GridWalker gridWalker({ -TERRAIN_SIZE_2, -TERRAIN_SIZE_2, TERRAIN_SIZE_2, TERRAIN_SIZE_2 }, CELL_SIZE);
 
-    if (directionNormalized.isZero() || distance < EPSILON)
-      return false;
+    return gridWalker.walkByLine(origin, directionNormalized, distance, [=](int x, int y) {
+      return getTrianglePair(x, y).traceRay(origin, directionNormalized, distance, hitPosition, hitNormal, hitDistance);
+    });
+  }
 
-    float maxAxis = std::max(fabsf(directionNormalized.x), fabsf(directionNormalized.z));
+  bool Terrain::traceRayWithObjects(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
+  {
+    GridWalker gridWalker({ -TERRAIN_SIZE_2, -TERRAIN_SIZE_2, TERRAIN_SIZE_2, TERRAIN_SIZE_2 }, CG_GRID_CELL_SIZE);
+    vec3 currentHitPosition, currentHitNormal;
+    float currentHitDistance;
 
-    if (maxAxis < EPSILON)
-      return getTrianglePair(
-        int((origin.x + TERRAIN_SIZE_2) / CELL_SIZE),
-        int((origin.z + TERRAIN_SIZE_2) / CELL_SIZE)
-      ).traceRay(origin, directionNormalized, distance, hitPosition, hitNormal, hitDistance);
+    vec3 closestHitPosition, closestHitNormal;
+    float closestHitDistance = FLT_MAX;
 
-    vec2 direction2D = directionNormalized.xz();
-    vec2 step = direction2D / maxAxis * 0.999f;
-    float stepLength = step.length();
-    float sqDistance = distance * distance;
-    vec2 origin2D = origin.xz();
+    int overwalkSteps = 3;
+    bool collisionFound = false;
 
-    float distance2D = (1 - fabsf(directionNormalized.y) < EPSILON) ?
-      EPSILON :
-      distance * sqrtf(1 - directionNormalized.y * directionNormalized.y);
+    gridWalker.walkByLine(origin, directionNormalized, distance, [&](int x, int y) {
+      bool isHit = traceRayWithCGGridCellObjects(x, y, origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance);
 
-    vec2 current = (origin2D + vec2 { TERRAIN_SIZE_2, TERRAIN_SIZE_2 }) / CELL_SIZE;
-    distance2D += CELL_SIZE * float(M_SQRT2);
-
-    int x = (int)current.x;
-    int y = (int)current.y;
-
-    while (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE && distance2D > 0)
-    {
-      if (getTrianglePair(x, y).traceRay(origin, directionNormalized, distance, hitPosition, hitNormal, hitDistance))
-        return true;
-
-      vec2 next = current + step;
-      int nx = (int)next.x;
-      int ny = (int)next.y;
-
-      // diagonal step
-      if (nx != x && ny != y)
+      if (isHit && currentHitDistance < closestHitDistance)
       {
-        vec2 gridPoint = vec2 { float(std::min(x, nx) + 1), float(std::min(y, ny) + 1) };
-        vec2 toGridPoint = gridPoint - current;
-        vec2 right = vec2 { toGridPoint.y, -toGridPoint.x };
-        float k = direction2D * right * sign(step.x) * sign(step.y);
+        closestHitPosition = currentHitPosition;
+        closestHitDistance = currentHitDistance;
+        closestHitNormal = currentHitNormal;
+      }
 
-        if (k > 0 && nx >= 0 && nx < GRID_SIZE)
+      if (closestHitDistance < FLT_MAX)
+        overwalkSteps--;
+
+      return overwalkSteps == 0;
+    });
+
+    if (closestHitDistance < FLT_MAX)
+    {
+      if (hitPosition)
+        *hitPosition = closestHitPosition;
+
+      if (hitNormal)
+        *hitNormal = closestHitNormal;
+
+      if (hitDistance)
+        *hitDistance = closestHitDistance;
+
+      return true;
+    }
+
+    return false;
+  }
+
+  bool Terrain::traceRayWithObjects_Unoptimized(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
+  {
+    vec3 currentHitPosition, currentHitNormal;
+    float currentHitDistance;
+
+    vec3 closestHitPosition, closestHitNormal;
+    float closestHitDistance = FLT_MAX;
+
+    for (int i = 0; i < objectCollisionGeometries.count(); i++)
+      if (objectCollisionGeometries.isAlive(i))
+      {
+        const CollisionGeometry& geometry = objectCollisionGeometries.get(i);
+        bool hitObject = geometry.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance);
+
+        if (hitObject && currentHitDistance < closestHitDistance)
         {
-          if (getTrianglePair(nx, y).traceRay(origin, directionNormalized, distance, hitPosition, hitNormal, hitDistance))
-            return true;
-        }
-        else if (k < 0 && ny >= 0 && ny < GRID_SIZE)
-        {
-          if (getTrianglePair(x, ny).traceRay(origin, directionNormalized, distance, hitPosition, hitNormal, hitDistance))
-            return true;
+          closestHitPosition = currentHitPosition;
+          closestHitNormal = currentHitNormal;
+          closestHitDistance = currentHitDistance;
         }
       }
 
-      x = nx;
-      y = ny;
-      current = next;
-      distance2D -= stepLength;
+    if (closestHitDistance < FLT_MAX)
+    {
+      if (hitPosition)
+        *hitPosition = closestHitPosition;
+
+      if (hitNormal)
+        *hitNormal = closestHitNormal;
+
+      if (hitDistance)
+        *hitDistance = closestHitDistance;
+
+      return true;
+    }
+
+    return false;
+  }
+
+  bool Terrain::traceRayWithCGGridCellObjects(int cgGridCellX, int cgGridCellY, vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
+  {
+    const CGGridCell& cgGridCell = cgGrid[cgGridCellY][cgGridCellX];
+    vec3 currentHitPosition, currentHitNormal;
+    float currentHitDistance;
+
+    vec3 closestHitPosition, closestHitNormal;
+    float closestHitDistance = FLT_MAX;
+
+    for (int i = 0; i < cgGridCell.size(); i++)
+    {
+      if (objectCollisionGeometries.isAlive(cgGridCell[i]))
+      {
+        const CollisionGeometry& geometry = objectCollisionGeometries.get(cgGridCell[i]);
+        bool hitObject = geometry.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance);
+        traceCount++;
+
+        if (hitObject && currentHitDistance < closestHitDistance)
+        {
+          closestHitPosition = currentHitPosition;
+          closestHitNormal = currentHitNormal;
+          closestHitDistance = currentHitDistance;
+        }
+      }
+    }
+
+    if (closestHitDistance < FLT_MAX)
+    {
+      if (hitPosition)
+        *hitPosition = closestHitPosition;
+
+      if (hitNormal)
+        *hitNormal = closestHitNormal;
+
+      if (hitDistance)
+        *hitDistance = closestHitDistance;
+
+      return true;
     }
 
     return false;
@@ -289,14 +351,77 @@ namespace game
         obj.draw(drawWires);
       }
 
-    //drawDebug();
+    drawDebug();
   }
 
   void Terrain::drawDebug() const
   {
-    for (int i = 0; i < objectCollisionGeometries.count(); i++)
-      if (objectCollisionGeometries.isAlive(i))
-        objectCollisionGeometries.get(i).drawDebug();
+    //for (int i = 0; i < objectCollisionGeometries.count(); i++)
+    //  if (objectCollisionGeometries.isAlive(i))
+    //    objectCollisionGeometries.get(i).drawDebug();
+
+    //std::vector<std::pair<vec3, vec3>> lines =
+    //{
+    //  {{ -100, 50, -50}, { 50, -50, 100}},
+    //};
+
+    //for (auto [start, end] : lines)
+    //{
+    //  vec3 origin = start;
+    //  vec3 direction = end - start;
+    //  float distance = direction.length();
+    //  vec3 directionNormalized = direction / distance;
+
+    //  visualizeRayTracing(origin, directionNormalized, distance);
+    //}
+  }
+
+  void Terrain::visualizeRayTracing(vec3 origin, vec3 directionNormalized, float distance) const
+  {
+    vec3 hitPosition1, hitNormal1;
+    float hitDistance1;
+    vec3 hitPosition2, hitNormal2;
+    float hitDistance2;
+
+    bool isHit1 = traceRayWithObjects(origin, directionNormalized, distance, &hitPosition1, &hitNormal1, &hitDistance1);
+    bool isHit2 = traceRayWithObjects_Unoptimized(origin, directionNormalized, distance, &hitPosition2, &hitNormal2, &hitDistance2);
+
+    //if((scenePtr->getPlayer().position - hitPosition1).length() < 10)
+    //  DrawSphere(hitPosition1 + vec3::up * 0.1f, 0.2f, GREEN);
+
+    vec3 diff = hitPosition1 - hitPosition2;
+
+    if (isHit1)
+      DrawSphere(hitPosition1 + vec3::up * 0.1f, 0.2f, GREEN);
+
+    if (isHit2)
+      DrawSphere(hitPosition2 - vec3::up * 0.1f, 0.2f, YELLOW);
+
+    DrawLine3D(origin, origin + directionNormalized * distance, RED);
+    DrawLine3D(origin, origin + vec3::up * 1000, RED);
+
+    GridWalker gridWalker({ -TERRAIN_SIZE_2, -TERRAIN_SIZE_2, TERRAIN_SIZE_2, TERRAIN_SIZE_2 }, CG_GRID_CELL_SIZE);
+
+    gridWalker.walkByLine(origin, directionNormalized, distance, [this](int x, int y) {
+      float x0 = x * CG_GRID_CELL_SIZE - TERRAIN_SIZE_2;
+      float y0 = y * CG_GRID_CELL_SIZE - TERRAIN_SIZE_2;
+      float x1 = x * CG_GRID_CELL_SIZE + CG_GRID_CELL_SIZE - TERRAIN_SIZE_2;
+      float y1 = y * CG_GRID_CELL_SIZE + CG_GRID_CELL_SIZE - TERRAIN_SIZE_2;
+      auto cg = cgGrid[y][x];
+
+      float step = 1;
+      for (float yy = y0 + step / 2; yy <= y1; yy += step)
+        for (float xx = x0 + step / 2; xx <= x1; xx += step)
+          {
+            float h = getHeight(xx + step / 2, yy + step / 2, nullptr) + 0.5f;
+            float k = std::max(fabsf((xx - (x0 + x1) / 2) / (x1 - x0) * 2), fabsf((yy - (y0 + y1) / 2) / (y1 - y0)) * 2);
+            bool isBorder = (xx - x0 < 0.75 * step || x1 - xx < 0.75 * step || yy - y0 < 0.75 * step || y1 - yy < 0.75 * step);
+            unsigned char transparency = isBorder ? 64 : (unsigned char)(16 + k * k * 16);
+            DrawPlane({ xx, h, yy }, { step, step }, { 255, 255, 255, transparency });
+          }
+
+      return false;
+    });
   }
 
   void Terrain::generate(Mode mode)
@@ -444,13 +569,14 @@ namespace game
     model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = terrainTexture;
     modelLoaded = true;
 
-    generateObjects();
-
 #endif // UNIT_TEST
+
+    generateObjects();
   }
 
   void Terrain::generateObjects()
   {
+    game::gSeed = 123;
     objects.clear();
     objectCollisionGeometries.clear();
 
@@ -468,7 +594,7 @@ namespace game
 
     for (int i = 0; i < OBJECT_COUNT; i++)
     {
-      std::function<CollisionGeometry (vec3, float, float)> createCollisionGeometry;
+      std::function<CollisionGeometry(vec3, float, float)> createCollisionGeometry;
       const Model* model = nullptr;
       float scale = 0;
       float radius = 0;
@@ -490,6 +616,7 @@ namespace game
             model = &rockModel;
             scale = randf(1, 5);
             dy = TERRAIN_HEIGHT / TERRAIN_SIZE * scale * 10;
+            radius = 17.1f;
           }
           else if (type > 30)
           {
@@ -497,6 +624,7 @@ namespace game
             model = &tree1Model;
             scale = randf(0.25f, 0.75f);
             dy = TERRAIN_HEIGHT / TERRAIN_SIZE * scale * 5;
+            radius = 4.4f;
           }
           else
           {
@@ -504,10 +632,8 @@ namespace game
             model = &tree2Model;
             scale = randf(0.15f, 0.5f);
             dy = TERRAIN_HEIGHT / TERRAIN_SIZE * scale * 5;
+            radius = 1.1f;
           };
-
-          BoundingBox box = GetModelBoundingBox(*model);
-          radius = std::max(box.max.x - box.min.x, box.max.z - box.min.z) * scale * 0.5f;
         }
 
         x = randf(-TERRAIN_SIZE_2 + radius, TERRAIN_SIZE_2 - radius);
@@ -533,7 +659,18 @@ namespace game
       vec3 position = { x, y, z };
       float angle = randf(2 * PI);
       objects.tryAdd(*model, position, angle, scale);
-      objectCollisionGeometries.tryAdd(createCollisionGeometry(position, angle, scale));
+      CollisionGeometry cg = createCollisionGeometry(position, angle, scale);
+      int index = objectCollisionGeometries.tryAdd(cg);
+      auto [min, max] = cg.getBounds();
+
+      int cgGridMinX = clamp((int)((min.x + TERRAIN_SIZE_2) / CG_GRID_CELL_SIZE), 0, CG_GRID_SIZE - 1);
+      int cgGridMaxX = clamp((int)((max.x + TERRAIN_SIZE_2) / CG_GRID_CELL_SIZE), 0, CG_GRID_SIZE - 1);
+      int cgGridMinY = clamp((int)((min.z + TERRAIN_SIZE_2) / CG_GRID_CELL_SIZE), 0, CG_GRID_SIZE - 1);
+      int cgGridMaxY = clamp((int)((max.z + TERRAIN_SIZE_2) / CG_GRID_CELL_SIZE), 0, CG_GRID_SIZE - 1);
+
+      for (int y = cgGridMinY; y <= cgGridMaxY; y++)
+        for (int x = cgGridMinX; x <= cgGridMaxX; x++)
+          cgGrid[y][x].add(index);
     }
   }
 

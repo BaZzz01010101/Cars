@@ -10,6 +10,9 @@
     <ClCompile Include="src\TerrainObject.cpp" />
     <ClCompile Include="src\Renderable.cpp" />
     <ClCompile Include="src\CollisionGeometry.cpp" />
+    <ClCompile Include="src\GridWalker.cpp" />
+    <ClCompile Include="src\Config.cpp" />
+    <ClCompile Include="src\box2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Helpers.h" />
@@ -21,5 +24,8 @@
     <ClInclude Include="src\Renderable.h" />
     <ClInclude Include="src\CollisionGeometry.h" />
     <ClInclude Include="src\SemiVector.hpp" />
+    <ClInclude Include="src\GridWalker.h" />
+    <ClInclude Include="src\Config.h" />
+    <ClInclude Include="src\box2.h" />
   </ItemGroup>
 </Project>

@@ -71,6 +71,25 @@ namespace game
     };
   }
 
+  vec3 vec3::randomInBox(float xSize, float ySize, float zSize)
+  {
+    if (xSize <= 0)
+      return vec3::zero;
+
+    if (ySize <= 0)
+      return vec3::zero;
+
+    if (zSize <= 0)
+      return vec3::zero;
+
+    return
+    {
+      randf(-xSize, xSize),
+      randf(-ySize, ySize),
+      randf(-zSize, zSize),
+    };
+  }
+
   vec3::vec3(Vector3 v) : Vector3 { v }
   {}
 

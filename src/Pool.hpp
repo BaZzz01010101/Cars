@@ -89,6 +89,12 @@ namespace game
     static constexpr int BUF_SIZE = sizeof(Type) * Capacity;
 
     char buf[BUF_SIZE] { 0 };
+
+#ifdef _DEBUG
+    // This is for debugging puposes only and allows to view types objects in the debugger.
+    Type (&objects)[BUF_SIZE / sizeof(Type)] = reinterpret_cast<Type(&)[BUF_SIZE / sizeof(Type)]>(buf);
+#endif
+
     BoolArray<Capacity> alive { false };
     int aliveCount = 0;
 

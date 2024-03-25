@@ -13,7 +13,7 @@ void Renderable::draw(Matrix transform, bool drawWires)
       DrawMesh(model.meshes[i], model.materials[model.meshMaterial[i]], transform);
 
     rlEnableWireMode();
-    Material mat = LoadMaterialDefault();
+    static Material mat = LoadMaterialDefault();
     mat.maps->color = Color { 255, 255, 255, 64 };
     DrawMesh(model.meshes[i], mat, transform);
     rlDisableWireMode();

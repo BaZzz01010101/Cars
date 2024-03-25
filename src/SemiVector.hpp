@@ -34,6 +34,7 @@ class SemiVector
       for (int i = std::max(index - N, 0) + 1; i < vec.size(); i++)
         vec[i - 1] = vec[i];
 
+      vec.resize(vec.size() - 1);
       --count;
     }
 

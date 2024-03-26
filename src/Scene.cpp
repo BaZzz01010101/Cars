@@ -8,7 +8,8 @@ namespace game
     terrain(terrainTexture, tree1Model, tree2Model, rockModel),
     config(config),
     camera(config)
-  {}
+  {
+  }
 
   Scene::~Scene()
   {
@@ -49,7 +50,7 @@ namespace game
 
     if (rockTextureLoaded)
       UnloadTexture(rockTexture);
- 
+
     carModelLoaded = true;
     wheelModelLoaded = true;
     gunModelLoaded = true;
@@ -118,7 +119,6 @@ namespace game
   void Scene::update(float dt)
   {
     terrain.traceCount = 0;
-    updatePlayerControl(dt);
     updateFiring(dt);
 
     thread_local int slowMoCounter = 0;
@@ -260,17 +260,6 @@ namespace game
       ));
   }
 
-  void Scene::updatePlayerControl(float dt)
-  {
-    Car& player = getPlayer();
-    const Config::Physics::Car& carConfig = config.physics.car;
-
-    player.verticalTrust = player.mass * 20 * float(IsKeyDown(KEY_LEFT_SHIFT));
-    player.handBreaked = IsKeyDown(KEY_SPACE);
-    player.enginePowerDirection = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S));
-    player.steeringDirection = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D));
-  }
-
   void Scene::draw()
   {
     BeginMode3D(camera);
@@ -315,6 +304,25 @@ namespace game
     Car& player = cars.get(playerIndex);
     player.resetToPosition(playerPosition, playerRotation);
     camera.reset(playerPosition);
+  }
+
+  void Scene::updateLocalPlayerControl(int playerIndex, const PlayerControl& playerControl)
+  {
+    gunFiring = playerControl.primaryFire;
+    cannonFiring = playerControl.secondaryFire;
+
+    Car& player = cars.get(playerIndex);
+    player.updateControl(playerControl);
+  }
+
+  vec3 Scene::getCameraTarget() const
+  {
+    vec3 target;
+
+    if (terrain.traceRay(camera.position, camera.direction, FLT_MAX, &target, nullptr, nullptr))
+      return target;
+
+    return camera.position + camera.direction * 1000;
   }
 
 }

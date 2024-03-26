@@ -13,7 +13,8 @@ namespace game
     config(Config::DEFAULT),
     scene(config),
     hud(config)
-  {}
+  {
+  }
 
   void App::initialize()
   {
@@ -28,6 +29,7 @@ namespace game
   {
     while (!WindowShouldClose())
     {
+      updatePlayerControl();
       updateShortcuts();
 
       float dt = GetFrameTime();
@@ -82,14 +84,28 @@ namespace game
   }
 
   void App::drawDebug()
-  {}
+  {
+  }
+
+  void App::updatePlayerControl()
+  {
+    PlayerControl playerControl = {
+      .uid = 0,
+      .steeringAxis = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D)),
+      .accelerationAxis = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S)),
+      .thrustAxis = float(IsKeyDown(KEY_LEFT_SHIFT)),
+      .target = scene.getCameraTarget(),
+      .primaryFire = IsMouseButtonDown(MOUSE_LEFT_BUTTON),
+      .secondaryFire = IsMouseButtonDown(MOUSE_RIGHT_BUTTON),
+      .handBrake = IsKeyDown(KEY_SPACE),
+    };
+
+    scene.updateLocalPlayerControl(scene.playerIndex, playerControl);
+  }
 
   void App::updateShortcuts()
   {
     Car& player = scene.getPlayer();
-
-    scene.gunFiring = IsMouseButtonDown(MOUSE_LEFT_BUTTON);
-    scene.cannonFiring = IsMouseButtonDown(MOUSE_RIGHT_BUTTON);
 
     if (IsKeyPressed(KEY_P))
       togglePaused();

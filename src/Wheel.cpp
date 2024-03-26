@@ -15,7 +15,7 @@ namespace game
     momentOfInertia = 0.5f * wheelConfig.mass * sqr(wheelConfig.radius);
   }
 
-  void Wheel::update(float dt, const DynamicObject& parent, float steeringAngle, float sharedMass, float enginePower, float brakePower, bool handBreaked)
+  void Wheel::update(float dt, const DynamicObject& parent, float steeringAngle, float sharedMass, float enginePower, bool handBreaked)
   {
     vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
     position = parent.position + globalConnectionPoint;

@@ -26,6 +26,7 @@ namespace game
     void updateShortcuts();
     void draw();
     void drawDebug();
+    void updatePlayerControl();
   };
 
 }

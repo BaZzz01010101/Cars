@@ -6,6 +6,7 @@
 #include "Pool.hpp"
 #include "Projectile.h"
 #include "ExplosionParticle.h"
+#include "PlayerControl.h"
 
 namespace game
 {
@@ -22,6 +23,7 @@ namespace game
     CustomCamera camera;
     vec3 gunRayHit = vec3::zero;
     vec3 cannonRayHit = vec3::zero;
+    int playerIndex = 0;
 
     Scene(const Config& config);
     ~Scene();
@@ -37,11 +39,12 @@ namespace game
     void reset(vec3 playerPosition, quat playerRotation);
     const Car& getPlayer() const { return cars.get(playerIndex); }
     Car& getPlayer() { return cars.get(playerIndex); }
+    void updateLocalPlayerControl(int playerIndex, const PlayerControl& playerControl);
+    vec3 getCameraTarget() const;
 
   private:
     const Config& config {};
     Terrain terrain;
-    int playerIndex = 0;
     Pool<Car, 1> cars {};
     Pool<Projectile, 1000> projectiles {};
     Pool<ExplosionParticle, 10000> explosionParticles {};
@@ -77,7 +80,6 @@ namespace game
 
     void updateGameObjects(float dt);
     void updateFiring(float dt);
-    void updatePlayerControl(float dt);
     void createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position);
     void unloadResources();
   };

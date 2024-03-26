@@ -21,7 +21,7 @@ namespace game
     Wheel& operator=(Wheel&) = delete;
     Wheel& operator=(Wheel&&) = delete;
 
-    void update(float dt, const DynamicObject& parent, float steeringAngle, float sharedMass, float enginePower, float brakePower, bool handBreaked);
+    void update(float dt, const DynamicObject& parent, float steeringAngle, float sharedMass, float enginePower, bool handBreaked);
     void reset();
     void draw(bool drawWires);
 

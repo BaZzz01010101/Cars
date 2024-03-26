@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Car.h"
 #include "Helpers.h"
+#include "PlayerControl.h"
 
 namespace game
 {
@@ -33,7 +34,6 @@ namespace game
     force = vec3::zero;
     moment = vec3::zero;
     enginePower = 0;
-    brakePower = 0;
     handBreaked = false;
     steeringAngle = 0.0f;
     frontLeftWheel.reset();
@@ -55,13 +55,16 @@ namespace game
     float aerodinamicForce = carConfig.aerodynamicKoef * velocity.sqLength();
     applyGlobalForceAtCenterOfMass(-aerodinamicForce * up());
 
+    applyGlobalForceAtCenterOfMass({ 0, verticalTrust, 0 });
+
     vec3 alignmentMoment = getAutoAlignmentMoment(dt);
     applyMoment(alignmentMoment);
 
     vec3 airFrictionMoment = -angularVelocity / dt * momentOfInertia * 0.001f;
     applyMoment(airFrictionMoment);
 
-    updateControl(dt);
+    updateEngine(dt);
+    updateSteering(dt);
 
     quat wheelRotation = rotation * quat::fromEuler(steeringAngle, 0, 0);
 
@@ -89,10 +92,10 @@ namespace game
 
     float frontLeftSteeringAngle = steeringAngle + correctionAngle;
     float frontRightSteeringAngle = steeringAngle - correctionAngle;
-    frontLeftWheel.update(dt, *this, frontLeftSteeringAngle, sharedMass, rearPower * enginePower, brakePower, handBreaked);
-    frontRightWheel.update(dt, *this, frontLeftSteeringAngle, sharedMass, rearPower * enginePower, brakePower, handBreaked);
-    rearLeftWheel.update(dt, *this, 0, sharedMass, rearPower * enginePower, brakePower, handBreaked);
-    rearRightWheel.update(dt, *this, 0, sharedMass, rearPower * enginePower, brakePower, handBreaked);
+    frontLeftWheel.update(dt, *this, frontLeftSteeringAngle, sharedMass, rearPower * enginePower, handBreaked);
+    frontRightWheel.update(dt, *this, frontLeftSteeringAngle, sharedMass, rearPower * enginePower, handBreaked);
+    rearLeftWheel.update(dt, *this, 0, sharedMass, rearPower * enginePower, handBreaked);
+    rearRightWheel.update(dt, *this, 0, sharedMass, rearPower * enginePower, handBreaked);
   }
 
   void Car::updateTurrets(float dt)
@@ -103,7 +106,7 @@ namespace game
     vec3 targetCollisionPosition;
     vec3 gunPosition = gun.position + config.physics.gun.barrelPosition.y * up();
     vec3 cannonPosition = cannon.position + config.physics.cannon.barrelPosition.y * up();
-    bool isHit = terrain.traceRay(camera.position, camera.direction, -1, &targetCollisionPosition, nullptr, nullptr);
+    bool isHit = terrain.traceRay(camera.position, camera.direction, FLT_MAX, &targetCollisionPosition, nullptr, nullptr);
 
     gun.expectedTarget = isHit ? targetCollisionPosition : camera.position + 1000 * camera.direction;
     cannon.expectedTarget = isHit ? targetCollisionPosition : camera.position + 1000 * camera.direction;
@@ -213,18 +216,27 @@ namespace game
     return moment;
   }
 
-  void Car::updateControl(float dt)
+  void Car::updateControl(const PlayerControl& playerControl)
+  {
+    verticalTrust = mass * 20 * playerControl.thrustAxis;
+    handBreaked = playerControl.handBrake;
+    enginePowerDirection = playerControl.accelerationAxis;
+    steeringDirection = playerControl.steeringAxis;
+  }
+
+  void Car::updateEngine(float dt)
+  {
+    float ep = (sign(enginePowerDirection) == sign(enginePower)) ? carConfig.enginePower : carConfig.brakePower;
+    float step = ep * dt;
+    float maxForwardEnginePower = mapRangeClamped(velocity * forward(), 0, carConfig.maxSpeed, ep, 0);
+    float maxBackwardEnginePower = mapRangeClamped(velocity * forward(), -carConfig.maxSpeed, 0, 0, ep);
+    enginePower = moveTo(enginePower, maxForwardEnginePower * float(enginePowerDirection > 0) - maxBackwardEnginePower * float(enginePowerDirection < 0), step);
+  }
+
+  void Car::updateSteering(float dt)
   {
     float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0, carConfig.maxSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
     float steeringTarget;
-
-    applyGlobalForceAtCenterOfMass({ 0, verticalTrust, 0 });
-
-    float step = (sign(enginePowerDirection) == sign(enginePower)) ? carConfig.enginePower * dt : carConfig.enginePower * 4 * dt;
-    float maxForwardEnginePower = mapRangeClamped(velocity * forward(), 0, carConfig.maxSpeed, carConfig.enginePower, 0);
-    float maxBackwardEnginePower = mapRangeClamped(velocity * forward(), -carConfig.maxSpeed, 0, 0, carConfig.enginePower);
-    enginePower = moveTo(enginePower, maxForwardEnginePower * float(enginePowerDirection > 0) - maxBackwardEnginePower * float(enginePowerDirection < 0), step);
-    //brakePower = carConfig.brakePower * float(IsKeyDown(KEY_END));
 
     if (steeringDirection == 0.0f)
     {

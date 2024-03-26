@@ -103,6 +103,7 @@
     <ClCompile Include="src\CollisionGeometry.cpp" />
     <ClCompile Include="src\ExplosionParticle.cpp" />
     <ClCompile Include="src\GridWalker.cpp" />
+    <ClCompile Include="src\PlayerControl.cpp" />
     <ClCompile Include="src\Projectile.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\CustomCamera.cpp" />
@@ -132,6 +133,7 @@
     <ClInclude Include="src\CollisionGeometry.h" />
     <ClInclude Include="src\ExplosionParticle.h" />
     <ClInclude Include="src\GridWalker.h" />
+    <ClInclude Include="src\PlayerControl.h" />
     <ClInclude Include="src\Projectile.h" />
     <ClInclude Include="src\Pool.hpp" />
     <ClInclude Include="src\Config.h" />

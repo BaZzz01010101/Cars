@@ -6,6 +6,7 @@
 #include "Renderable.h"
 #include "PhysicalObject.h"
 #include "CustomCamera.h"
+#include "PlayerControl.h"
 
 namespace game
 {
@@ -15,11 +16,12 @@ namespace game
 
   public:
     float enginePower {};
-    float brakePower {};
     bool handBreaked {};
     float steeringDirection {};
     float enginePowerDirection {};
     float verticalTrust {};
+    float steeringSpeed = 0;
+    float steeringAngle = 0;
 
     Turret gun;
     Turret cannon;
@@ -35,6 +37,7 @@ namespace game
     Car& operator=(Car&) = delete;
     Car& operator=(Car&&) = delete;
 
+    void updateControl(const PlayerControl& playerControl);
     void update(float dt);
     void draw(bool drawWires);
 
@@ -48,14 +51,12 @@ namespace game
     const Terrain& terrain;
     const CustomCamera& camera;
 
-    float steeringSpeed = 0;
-    float steeringAngle = 0;
-
-    void updateControl(float dt);
+    void updateSteering(float dt);
     void updateWheels(float dt);
     void updateTurrets(float dt);
     void updateCollisions(float dt);
     vec3 getAutoAlignmentMoment(float dt);
+    void updateEngine(float dt);
     void drawDebug();
   };
 

@@ -11,8 +11,8 @@ namespace game
       .gravity = 9.8f,
       .car = {
         .mass = 1500,
-        .enginePower = 100,
-        .brakePower = 10000,
+        .enginePower = 200,
+        .brakePower = 800,
         .handBrakePower = 100000,
         .maxSpeed = 50,
         .minSteeringAngle = PI / 8,
@@ -40,7 +40,7 @@ namespace game
         .suspensionStiffness = 100000,
         .suspensionDamping = 0.2f,
         .maxSuspensionOffset = 0.5f,
-        .tireFriction = 0.9f,
+        .tireFriction = 0.95f,
         .rollingFriction = 0.01f,
       },
       .rearWheels = {

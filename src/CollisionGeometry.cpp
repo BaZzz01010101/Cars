@@ -49,7 +49,7 @@ namespace game
 
     for (int i = 0; i < spheres.size(); i++)
     {
-      const Sphere& sphere = spheres[i];
+      const sphere& sphere = spheres[i];
       vec3 position = sphere.position;
       float radius = sphere.radius;
 
@@ -69,43 +69,5 @@ namespace game
   {
     for (int i = 0; i < spheres.size(); i++)
       DrawSphereWires(spheres[i].position, spheres[i].radius, 8, 8, YELLOW);
-  }
-
-  bool CollisionGeometry::Sphere::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
-  {
-    vec3 originToCenter = position - origin;
-    float originToCenterSqLength = originToCenter.sqLength();
-    float sqDistance = sqr(distance);
-    float sqRadius = sqr(radius);
-
-    if (originToCenterSqLength > sqr(radius + distance))
-      return false;
-
-    float originToClosestRayPointLength = originToCenter * directionNormalized;
-
-    if (originToClosestRayPointLength < 0)
-      return false;
-
-    float originToClosestRayPointSqLength = sqr(originToClosestRayPointLength);
-    float centerToClosestRayPointSqLength = originToCenterSqLength - originToClosestRayPointSqLength;
-
-    if (centerToClosestRayPointSqLength > sqRadius)
-      return false;
-
-    float originToHitPointLength = originToClosestRayPointLength - sqrt(sqRadius - centerToClosestRayPointSqLength);
-
-    if (originToHitPointLength > distance)
-      return false;
-
-    if (hitPosition)
-      *hitPosition = origin + directionNormalized * originToHitPointLength;
-
-    if (hitNormal)
-      *hitNormal = (directionNormalized * originToHitPointLength - originToCenter).normalized();
-
-    if (hitDistance)
-      *hitDistance = originToHitPointLength;
-
-    return true;
   }
 }

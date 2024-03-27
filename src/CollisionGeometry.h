@@ -13,16 +13,8 @@ namespace game
     void drawDebug() const;
 
   private:
-    struct Sphere
-    {
-      vec3 position {};
-      float radius {};
-
-      bool traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const;
-    };
-
     static constexpr int STATIC_COUNT = 5;
-    SemiVector<Sphere, STATIC_COUNT> spheres;
+    SemiVector<sphere, STATIC_COUNT> spheres;
   };
 
 }

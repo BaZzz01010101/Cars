@@ -13,7 +13,7 @@
     <ClCompile Include="src\GridWalker.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\box2.cpp" />
-    <ClCompile Include="src\sphere.cpp" />
+    <ClCompile Include="src\Sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Helpers.h" />
@@ -28,6 +28,6 @@
     <ClInclude Include="src\GridWalker.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\box2.h" />
-    <ClInclude Include="src\sphere.h" />
+    <ClInclude Include="src\Sphere.h" />
   </ItemGroup>
 </Project>

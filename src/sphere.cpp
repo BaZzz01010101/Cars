@@ -1,11 +1,11 @@
 #include "pch.h"
-#include "sphere.h"
+#include "Sphere.h"
 #include "Helpers.h"
 
 namespace game
 {
 
-  bool sphere::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
+  bool Sphere::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
   {
     vec3 originToCenter = center - origin;
     float originToCenterSqLength = originToCenter.sqLength();
@@ -42,7 +42,7 @@ namespace game
     return true;
   }
 
-  bool sphere::collideWith(sphere other, vec3* collisionPoint, vec3* collisionNormal, float* penetration) const
+  bool Sphere::collideWith(Sphere other, vec3* collisionPoint, vec3* collisionNormal, float* penetration) const
   {
     vec3 centerToCenter = other.center - center;
     float centerToCenterSqLength = centerToCenter.sqLength();

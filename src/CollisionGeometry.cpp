@@ -42,7 +42,7 @@ namespace game
     return true;
   }
 
-  bool CollisionGeometry::collideWith(sphere sphere, vec3* collisionPoint, vec3* collisionNormal, float* penetration) const
+  bool CollisionGeometry::collideWith(Sphere sphere, vec3* collisionPoint, vec3* collisionNormal, float* penetration) const
   {
     float avgPenetration = 0;
     vec3 avgCollisionPosition {};
@@ -80,7 +80,7 @@ namespace game
 
     for (int i = 0; i < spheres.size(); i++)
     {
-      const sphere& sphere = spheres[i];
+      const Sphere& sphere = spheres[i];
       vec3 position = sphere.center;
       float radius = sphere.radius;
 

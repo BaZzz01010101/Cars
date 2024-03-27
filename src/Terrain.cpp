@@ -180,7 +180,7 @@ namespace game
     return false;
   }
 
-  bool Terrain::collideSphereWithObjects(sphere sphere, vec3* collisionPoint, vec3* collisionNormal, float* penetration) const
+  bool Terrain::collideSphereWithObjects(Sphere sphere, vec3* collisionPoint, vec3* collisionNormal, float* penetration) const
   {
     vec2 min = sphere.center.xz() - sphere.radius;
     vec2 max = sphere.center.xz() + sphere.radius;

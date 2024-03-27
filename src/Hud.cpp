@@ -185,7 +185,7 @@ namespace game
     if (camera.direction * turret.forward() > 0)
     {
       vec3 hitPosition;
-      if(sphere { camera.position, 1000 }.traceRay(turret.position + turret.forward() * 2000, -turret.forward(), FLT_MAX, &hitPosition, nullptr, nullptr))
+      if(Sphere { camera.position, 1000 }.traceRay(turret.position + turret.forward() * 2000, -turret.forward(), FLT_MAX, &hitPosition, nullptr, nullptr))
       {
         vec2 position = GetWorldToScreen(hitPosition, camera);
         drawCrossHair(position, textureIndex, srcSize, dstSize, color);

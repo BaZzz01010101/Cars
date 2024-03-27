@@ -106,7 +106,7 @@ namespace game
 
   void Car::updateCollisions(float dt)
   {
-    static const sphere collisionSpheres[4] = {
+    static const Sphere collisionSpheres[4] = {
       {{  0.32f, 0.22f,  1.42f }, 0.75f },
       {{ -0.32f, 0.22f,  1.42f }, 0.75f },
       {{ -0.06f, 0.64f, -1.45f }, 1.23f },
@@ -139,11 +139,11 @@ namespace game
     std::vector<ForceAndPoint> nForces;
     float div = 0;
 
-    for (sphere s : collisionSpheres)
+    for (Sphere sphere : collisionSpheres)
     {
-      sphere worldSphere = {
-        position + s.center.rotatedBy(rotation),
-        s.radius
+      Sphere worldSphere = {
+        position + sphere.center.rotatedBy(rotation),
+        sphere.radius
       };
 
       vec3 collisionPoint {};

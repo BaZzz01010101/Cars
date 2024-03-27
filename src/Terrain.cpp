@@ -180,6 +180,55 @@ namespace game
     return false;
   }
 
+  bool Terrain::collideSphereWithObjects(sphere sphere, vec3* collisionPoint, vec3* collisionNormal, float* penetration) const
+  {
+    vec2 min = sphere.center.xz() - sphere.radius;
+    vec2 max = sphere.center.xz() + sphere.radius;
+    int minCellX = clamp((int)((min.x + TERRAIN_SIZE_2) / CG_GRID_CELL_SIZE), 0, CG_GRID_SIZE - 1);
+    int minCellY = clamp((int)((min.y + TERRAIN_SIZE_2) / CG_GRID_CELL_SIZE), 0, CG_GRID_SIZE - 1);
+    int maxCellX = clamp((int)((max.x + TERRAIN_SIZE_2) / CG_GRID_CELL_SIZE), 0, CG_GRID_SIZE - 1);
+    int maxCellY = clamp((int)((max.y + TERRAIN_SIZE_2) / CG_GRID_CELL_SIZE), 0, CG_GRID_SIZE - 1);
+
+    float avgPenetration = 0;
+    vec3 avgCollisionPosition {};
+    vec3 avgCollisionNormal {};
+    int collisionCount = 0;
+
+    for (int y = minCellY; y <= maxCellY; y++)
+      for (int x = minCellX; x <= maxCellX; x++)
+      {
+        const CGGridCell& cgGridCell = cgGrid[y][x];
+
+        for (int i = 0; i < cgGridCell.size(); i++)
+          if (objectCollisionGeometries.isAlive(cgGridCell[i]))
+          {
+            const CollisionGeometry& geometry = objectCollisionGeometries.get(cgGridCell[i]);
+
+            if (geometry.collideWith(sphere, collisionPoint, collisionNormal, penetration))
+            {
+              avgCollisionPosition += *collisionPoint;
+              avgCollisionNormal += *collisionNormal;
+              avgPenetration += *penetration;
+              collisionCount++;
+            }
+          }
+      }
+
+    if (collisionCount == 0)
+      return false;
+
+    if (collisionPoint)
+      *collisionPoint = avgCollisionPosition / float(collisionCount);
+
+    if (collisionNormal)
+      *collisionNormal = avgCollisionNormal / float(collisionCount);
+
+    if (penetration)
+      *penetration = avgPenetration / float(collisionCount);
+
+    return true;
+  }
+
   bool Terrain::traceRayWithObjects_Unoptimized(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
   {
     vec3 currentHitPosition, currentHitNormal;
@@ -386,9 +435,6 @@ namespace game
     bool isHit1 = traceRayWithObjects(origin, directionNormalized, distance, &hitPosition1, &hitNormal1, &hitDistance1);
     bool isHit2 = traceRayWithObjects_Unoptimized(origin, directionNormalized, distance, &hitPosition2, &hitNormal2, &hitDistance2);
 
-    //if((scenePtr->getPlayer().position - hitPosition1).length() < 10)
-    //  DrawSphere(hitPosition1 + vec3::up * 0.1f, 0.2f, GREEN);
-
     vec3 diff = hitPosition1 - hitPosition2;
 
     if (isHit1)
@@ -407,18 +453,17 @@ namespace game
       float y0 = y * CG_GRID_CELL_SIZE - TERRAIN_SIZE_2;
       float x1 = x * CG_GRID_CELL_SIZE + CG_GRID_CELL_SIZE - TERRAIN_SIZE_2;
       float y1 = y * CG_GRID_CELL_SIZE + CG_GRID_CELL_SIZE - TERRAIN_SIZE_2;
-      auto cg = cgGrid[y][x];
+      const float step = 1;
 
-      float step = 1;
       for (float yy = y0 + step / 2; yy <= y1; yy += step)
         for (float xx = x0 + step / 2; xx <= x1; xx += step)
-          {
-            float h = getHeight(xx + step / 2, yy + step / 2, nullptr) + 0.5f;
-            float k = std::max(fabsf((xx - (x0 + x1) / 2) / (x1 - x0) * 2), fabsf((yy - (y0 + y1) / 2) / (y1 - y0)) * 2);
-            bool isBorder = (xx - x0 < 0.75 * step || x1 - xx < 0.75 * step || yy - y0 < 0.75 * step || y1 - yy < 0.75 * step);
-            unsigned char transparency = isBorder ? 64 : (unsigned char)(16 + k * k * 16);
-            DrawPlane({ xx, h, yy }, { step, step }, { 255, 255, 255, transparency });
-          }
+        {
+          float h = getHeight(xx + step / 2, yy + step / 2, nullptr) + 0.5f;
+          float k = std::max(fabsf((xx - (x0 + x1) / 2) / (x1 - x0) * 2), fabsf((yy - (y0 + y1) / 2) / (y1 - y0)) * 2);
+          bool isBorder = (xx - x0 < 0.75 * step || x1 - xx < 0.75 * step || yy - y0 < 0.75 * step || y1 - yy < 0.75 * step);
+          unsigned char transparency = isBorder ? 64 : (unsigned char)(16 + k * k * 16);
+          DrawPlane({ xx, h, yy }, { step, step }, { 255, 255, 255, transparency });
+        }
 
       return false;
     });
@@ -876,4 +921,4 @@ namespace game
     return false;
   }
 
-}
+  }

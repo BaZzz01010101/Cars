@@ -149,10 +149,10 @@ namespace game
     {
       scene.getPlayer().syncState({
         .uid = 0,
-        .position = {0, 20, 0},
-        .rotation = quat::identity,
-        .velocity = {0, 20, 10},
-        .angularVelocity = {0, 0, 20},
+        .position = {-1, 7, 0},
+        .rotation = quat::identity.rotatedByYAngle(PI / 2),
+        .velocity = {randf(20, 50) * sign(randf(-1, 1)), 0, randf(20, 50) * sign(randf(-1, 1))},
+        .angularVelocity = {0, 0, 0},
         .gunYaw = PI / 2,
         .gunPitch = 0.5,
         .cannonYaw = -PI / 2,

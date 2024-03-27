@@ -9,6 +9,7 @@ namespace game
   public:
     void add(vec3 position, float radius);
     bool traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const;
+    bool collideWith(sphere sphere, vec3* collisionPoint, vec3* collisionNormal, float* penetration) const;
     std::pair<vec3, vec3> getBounds() const;
     void drawDebug() const;
 

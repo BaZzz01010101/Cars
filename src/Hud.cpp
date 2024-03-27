@@ -191,8 +191,8 @@ namespace game
         drawCrossHair(position, textureIndex, srcSize, dstSize, color);
       }
 
-      //vec2 position = GetWorldToScreen(turret.currentTarget, camera);
-      //drawCrossHair(position, textureIndex, srcSize, dstSize, color);
+      //vec2 center = GetWorldToScreen(turret.currentTarget, camera);
+      //drawCrossHair(center, textureIndex, srcSize, dstSize, color);
     }
   }
 

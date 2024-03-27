@@ -7,7 +7,7 @@ namespace game
 
   bool sphere::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
   {
-    vec3 originToCenter = position - origin;
+    vec3 originToCenter = center - origin;
     float originToCenterSqLength = originToCenter.sqLength();
     float sqRadius = sqr(radius);
 
@@ -38,6 +38,45 @@ namespace game
 
     if (hitDistance)
       *hitDistance = originToHitPointLength;
+
+    return true;
+  }
+
+  bool sphere::collideWith(sphere other, vec3* collisionPoint, vec3* collisionNormal, float* penetration) const
+  {
+    vec3 centerToCenter = other.center - center;
+    float centerToCenterSqLength = centerToCenter.sqLength();
+    float radiusSum = other.radius + radius;
+    float sqRadiusSum = sqr(radiusSum);
+
+    if (centerToCenterSqLength > sqRadiusSum)
+      return false;
+
+    if (centerToCenterSqLength < EPSILON)
+    {
+      if (collisionPoint)
+        *collisionPoint = center + vec3 { 0, radiusSum, 0 };
+
+      if (collisionNormal)
+        *collisionNormal = vec3::up;
+
+      if (penetration)
+        *penetration = radiusSum;
+
+      return true;
+    }
+
+    float centerToCenterLength = sqrt(centerToCenterSqLength);
+    vec3 centerToCenterNormalized = centerToCenter / centerToCenterLength;
+
+    if (collisionPoint)
+      *collisionPoint = center + centerToCenterNormalized * radius;
+
+    if (collisionNormal)
+      *collisionNormal = centerToCenterNormalized;
+
+    if (penetration)
+      *penetration = radiusSum - centerToCenterLength;
 
     return true;
   }

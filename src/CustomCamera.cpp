@@ -13,7 +13,7 @@ namespace game
 
   void CustomCamera::update(float dt, const Terrain& terrain, vec3 playerPosition)
   {
-    // TODO: Fix potential incorrect calculations of camera position
+    // TODO: Fix potential incorrect calculations of camera center
     // getting mouse delta inside update can lead to incorrect calculations due to the multiple
     // accounting of the same mouse delta in recurcive update calls in App::update because RayLib
     // seems updating input state once per frame
@@ -23,7 +23,7 @@ namespace game
     yaw -= mouseDelta.x * cameraConfig.horzSensitivity * 0.001f;
     yaw = normalizeAngle(yaw);
 
-    pitch -= mouseDelta.y * cameraConfig.vertSensitivity * 0.001f * (1 - 2 * cameraConfig.invertY);
+    pitch += mouseDelta.y * cameraConfig.vertSensitivity * 0.001f * (1 - 2 * cameraConfig.invertY);
     pitch = std::clamp(pitch, -cameraConfig.maxPitch, cameraConfig.maxPitch);
 
     quat rotation = quat::fromYAngle(yaw) * quat::fromXAngle(pitch);

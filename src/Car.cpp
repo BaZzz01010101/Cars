@@ -106,7 +106,14 @@ namespace game
 
   void Car::updateCollisions(float dt)
   {
-    const std::vector<vec3> points = {
+    static const sphere collisionSpheres[4] = {
+      {{  0.32f, 0.22f,  1.42f }, 0.75f },
+      {{ -0.32f, 0.22f,  1.42f }, 0.75f },
+      {{ -0.06f, 0.64f, -1.45f }, 1.23f },
+      {{ -0.05f, 0.61f,  0.00f }, 1.10f },
+    };
+
+    static const std::vector<vec3> points = {
       {0.81f, 0.11f, 2.34f},
       {0.73f, 1.37f, 0.61f},
       {0.64f, 1.32f, -0.81f},
@@ -124,56 +131,70 @@ namespace game
       applyMoment({ 0, 0, -10000 });
     }
 
+    typedef std::tuple<vec3, vec3, float> Hit;
+    std::vector<Hit> hits;
+
     typedef std::pair<vec3, vec3> ForceAndPoint;
     std::vector<ForceAndPoint> frictionForces;
     std::vector<ForceAndPoint> nForces;
     float div = 0;
 
+    for (sphere s : collisionSpheres)
+    {
+      sphere worldSphere = {
+        position + s.center.rotatedBy(rotation),
+        s.radius
+      };
+
+      vec3 collisionPoint {};
+      vec3 collisionNormal {};
+      float penetration = 0;
+
+      if(terrain.collideSphereWithObjects(worldSphere, &collisionPoint, &collisionNormal, &penetration))
+      {
+        vec3 carPoint = collisionPoint - collisionNormal * penetration - position;
+        hits.push_back({ carPoint, collisionNormal, penetration });
+      }
+    }
+
     for (vec3 pt : points)
     {
-      vec3 ptRotated = pt.rotatedBy(rotation);
-      vec3 ptGlobal = ptRotated + position;
-      vec3 traceDirection = ptGlobal - position;
-      float distance = traceDirection.length();
-      traceDirection /= distance;
-      //distance += 0.01f;
+      vec3 carPoint = pt.rotatedBy(rotation);
+      vec3 carPointGlobal = carPoint + position;
       vec3 normal;
 
       const float MAX_PENETRATION = 0.1f;
-      
-      float terrainY = terrain.getHeight(ptGlobal.x, ptGlobal.z, &normal);
-      float penetration = std::max(terrainY - ptGlobal.y, 0.0f) / MAX_PENETRATION;
-      float hitDistance;
 
-      if(terrain.traceRay(position, traceDirection, distance, nullptr, &normal, &hitDistance))
-      {
-        penetration = std::max(distance - hitDistance, 0.0f) / MAX_PENETRATION;
-      }
+      float terrainY = terrain.getHeight(carPointGlobal.x, carPointGlobal.z, &normal);
+      float penetration = std::max(terrainY - carPointGlobal.y, 0.0f);
 
-      vec3 ptRotationfVelocity = (angularVelocity % pt).rotatedBy(rotation);
-      vec3 ptVelocity = vec3::zero;
-      ptVelocity += velocity;
-      ptVelocity += ptRotationfVelocity;
+      if(penetration > 0)
+        hits.push_back({ carPoint, normal, penetration });
+    }
+    
+    for (auto [point, normal, penetration] : hits)
+    {
+      vec3 ptLocal = point.rotatedBy(rotation.inverted());
+      const float MAX_PENETRATION = 0.1f;
 
-      if (penetration > 0)
-      {
-        div += 1.0f;
-        //position.y += terrainY - ptGlobal.y;
-        float nForceScalar = mass / dt * penetration;
-        nForceScalar = std::min(nForceScalar, 50000.0f);
-        vec3 nForce = normal * nForceScalar;
+      vec3 ptRotationfVelocityGlobal = (angularVelocity % ptLocal).rotatedBy(rotation);
+      vec3 ptVelocityGlobal = velocity + ptRotationfVelocityGlobal;
 
-        vec3 frictionForce = -ptVelocity.projectedOnPlane(normal) / dt / (pt.sqLength() / momentOfInertia + 1 / mass);
-        float frictionForceScalar = frictionForce.length();
-        float maxFrictionForce = std::min(nForceScalar, 10000.0f) * carConfig.bodyFriction;
-        velocity -= velocity.projectedOnVector(normal) * clamp(penetration * dt * 10, 0.0f, 1.0f);
+      div += 1.0f;
+      float nForceScalar = 20 * mass / dt * penetration * penetration;
+      nForceScalar = std::min(nForceScalar, 500000.0f);
+      vec3 nForce = normal * nForceScalar;
 
-        if (frictionForceScalar > 0 && frictionForceScalar > sqr(maxFrictionForce))
-          frictionForce = frictionForce / frictionForceScalar * maxFrictionForce;
+      vec3 frictionForce = -ptVelocityGlobal.projectedOnPlane(normal) / dt / (ptLocal.sqLength() / momentOfInertia + 1 / mass);
+      float frictionForceScalar = frictionForce.length();
+      float maxFrictionForce = std::min(nForceScalar, 50000.0f) * carConfig.bodyFriction;
+      velocity -= velocity.projectedOnVector(normal) * clamp(penetration * penetration * dt * 100, 0.0f, 1.0f);
 
-        frictionForces.push_back({ frictionForce, ptRotated });
-        nForces.push_back({ nForce, ptRotated });
-      }
+      if (frictionForceScalar > 0 && frictionForceScalar > sqr(maxFrictionForce))
+        frictionForce = frictionForce / frictionForceScalar * maxFrictionForce;
+
+      frictionForces.push_back({ frictionForce, point });
+      nForces.push_back({ nForce, point });
     }
 
     for (const ForceAndPoint& f : frictionForces)
@@ -237,7 +258,7 @@ namespace game
 
   void Car::updateSteering(float dt)
   {
-    float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0, carConfig.maxSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
+    float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0.1f * carConfig.maxSpeed, 0.5f * carConfig.maxSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
     float steeringTarget;
 
     if (steeringDirection == 0.0f)

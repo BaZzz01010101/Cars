@@ -100,16 +100,6 @@ namespace game
 
   void Car::updateTurrets(float dt)
   {
-    // TODO: Consider better targeting method
-    // In current implementation the cross hair sometimes behaves unpreditably
-    // when tracing not hit the terrain
-    vec3 targetCollisionPosition;
-    vec3 gunPosition = gun.position + config.physics.gun.barrelPosition.y * up();
-    vec3 cannonPosition = cannon.position + config.physics.cannon.barrelPosition.y * up();
-    bool isHit = terrain.traceRay(camera.position, camera.direction, FLT_MAX, &targetCollisionPosition, nullptr, nullptr);
-
-    gun.expectedTarget = isHit ? targetCollisionPosition : camera.position + 1000 * camera.direction;
-    cannon.expectedTarget = isHit ? targetCollisionPosition : camera.position + 1000 * camera.direction;
     gun.update(dt, *this);
     cannon.update(dt, *this);
   }
@@ -222,6 +212,8 @@ namespace game
     handBreaked = playerControl.handBrake;
     enginePowerDirection = playerControl.accelerationAxis;
     steeringDirection = playerControl.steeringAxis;
+    gun.expectedTarget = playerControl.target;
+    cannon.expectedTarget = playerControl.target;
   }
 
   void Car::updateEngine(float dt)

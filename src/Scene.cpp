@@ -319,8 +319,8 @@ namespace game
   {
     vec3 target;
 
-    if (terrain.traceRay(camera.position, camera.direction, FLT_MAX, &target, nullptr, nullptr))
-      return target;
+    //if (terrain.traceRay(camera.position, camera.direction, FLT_MAX, &target, nullptr, nullptr))
+    //  return target;
 
     return camera.position + camera.direction * 1000;
   }

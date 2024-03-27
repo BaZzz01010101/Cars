@@ -28,7 +28,8 @@ namespace game
   void Turret::update(float dt, const Object& parent)
   {
     float targetYaw, targetPitch;
-    (expectedTarget - position).rotatedBy(parent.rotation.inverted()).yawPitch(&targetYaw, &targetPitch);
+    vec3 pos = position + vec3 { 0, config.barrelPosition.y, 0 }.rotatedBy(rotation);
+    (expectedTarget - pos).rotatedBy(parent.rotation.inverted()).yawPitch(&targetYaw, &targetPitch);
 
     yaw = moveTo(yaw, targetYaw, config.rotationSpeed * dt);
     pitch = moveTo(pitch, targetPitch, config.rotationSpeed * dt);
@@ -44,8 +45,9 @@ namespace game
     // TODO: Consider better targeting method
     // In current implementation the cross hair sometimes behaves unpreditably
     // when tracing not hit the terrain
-    if (!terrain.traceRay(barrelPosition(), forward(), FLT_MAX, &currentTarget, nullptr, nullptr))
-      currentTarget = position + 1000.0f * forward();
+    //pos = position + vec3 { 0, config.barrelPosition.y, 0 }.rotatedBy(rotation);
+    //if (!terrain.traceRay(pos, forward(), FLT_MAX, &currentTarget, nullptr, nullptr))
+      currentTarget = position + 1000 * forward();
   }
 
   void Turret::draw(bool drawWires)

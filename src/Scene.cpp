@@ -306,7 +306,7 @@ namespace game
     camera.reset(playerPosition);
   }
 
-  void Scene::updateLocalPlayerControl(int playerIndex, const PlayerControl& playerControl)
+  void Scene::updateLocalPlayerControl(const PlayerControl& playerControl)
   {
     gunFiring = playerControl.primaryFire;
     cannonFiring = playerControl.secondaryFire;
@@ -315,13 +315,20 @@ namespace game
     player.updateControl(playerControl);
   }
 
+  void Scene::updateRemotePlayerControl(int index, const PlayerControl& playerControl)
+  {
+    Car& player = cars.get(playerIndex);
+    player.updateControl(playerControl);
+  }
+
+  void Scene::syncRemotePlayerState(int index, const PlayerState& playerState)
+  {
+    Car& player = cars.get(index);
+    player.syncState(playerState);
+  }
+
   vec3 Scene::getCameraTarget() const
   {
-    vec3 target;
-
-    //if (terrain.traceRay(camera.position, camera.direction, FLT_MAX, &target, nullptr, nullptr))
-    //  return target;
-
     return camera.position + camera.direction * 1000;
   }
 

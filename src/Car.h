@@ -7,6 +7,7 @@
 #include "PhysicalObject.h"
 #include "CustomCamera.h"
 #include "PlayerControl.h"
+#include "PlayerState.h"
 
 namespace game
 {
@@ -37,9 +38,10 @@ namespace game
     Car& operator=(Car&) = delete;
     Car& operator=(Car&&) = delete;
 
-    void updateControl(const PlayerControl& playerControl);
     void update(float dt);
     void draw(bool drawWires);
+    void updateControl(const PlayerControl& playerControl);
+    void syncState(const PlayerState& playerState);
 
     void resetToPosition(vec3 position, quat rotation);
     bool traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const;

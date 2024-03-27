@@ -21,7 +21,7 @@ namespace game
   {
     maxDelta = fabsf(maxDelta);
     vec3 delta = target - current;
-    float len = Vector3Length(delta);
+    float len = delta.length();
 
     if (len <= maxDelta)
       return target;

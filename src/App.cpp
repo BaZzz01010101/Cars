@@ -100,7 +100,7 @@ namespace game
       .handBrake = IsKeyDown(KEY_SPACE),
     };
 
-    scene.updateLocalPlayerControl(scene.playerIndex, playerControl);
+    scene.updateLocalPlayerControl(playerControl);
   }
 
   void App::updateShortcuts()
@@ -143,6 +143,21 @@ namespace game
       player.rotation = quat::fromEuler(0, 0, 0.18f * PI);
       player.rotation = player.rotation * quat::fromEuler(PI / 2, 0, 0);
       player.rotation = player.rotation * quat::fromEuler(0, 0, 0.02f * PI);
+    }
+
+    if (IsKeyPressed(KEY_F4))
+    {
+      scene.getPlayer().syncState({
+        .uid = 0,
+        .position = {0, 20, 0},
+        .rotation = quat::identity,
+        .velocity = {0, 20, 10},
+        .angularVelocity = {0, 0, 20},
+        .gunYaw = PI / 2,
+        .gunPitch = 0.5,
+        .cannonYaw = -PI / 2,
+        .cannonPitch = -0.5,
+        });
     }
   }
 

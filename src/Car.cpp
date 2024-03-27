@@ -216,6 +216,16 @@ namespace game
     cannon.expectedTarget = playerControl.target;
   }
 
+  void Car::syncState(const PlayerState& playerState)
+  {
+    position = playerState.position;
+    velocity = playerState.velocity;
+    rotation = playerState.rotation;
+    angularVelocity = playerState.angularVelocity;
+    gun.syncState(playerState.gunYaw, playerState.gunPitch);
+    cannon.syncState(playerState.cannonYaw, playerState.cannonPitch);
+  }
+
   void Car::updateEngine(float dt)
   {
     float ep = (sign(enginePowerDirection) == sign(enginePower)) ? carConfig.enginePower : carConfig.brakePower;

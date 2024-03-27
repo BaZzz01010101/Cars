@@ -9,7 +9,6 @@ namespace game
   {
     vec3 originToCenter = position - origin;
     float originToCenterSqLength = originToCenter.sqLength();
-    float sqDistance = sqr(distance);
     float sqRadius = sqr(radius);
 
     if (originToCenterSqLength > sqr(radius + distance))

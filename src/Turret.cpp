@@ -25,6 +25,12 @@ namespace game
     return position + config.barrelPosition.rotatedBy(rotation);
   }
 
+  void Turret::syncState(float yaw, float pitch)
+  {
+    this->yaw = yaw;
+    this->pitch = pitch;
+  }
+
   void Turret::update(float dt, const Object& parent)
   {
     float targetYaw, targetPitch;

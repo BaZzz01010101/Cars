@@ -7,6 +7,7 @@
 #include "Projectile.h"
 #include "ExplosionParticle.h"
 #include "PlayerControl.h"
+#include "PlayerState.h"
 
 namespace game
 {
@@ -39,7 +40,9 @@ namespace game
     void reset(vec3 playerPosition, quat playerRotation);
     const Car& getPlayer() const { return cars.get(playerIndex); }
     Car& getPlayer() { return cars.get(playerIndex); }
-    void updateLocalPlayerControl(int playerIndex, const PlayerControl& playerControl);
+    void updateLocalPlayerControl(const PlayerControl& playerControl);
+    void updateRemotePlayerControl(int index, const PlayerControl& playerControl);
+    void syncRemotePlayerState(int index, const PlayerState& playerState);
     vec3 getCameraTarget() const;
 
   private:

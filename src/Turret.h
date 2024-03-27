@@ -23,6 +23,7 @@ namespace game
 
     void update(float dt, const Object& parent);
     void draw(bool drawWires);
+    void syncState(float yaw, float pitch);
 
   private:
     const Config::Physics::Turret& config {};

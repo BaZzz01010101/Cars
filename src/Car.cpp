@@ -5,7 +5,7 @@
 
 namespace game
 {
-  Car::Car(const Config& config, const Model& carModel, const Model& wheelModel, const Model& gunModel, const Model& cannonModel, const Terrain& terrain, const CustomCamera& camera) :
+  Car::Car(const Config& config, const Model& carModel, const Model& wheelModel, const Model& gunModel, const Model& cannonModel, const Terrain& terrain) :
     config(config),
     carConfig(config.physics.car),
     gravity(config.physics.gravity),
@@ -16,8 +16,7 @@ namespace game
     frontRightWheel(config, true, wheelModel, terrain, config.physics.car.connectionPoints.wheels.frontRight, "FrontRightWheel"),
     rearLeftWheel(config, false, wheelModel, terrain, config.physics.car.connectionPoints.wheels.rearLeft, "RearLeftWheel"),
     rearRightWheel(config, false, wheelModel, terrain, config.physics.car.connectionPoints.wheels.rearRight, "RearRightWheel"),
-    terrain(terrain),
-    camera(camera)
+    terrain(terrain)
   {
     mass = config.physics.car.mass;
     vec3 size = { 2.04f, 2.32f, 4.56f };
@@ -106,25 +105,8 @@ namespace game
 
   void Car::updateCollisions(float dt)
   {
-    static const Sphere collisionSpheres[4] = {
-      {{  0.32f, 0.22f,  1.42f }, 0.75f },
-      {{ -0.32f, 0.22f,  1.42f }, 0.75f },
-      {{ -0.06f, 0.64f, -1.45f }, 1.23f },
-      {{ -0.05f, 0.61f,  0.00f }, 1.10f },
-    };
-
-    static const std::vector<vec3> points = {
-      {0.81f, 0.11f, 2.34f},
-      {0.73f, 1.37f, 0.61f},
-      {0.64f, 1.32f, -0.81f},
-      {0.68f, 0.43f, -2.19f},
-      {0.97f, -0.15f, -1.88f},
-      {-0.81f, 0.11f, 2.34f},
-      {-0.73f, 1.37f, 0.61f},
-      {-0.64f, 1.32f, -0.81f},
-      {-0.68f, 0.43f, -2.19f},
-      {-0.97f, -0.15f, -1.88f},
-    };
+    const vec3(&collisionPoints)[10] = config.collisionGeometries.carPoints;
+    const Sphere(&collisionSpheres)[4] = config.collisionGeometries.carSpheres;
 
     if (IsKeyDown(KEY_F))
     {
@@ -150,14 +132,14 @@ namespace game
       vec3 collisionNormal {};
       float penetration = 0;
 
-      if(terrain.collideSphereWithObjects(worldSphere, &collisionPoint, &collisionNormal, &penetration))
+      if (terrain.collideSphereWithObjects(worldSphere, &collisionPoint, &collisionNormal, &penetration))
       {
         vec3 carPoint = collisionPoint - collisionNormal * penetration - position;
         hits.push_back({ carPoint, collisionNormal, penetration });
       }
     }
 
-    for (vec3 pt : points)
+    for (vec3 pt : collisionPoints)
     {
       vec3 carPoint = pt.rotatedBy(rotation);
       vec3 carPointGlobal = carPoint + position;
@@ -168,10 +150,10 @@ namespace game
       float terrainY = terrain.getHeight(carPointGlobal.x, carPointGlobal.z, &normal);
       float penetration = std::max(terrainY - carPointGlobal.y, 0.0f);
 
-      if(penetration > 0)
+      if (penetration > 0)
         hits.push_back({ carPoint, normal, penetration });
     }
-    
+
     for (auto [point, normal, penetration] : hits)
     {
       vec3 ptLocal = point.rotatedBy(rotation.inverted());
@@ -187,10 +169,10 @@ namespace game
 
       vec3 frictionForce = -ptVelocityGlobal.projectedOnPlane(normal) / dt / (ptLocal.sqLength() / momentOfInertia + 1 / mass);
       float frictionForceScalar = frictionForce.length();
-      float maxFrictionForce = std::min(nForceScalar, 50000.0f) * carConfig.bodyFriction;
-      velocity -= velocity.projectedOnVector(normal) * clamp(penetration * penetration * dt * 100, 0.0f, 1.0f);
+      float maxFrictionForce = std::min(nForceScalar, 2000000.0f) * carConfig.bodyFriction;
+      velocity -= velocity.projectedOnVector(normal) * clamp(penetration * penetration * dt * 400, 0.0f, 1.0f);
 
-      if (frictionForceScalar > 0 && frictionForceScalar > sqr(maxFrictionForce))
+      if (frictionForceScalar > 0 && frictionForceScalar > maxFrictionForce)
         frictionForce = frictionForce / frictionForceScalar * maxFrictionForce;
 
       frictionForces.push_back({ frictionForce, point });

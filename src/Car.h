@@ -32,7 +32,7 @@ namespace game
     Wheel rearLeftWheel;
     Wheel rearRightWheel;
 
-    Car(const Config& config, const Model& carModel, const Model& wheelModel, const Model& gunModel, const Model& cannonModel, const Terrain& terrain, const CustomCamera& camera);
+    Car(const Config& config, const Model& carModel, const Model& wheelModel, const Model& gunModel, const Model& cannonModel, const Terrain& terrain);
     Car(Car&) = delete;
     Car(Car&&) = delete;
     Car& operator=(Car&) = delete;
@@ -51,7 +51,6 @@ namespace game
     const Config::Physics::Car& carConfig {};
     const float& gravity {};
     const Terrain& terrain;
-    const CustomCamera& camera;
 
     void updateSteering(float dt);
     void updateWheels(float dt);

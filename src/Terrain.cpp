@@ -7,7 +7,8 @@ namespace game
 {
   Matrix const Terrain::transform = MatrixTranslate(-TERRAIN_SIZE_2, 0, -TERRAIN_SIZE_2);
 
-  Terrain::Terrain(const Texture& terrainTexture, const Model& tree1Model, const Model& tree2Model, const Model& rockModel) :
+  Terrain::Terrain(const Config& config, const Texture& terrainTexture, const Model& tree1Model, const Model& tree2Model, const Model& rockModel) :
+    config(config),
     terrainTexture(terrainTexture),
     tree1Model(tree1Model),
     tree2Model(tree2Model),
@@ -639,13 +640,13 @@ namespace game
 
     for (int i = 0; i < OBJECT_COUNT; i++)
     {
-      std::function<CollisionGeometry(vec3, float, float)> createCollisionGeometry;
       const Model* model = nullptr;
       float scale = 0;
       float radius = 0;
       float dy = 0;
       float x = 0;
       float z = 0;
+      const Sphere(*collisionSpheres)[10] = nullptr;
       const int MAX_ATTEMPTS = 100;
       int attempts = MAX_ATTEMPTS;
 
@@ -657,7 +658,7 @@ namespace game
 
           if (type > 80)
           {
-            createCollisionGeometry = &createRockCollisionGeometry;
+            collisionSpheres = &config.collisionGeometries.rockSpheres;
             model = &rockModel;
             scale = randf(1, 5);
             dy = TERRAIN_HEIGHT / TERRAIN_SIZE * scale * 10;
@@ -665,7 +666,7 @@ namespace game
           }
           else if (type > 30)
           {
-            createCollisionGeometry = &createTree1CollisionGeometry;
+            collisionSpheres = &config.collisionGeometries.tree1Spheres;
             model = &tree1Model;
             scale = randf(0.25f, 0.75f);
             dy = TERRAIN_HEIGHT / TERRAIN_SIZE * scale * 5;
@@ -673,7 +674,7 @@ namespace game
           }
           else
           {
-            createCollisionGeometry = &createTree2CollisionGeometry;
+            collisionSpheres = &config.collisionGeometries.tree2Spheres;
             model = &tree2Model;
             scale = randf(0.15f, 0.5f);
             dy = TERRAIN_HEIGHT / TERRAIN_SIZE * scale * 5;
@@ -704,7 +705,7 @@ namespace game
       vec3 position = { x, y, z };
       float angle = randf(2 * PI);
       objects.tryAdd(*model, position, angle, scale);
-      CollisionGeometry cg = createCollisionGeometry(position, angle, scale);
+      CollisionGeometry cg = createCollisionGeometry(collisionSpheres, position, angle, scale);
       int index = objectCollisionGeometries.tryAdd(cg);
       auto [min, max] = cg.getBounds();
 
@@ -719,72 +720,13 @@ namespace game
     }
   }
 
-  CollisionGeometry Terrain::createTree1CollisionGeometry(vec3 position, float angle, float scale)
+  CollisionGeometry Terrain::createCollisionGeometry(const Sphere(*spheres)[10], vec3 position, float angle, float scale)
   {
-    static std::pair<vec3, float> spheres[] = {
-      {{ 0.000f, -0.330f,  0.000f}, 1.990f},
-      {{ 0.000f,  2.145f,  0.165f}, 1.330f},
-      {{-0.000f,  3.630f,  0.495f}, 1.330f},
-      {{ 0.000f,  5.610f,  0.660f}, 1.495f},
-      {{-0.000f,  8.250f,  0.990f}, 1.660f},
-      {{-3.036f,  7.831f, -1.584f}, 1.957f},
-      {{-4.356f, 10.693f, -0.066f}, 2.848f},
-      {{ 3.498f, 11.383f, -1.386f}, 2.584f},
-      {{ 2.673f, 12.637f,  5.016f}, 3.838f},
-      {{-0.677f, 13.937f,  1.132f}, 5.452f}
-    };
-
     quat rotation = quat::fromYAngle(angle);
     CollisionGeometry cg;
 
-    for (auto& p : spheres)
-      cg.add(position + p.first.rotatedBy(rotation) * scale, p.second * scale);
-
-    return cg;
-  }
-
-  CollisionGeometry Terrain::createTree2CollisionGeometry(vec3 position, float angle, float scale)
-  {
-    static std::pair<vec3, float> spheres[] = {
-      {{ 0.000f, -1.650f,  0.000f}, 3.640f},
-      {{-0.165f,  2.310f, -0.165f}, 1.330f},
-      {{-0.000f,  3.960f, -0.330f}, 1.330f},
-      {{ 0.000f,  5.940f, -0.495f}, 1.495f},
-      {{-1.150f,  9.900f,  0.495f}, 4.465f},
-      {{-0.396f, 14.431f,  0.231f}, 5.092f},
-      {{ 3.894f, 12.178f,  0.759f}, 3.673f},
-      {{-0.132f, 16.993f, -4.851f}, 1.924f},
-      {{-2.772f, 19.237f,  1.056f}, 2.188f},
-      {{-3.812f, 21.856f,  2.617f}, 1.162f}
-    };
-
-    quat rotation = quat::fromYAngle(angle);
-    CollisionGeometry cg;
-
-    for (auto& p : spheres)
-      cg.add(position + p.first.rotatedBy(rotation) * scale, p.second * scale);
-
-    return cg;
-  }
-
-  CollisionGeometry Terrain::createRockCollisionGeometry(vec3 position, float angle, float scale)
-  {
-    static std::pair<vec3, float> spheres[] = {
-      {{-0.825f, -0.115f, -3.465f}, 1.825f},
-      {{ 0.000f,  1.040f, -2.310f}, 1.330f},
-      {{-1.155f, -0.115f, -1.320f}, 1.660f},
-      {{-0.990f,  0.380f,  2.310f}, 1.165f},
-      {{-0.495f,  1.205f,  1.320f}, 1.495f},
-      {{ 0.330f,  1.535f, -0.990f}, 1.990f},
-      {{ 0.825f,  1.205f,  0.990f}, 1.165f},
-      {{ 0.495f,  2.525f,  0.825f}, 1.660f},
-    };
-
-    quat rotation = quat::fromYAngle(angle);
-    CollisionGeometry cg;
-
-    for (auto& p : spheres)
-      cg.add(position + p.first.rotatedBy(rotation) * scale, p.second * scale);
+    for (const Sphere& p : *spheres)
+      cg.add(position + p.center.rotatedBy(rotation) * scale, p.radius * scale);
 
     return cg;
   }
@@ -921,4 +863,4 @@ namespace game
     return false;
   }
 
-  }
+}

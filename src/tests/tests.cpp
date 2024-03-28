@@ -15,8 +15,8 @@ namespace game_tests
   public:
     CGGridCell (&cgGrid)[CG_GRID_SIZE][CG_GRID_SIZE] = game::Terrain::cgGrid;
 
-    Terrain(const Texture& terrainTexture, const Model& tree1Model, const Model& tree2Model, const Model& rockModel) :
-      game::Terrain(terrainTexture, tree1Model, tree2Model, rockModel)
+    Terrain(const Config& config, const Texture& terrainTexture, const Model& tree1Model, const Model& tree2Model, const Model& rockModel) :
+      game::Terrain(config, terrainTexture, tree1Model, tree2Model, rockModel)
     {}
 
     bool traceRayWithTerrain(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
@@ -692,6 +692,6 @@ namespace game_tests
   Model tree1Model {};
   Model tree2Model {};
   Model rockModel {};
-  Terrain TerrainTest::terrain(terrainTexture, tree1Model, tree2Model, rockModel);
+  Terrain TerrainTest::terrain(Config::DEFAULT, terrainTexture, tree1Model, tree2Model, rockModel);
 
 }

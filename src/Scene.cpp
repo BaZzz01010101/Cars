@@ -5,7 +5,7 @@
 namespace game
 {
   Scene::Scene(const Config& config) :
-    terrain(terrainTexture, tree1Model, tree2Model, rockModel),
+    terrain(config, terrainTexture, tree1Model, tree2Model, rockModel),
     config(config),
     camera(config)
   {
@@ -110,7 +110,7 @@ namespace game
 
     terrain.init();
 
-    playerIndex = cars.tryAdd(config, carModel, wheelModel, gunModel, cannonModel, terrain, camera);
+    playerIndex = cars.tryAdd(config, carModel, wheelModel, gunModel, cannonModel, terrain);
     Car& player = cars.get(playerIndex);
     float h = terrain.getHeight(0, 0);
     player.position = { 0, h + 2, 0 };

@@ -135,6 +135,15 @@ namespace game
       } resources;
     } graphics;
 
+    struct CollisionGeometries
+    {
+      vec3 carPoints[10];
+      Sphere carSpheres[4];
+      Sphere tree1Spheres[10];
+      Sphere tree2Spheres[10];
+      Sphere rockSpheres[10];
+    } collisionGeometries;
+
     static Config DEFAULT;
   };
 }

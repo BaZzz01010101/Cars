@@ -1,8 +1,10 @@
 #pragma once
+#include "Config.h"
 #include "Pool.hpp"
 #include "TerrainObject.h"
 #include "CollisionGeometry.h"
 #include "Helpers.h"
+#include "Sphere.h"
 
 namespace game
 {
@@ -32,7 +34,7 @@ namespace game
 
     typedef SemiVector<int, EXPECTED_OBJECTS_PER_CG_GRID_CELL> CGGridCell;
 
-    Terrain(const Texture& terrainTexture, const Model& tree1Model, const Model& tree2Model, const Model& rockModel);
+    Terrain(const Config& config, const Texture& terrainTexture, const Model& tree1Model, const Model& tree2Model, const Model& rockModel);
     ~Terrain();
     Terrain(Terrain&) = delete;
     Terrain(Terrain&&) = delete;
@@ -77,6 +79,7 @@ namespace game
       bool traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const;
     };
 
+    const Config& config;
     const static Matrix transform;
 
     Mode mode = Mode::Normal;
@@ -99,6 +102,7 @@ namespace game
     static CollisionGeometry createTree1CollisionGeometry(vec3 position, float angle, float scale);
     static CollisionGeometry createTree2CollisionGeometry(vec3 position, float angle, float scale);
     static CollisionGeometry createRockCollisionGeometry(vec3 position, float angle, float scale);
+    static CollisionGeometry createCollisionGeometry(const Sphere(*spheres)[10], vec3 position, float angle, float scale);
 
     void unloadResources();
     void generateObjects();

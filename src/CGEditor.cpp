@@ -44,7 +44,7 @@ namespace game
       auto& [center, radius] = spheres[i];
       vec3 pos = position + scale * center.rotatedBy(rotation);
 
-      DrawSphere(pos, scale * radius, i == index ? YELLOW : RED);
+      DrawSphereWires(pos, scale * radius, 16, 16, i == index ? YELLOW : RED);
     }
   }
 }

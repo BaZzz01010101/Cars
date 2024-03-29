@@ -40,7 +40,7 @@ namespace game
       aliveCount--;
     }
 
-    Type& get(int index)
+    Type& operator[](int index)
     {
       _ASSERT(index >= 0 && index < Capacity);
       _ASSERT(alive[index]);
@@ -48,7 +48,7 @@ namespace game
       return object(index);
     }
 
-    const Type& get(int index) const
+    const Type& operator[](int index) const
     {
       _ASSERT(index >= 0 && index < Capacity);
       _ASSERT(alive[index]);

@@ -203,7 +203,7 @@ namespace game
         for (int i = 0; i < cgGridCell.size(); i++)
           if (objectCollisionGeometries.isAlive(cgGridCell[i]))
           {
-            const CollisionGeometry& geometry = objectCollisionGeometries.get(cgGridCell[i]);
+            const CollisionGeometry& geometry = objectCollisionGeometries[cgGridCell[i]];
 
             if (geometry.collideWith(sphere, collisionPoint, collisionNormal, penetration))
             {
@@ -241,7 +241,7 @@ namespace game
     for (int i = 0; i < objectCollisionGeometries.count(); i++)
       if (objectCollisionGeometries.isAlive(i))
       {
-        const CollisionGeometry& geometry = objectCollisionGeometries.get(i);
+        const CollisionGeometry& geometry = objectCollisionGeometries[i];
         bool hitObject = geometry.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance);
 
         if (hitObject && currentHitDistance < closestHitDistance)
@@ -282,7 +282,7 @@ namespace game
     {
       if (objectCollisionGeometries.isAlive(cgGridCell[i]))
       {
-        const CollisionGeometry& geometry = objectCollisionGeometries.get(cgGridCell[i]);
+        const CollisionGeometry& geometry = objectCollisionGeometries[cgGridCell[i]];
         bool hitObject = geometry.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance);
         traceCount++;
 
@@ -397,7 +397,7 @@ namespace game
     for (int i = 0; i < objects.capacity(); i++)
       if (objects.isAlive(i))
       {
-        TerrainObject& obj = objects.get(i);
+        TerrainObject& obj = objects[i];
         obj.draw(drawWires);
       }
 

@@ -111,7 +111,7 @@ namespace game
     terrain.init();
 
     playerIndex = cars.tryAdd(config, carModel, wheelModel, gunModel, cannonModel, terrain);
-    Car& player = cars.get(playerIndex);
+    Car& player = cars[playerIndex];
     float h = terrain.getHeight(0, 0);
     player.position = { 0, h + 2, 0 };
   }
@@ -128,7 +128,7 @@ namespace game
     if (!paused && (!slowMotion || slowMoCounter == 0))
       updateGameObjects(dt);
 
-    Car& player = cars.get(playerIndex);
+    Car& player = cars[playerIndex];
     camera.update(dt, terrain, player.position);
   }
 
@@ -136,14 +136,14 @@ namespace game
   {
     for (int i = 0; i < cars.capacity(); i++)
     {
-      Car& car = cars.get(i);
+      Car& car = cars[i];
       car.update(dt);
     }
 
     for (int i = 0; i < projectiles.capacity(); i++)
       if (projectiles.isAlive(i))
       {
-        Projectile& projectile = projectiles.get(i);
+        Projectile& projectile = projectiles[i];
         vec3 begin = projectile.position;
         projectile.update(dt);
         vec3 end = projectile.position;
@@ -166,7 +166,7 @@ namespace game
     for (int i = 0; i < explosionParticles.capacity(); i++)
       if (explosionParticles.isAlive(i))
       {
-        ExplosionParticle& particle = explosionParticles.get(i);
+        ExplosionParticle& particle = explosionParticles[i];
         particle.update(dt);
 
         if (particle.lifeTime < 0)
@@ -181,7 +181,7 @@ namespace game
       if (timeToNextGunFire <= 0)
       {
         const Config::Physics::Turret& gunConfig = config.physics.gun;
-        const Car& player = cars.get(playerIndex);
+        const Car& player = cars[playerIndex];
         const Turret& gun = player.gun;
 
         float bulletOffsetfix = gunConfig.projectileSpeed * -timeToNextGunFire;
@@ -221,7 +221,7 @@ namespace game
       if (timeToNextCannonFire <= 0)
       {
         const Config::Physics::Turret& cannonConfig = config.physics.cannon;
-        const Car& player = cars.get(playerIndex);
+        const Car& player = cars[playerIndex];
         const Turret& cannon = player.cannon;
 
         projectiles.tryAdd(Projectile {
@@ -264,26 +264,26 @@ namespace game
   {
     BeginMode3D(camera);
 
-    Car& player = cars.get(playerIndex);
+    Car& player = cars[playerIndex];
     terrain.draw(drawWires);
 
     for (int i = 0; i < cars.capacity(); i++)
     {
-      Car& car = cars.get(i);
+      Car& car = cars[i];
       car.draw(drawWires);
     }
 
     for (int i = 0; i < projectiles.capacity(); i++)
       if (projectiles.isAlive(i))
       {
-        Projectile& bullet = projectiles.get(i);
+        Projectile& bullet = projectiles[i];
         bullet.draw();
       }
 
     for (int i = 0; i < explosionParticles.capacity(); i++)
       if (explosionParticles.isAlive(i))
       {
-        ExplosionParticle& particle = explosionParticles.get(i);
+        ExplosionParticle& particle = explosionParticles[i];
         particle.draw();
       }
 
@@ -293,7 +293,7 @@ namespace game
   void Scene::regenerateTerrain(Terrain::Mode mode)
   {
     terrain.generate(mode);
-    Car& player = cars.get(playerIndex);
+    Car& player = cars[playerIndex];
     reset(player.position, player.rotation);
   }
 
@@ -301,7 +301,7 @@ namespace game
   {
     float terrainY = terrain.getHeight(playerPosition.x, playerPosition.z);
     playerPosition.y = terrainY + 2;
-    Car& player = cars.get(playerIndex);
+    Car& player = cars[playerIndex];
     player.resetToPosition(playerPosition, playerRotation);
     camera.reset(playerPosition);
   }
@@ -311,19 +311,19 @@ namespace game
     gunFiring = playerControl.primaryFire;
     cannonFiring = playerControl.secondaryFire;
 
-    Car& player = cars.get(playerIndex);
+    Car& player = cars[playerIndex];
     player.updateControl(playerControl);
   }
 
   void Scene::updateRemotePlayerControl(int index, const PlayerControl& playerControl)
   {
-    Car& player = cars.get(playerIndex);
+    Car& player = cars[playerIndex];
     player.updateControl(playerControl);
   }
 
   void Scene::syncRemotePlayerState(int index, const PlayerState& playerState)
   {
-    Car& player = cars.get(index);
+    Car& player = cars[index];
     player.syncState(playerState);
   }
 

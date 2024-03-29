@@ -38,8 +38,8 @@ namespace game
     void draw();
     void regenerateTerrain(Terrain::Mode mode);
     void reset(vec3 playerPosition, quat playerRotation);
-    const Car& getPlayer() const { return cars.get(playerIndex); }
-    Car& getPlayer() { return cars.get(playerIndex); }
+    const Car& getPlayer() const { return cars[playerIndex]; }
+    Car& getPlayer() { return cars[playerIndex]; }
     void updateLocalPlayerControl(const PlayerControl& playerControl);
     void updateRemotePlayerControl(int index, const PlayerControl& playerControl);
     void syncRemotePlayerState(int index, const PlayerState& playerState);

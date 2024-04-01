@@ -4,17 +4,13 @@
 
 namespace game
 {
+
   void Projectile::update(float dt)
   {
     position += velocity * dt;
     velocity -= 0.1f * velocity * dt;
     velocity.y -= gravity * dt;
     lifeTime -= dt;
-  }
-
-  void Projectile::draw() const
-  {
-    DrawCapsule(position, position + 0.1f * size * velocity, size, 5, 2, WHITE);
   }
 
 }

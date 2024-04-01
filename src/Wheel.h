@@ -1,12 +1,11 @@
 #pragma once
 #include "Terrain.h"
 #include "Config.h"
-#include "Renderable.h"
 #include "PhysicalObject.h"
 
 namespace game
 {
-  struct Wheel : public Renderable, public Object
+  struct Wheel : public Object
   {
     friend struct Hud;
 
@@ -29,7 +28,7 @@ namespace game
 
     const char* debugName = "UNKNOWN";
 
-    Wheel(const Config& config, bool isFrontWheel, const Model& model, const Terrain& terrain, vec3 connectionPoint, const char* debugName);
+    Wheel(const Config& config, bool isFrontWheel, const Terrain& terrain, vec3 connectionPoint, const char* debugName);
     Wheel(Wheel&) = delete;
     Wheel(Wheel&&) = delete;
     Wheel& operator=(Wheel&) = delete;
@@ -37,8 +36,6 @@ namespace game
 
     void update(float dt, const DynamicObject& parent, float steeringAngle, float sharedMass, float enginePower, bool handBreaked);
     void reset();
-    void draw(bool drawWires);
-    void drawDebug();
   };
 
 }

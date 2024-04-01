@@ -23,7 +23,6 @@ namespace game
     Type type = Type::UNKNOWN;
 
     void update(float dt);
-    void draw() const;
   };
 
 }

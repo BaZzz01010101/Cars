@@ -5,17 +5,16 @@
 
 namespace game
 {
-  Car::Car(const Config& config, const Model& carModel, const Model& wheelModel, const Model& gunModel, const Model& cannonModel, const Terrain& terrain) :
+  Car::Car(const Config& config, const Terrain& terrain) :
     config(config),
     carConfig(config.physics.car),
     gravity(config.physics.gravity),
-    Renderable(carModel),
-    gun(config.physics.gun, gunModel, terrain, config.physics.car.connectionPoints.weapon.gun, 1),
-    cannon(config.physics.cannon, gunModel, terrain, config.physics.car.connectionPoints.weapon.cannon, 2),
-    frontLeftWheel(config, true, wheelModel, terrain, config.physics.car.connectionPoints.wheels.frontLeft, "FrontLeftWheel"),
-    frontRightWheel(config, true, wheelModel, terrain, config.physics.car.connectionPoints.wheels.frontRight, "FrontRightWheel"),
-    rearLeftWheel(config, false, wheelModel, terrain, config.physics.car.connectionPoints.wheels.rearLeft, "RearLeftWheel"),
-    rearRightWheel(config, false, wheelModel, terrain, config.physics.car.connectionPoints.wheels.rearRight, "RearRightWheel"),
+    gun(config.physics.gun, terrain, config.physics.car.connectionPoints.weapon.gun, 1),
+    cannon(config.physics.cannon, terrain, config.physics.car.connectionPoints.weapon.cannon, 2),
+    frontLeftWheel(config, true, terrain, config.physics.car.connectionPoints.wheels.frontLeft, "FrontLeftWheel"),
+    frontRightWheel(config, true, terrain, config.physics.car.connectionPoints.wheels.frontRight, "FrontRightWheel"),
+    rearLeftWheel(config, false, terrain, config.physics.car.connectionPoints.wheels.rearLeft, "RearLeftWheel"),
+    rearRightWheel(config, false, terrain, config.physics.car.connectionPoints.wheels.rearRight, "RearRightWheel"),
     terrain(terrain)
   {
     mass = config.physics.car.mass;
@@ -254,44 +253,5 @@ namespace game
     rearRightWheel.update(dt, *this, 0, sharedMass, rearPower, handBreaked);
   }
 
-  void Car::draw(bool drawWires)
-  {
-    Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation), MatrixTranslate(position.x, position.y, position.z));
-    Renderable::draw(transform, drawWires);
-
-    frontLeftWheel.draw(drawWires);
-    frontRightWheel.draw(drawWires);
-    rearLeftWheel.draw(drawWires);
-    rearRightWheel.draw(drawWires);
-
-    gun.draw(drawWires);
-    cannon.draw(drawWires);
-
-    drawDebug();
-  }
-
-  void Car::drawDebug()
-  {
-    //drawVector(position, 3 * forward(), WHITE);
-    //drawVector(position, 3 * left(), LIGHTGRAY);
-    //drawVector(position, 3 * up(), DARKGRAY);
-
-    //drawVector(position, 0.001f * suspecsionForce, RED);
-    //drawVector(position, 0.5f * moment.logarithmic(), BLUE);
-    drawVector(position, 5 * vec3::forward, WHITE);
-    drawVector(position, 5 * vec3::left, LIGHTGRAY);
-
-    vec3 hitPosition, normal;
-    float distance;
-    DrawLine3D(gun.barrelPosition(), gun.barrelPosition() + gun.forward() * 10, BLUE);
-
-    if (terrain.traceRay(gun.barrelPosition(), gun.forward(), 10, &hitPosition, &normal, &distance))
-    {
-      DrawSphere(hitPosition, 0.1f, YELLOW);
-      DrawLine3D(hitPosition, hitPosition + normal * 5, YELLOW);
-      DrawSphere(hitPosition + normal * 5, 0.1f, YELLOW);
-    }
-
-  }
 }
 

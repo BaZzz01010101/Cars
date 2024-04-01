@@ -96,9 +96,4 @@ namespace game
     return { min, max };
   }
 
-  void CollisionGeometry::drawDebug() const
-  {
-    for (int i = 0; i < spheres.size(); i++)
-      DrawSphereWires(spheres[i].center, spheres[i].radius, 16, 16, YELLOW);
-  }
 }

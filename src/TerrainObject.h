@@ -1,21 +1,22 @@
 #pragma once
 #include "Object.h"
-#include "Renderable.h"
 
 namespace game
 {
 
-  struct TerrainObject : public Renderable
+  struct TerrainObject
   {
-    Matrix transform;
+    enum Type
+    {
+      Tree1,
+      Tree2,
+      Rock,
+    };
 
-    TerrainObject(const Model& model, vec3 position, float angle, float scale);
-    TerrainObject(TerrainObject&) = delete;
-    TerrainObject(TerrainObject&&) = delete;
-    TerrainObject& operator=(TerrainObject&) = delete;
-    TerrainObject& operator=(TerrainObject&&) = delete;
+    Type type {};
+    Matrix transform {};
 
-    void draw(bool drawWires);
+    TerrainObject(Type type, vec3 position, float angle, float scale);
   };
 
 }

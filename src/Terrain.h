@@ -57,34 +57,24 @@ namespace game
     static constexpr int EXPECTED_OBJECTS_PER_CG_GRID_CELL = (OBJECT_COUNT / (CG_GRID_SIZE * CG_GRID_SIZE) + 1) * 2;
 
     typedef SemiVector<int, EXPECTED_OBJECTS_PER_CG_GRID_CELL> CGGridCell;
+    typedef Pool<TerrainObject, OBJECT_COUNT> ObjectsPool;
+    typedef std::vector<float> HeightMap;
 
     static const Matrix transform;
 
     static CollisionGeometry createCollisionGeometry(const Sphere(*spheres)[10], vec3 position, float angle, float scale);
 
     const Config& config;
-    const Model& tree1Model {};
-    const Model& tree2Model {};
-    const Model& rockModel {};
-    const Texture& terrainTexture {};
-    const Texture& tree1Texture {};
-    const Texture& tree2Texture {};
-    const Texture& rockTexture {};
 
     Mode mode = Mode::Normal;
     std::vector<float> heightMap;
-    Pool<TerrainObject, OBJECT_COUNT> objects {};
+    ObjectsPool objects {};
     Pool<CollisionGeometry, OBJECT_COUNT> objectCollisionGeometries {};
     CGGridCell cgGrid[CG_GRID_SIZE][CG_GRID_SIZE] {};
-    Mesh mesh {};
-    Model model {};
-    Material wiresMaterial {};
-    bool modelLoaded = false;
 
     mutable int traceCount {};
 
-    Terrain(const Config& config, const Texture& terrainTexture, const Model& tree1Model, const Model& tree2Model, const Model& rockModel);
-    ~Terrain();
+    Terrain(const Config& config);
     Terrain(Terrain&) = delete;
     Terrain(Terrain&&) = delete;
     Terrain& operator=(Terrain&) = delete;
@@ -98,15 +88,11 @@ namespace game
     bool traceRayWithObjects(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const;
     bool collideSphereWithObjects(Sphere sphere, vec3* collisionPoint, vec3* collisionNormal, float* penetration) const;
     bool traceRayWithObjects_Unoptimized(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const;
-    void draw(bool drawWires);
-    void unloadResources();
     void generateObjects();
     bool traceRayWithCGGridCellObjects(int cgGridCellX, int cgGridCellY, vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const;
     float calcHeight(int x, int y, Mode mode) const;
     Triangle getTriangle(float worldX, float worldZ) const;
     TrianglePair getTrianglePair(int x, int y) const;
-    void drawDebug() const;
-    void visualizeRayTracing(vec3 origin, vec3 directionNormalized, float distance) const;
   };
 
 }

@@ -17,7 +17,6 @@ namespace game
     vec3 vertices[3] = { vec3::zero,  vec3::zero,  vec3::zero };
 
     void update(float dt);
-    void draw() const;
   };
 
 }

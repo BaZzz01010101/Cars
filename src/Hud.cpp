@@ -24,27 +24,27 @@ namespace game
     lastFontSize = config.graphics.hud.fontSize;
   }
 
-  void Hud::print(const char* text)
+  void Hud::print(const char* text) const
   {
     print(text, lastColor, lastPosX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* text, Color color)
+  void Hud::print(const char* text, Color color) const
   {
     print(text, color, lastPosX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* text, Color color, int posX)
+  void Hud::print(const char* text, Color color, int posX) const
   {
     print(text, lastColor, posX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* text, Color color, int posX, int posY)
+  void Hud::print(const char* text, Color color, int posX, int posY) const
   {
     print(text, color, posX, posY, lastFontSize);
   }
 
-  void Hud::print(const char* text, Color color, int posX, int posY, int fontSize)
+  void Hud::print(const char* text, Color color, int posX, int posY, int fontSize) const
   {
     DrawTextEx(font, text, { (float)posX - 1, (float)posY - 1 }, (float)fontSize, 0, BLACK);
     DrawTextEx(font, text, { (float)posX + 1, (float)posY - 1 }, (float)fontSize, 0, BLACK);
@@ -57,27 +57,27 @@ namespace game
     lastFontSize = fontSize;
   }
 
-  void Hud::printIf(bool condition, const char* text)
+  void Hud::printIf(bool condition, const char* text) const
   {
     printIf(condition, text, lastColor, lastPosX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::printIf(bool condition, const char* text, Color color)
+  void Hud::printIf(bool condition, const char* text, Color color) const
   {
     printIf(condition, text, color, lastPosX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::printIf(bool condition, const char* text, Color color, int posX)
+  void Hud::printIf(bool condition, const char* text, Color color, int posX) const
   {
     printIf(condition, text, color, posX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::printIf(bool condition, const char* text, Color color, int posX, int posY)
+  void Hud::printIf(bool condition, const char* text, Color color, int posX, int posY) const
   {
     printIf(condition, text, color, posX, posY, lastFontSize);
   }
 
-  void Hud::printIf(bool condition, const char* text, Color color, int posX, int posY, int fontSize)
+  void Hud::printIf(bool condition, const char* text, Color color, int posX, int posY, int fontSize) const
   {
     if (condition)
       print(text, color, posX, posY, fontSize);
@@ -90,27 +90,27 @@ namespace game
     }
   }
 
-  void Hud::print(const char* title, vec3 v)
+  void Hud::print(const char* title, vec3 v) const
   {
     print(title, v, lastColor, lastPosX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* title, vec3 v, Color color)
+  void Hud::print(const char* title, vec3 v, Color color) const
   {
     print(title, v, color, lastPosX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* title, vec3 v, Color color, int posX)
+  void Hud::print(const char* title, vec3 v, Color color, int posX) const
   {
     print(title, v, color, posX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* title, vec3 v, Color color, int posX, int posY)
+  void Hud::print(const char* title, vec3 v, Color color, int posX, int posY) const
   {
     print(title, v, color, posX, posY, lastFontSize);
   }
 
-  void Hud::print(const char* title, vec3 v, Color color, int posX, int posY, int fontSize)
+  void Hud::print(const char* title, vec3 v, Color color, int posX, int posY, int fontSize) const
   {
     print(TextFormat("%-10s: %5.1f |%5.1f |%5.1f :%5.1f", title, v.x, v.y, v.z, v.length()), color, posX, posY, fontSize);
 
@@ -123,27 +123,27 @@ namespace game
     }
   }
 
-  void Hud::print(const char* title, float f)
+  void Hud::print(const char* title, float f) const
   {
     print(title, f, lastColor, lastPosX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* title, float f, Color color)
+  void Hud::print(const char* title, float f, Color color) const
   {
     print(title, f, color, lastPosX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* title, float f, Color color, int posX)
+  void Hud::print(const char* title, float f, Color color, int posX) const
   {
     print(title, f, color, posX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* title, float f, Color color, int posX, int posY)
+  void Hud::print(const char* title, float f, Color color, int posX, int posY) const
   {
     print(title, f, color, posX, posY, lastFontSize);
   }
 
-  void Hud::print(const char* title, float f, Color color, int posX, int posY, int fontSize)
+  void Hud::print(const char* title, float f, Color color, int posX, int posY, int fontSize) const
   {
     print(TextFormat("%-10s: %5.1f", title, f), color, posX, posY, fontSize);
 
@@ -156,13 +156,13 @@ namespace game
     debugGraphs.updateControl();
   }
 
-  void Hud::draw(const Scene& scene)
+  void Hud::draw(const Scene& scene) const
   {
     drawCrossHairs(scene);
     drawDebug(scene);
   }
 
-  void Hud::drawCrossHairs(const Scene& scene)
+  void Hud::drawCrossHairs(const Scene& scene) const
   {
     int screenWidth = config.graphics.screen.width;
     int screenHeight = config.graphics.screen.height;
@@ -180,7 +180,7 @@ namespace game
     drawTurretCrossHair(scene.camera, player.gun, 2, srcSize, dstSize, color);
   }
 
-  void Hud::drawTurretCrossHair(const CustomCamera& camera, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color)
+  void Hud::drawTurretCrossHair(const CustomCamera& camera, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color) const
   {
     if (camera.direction * turret.forward() > 0)
     {
@@ -196,12 +196,12 @@ namespace game
     }
   }
 
-  void Hud::drawCrossHair(vec2 position, int textureIndex, float srcSize, float dstSize, Color color)
+  void Hud::drawCrossHair(vec2 position, int textureIndex, float srcSize, float dstSize, Color color) const
   {
     DrawTexturePro(crosshairsTexture, { srcSize * textureIndex, srcSize * textureIndex, srcSize, srcSize }, { float(position.x - 0.5f * dstSize), float(position.y - 0.5f * dstSize), dstSize, dstSize }, { 0, 0 }, 0, color);
   }
 
-  void Hud::drawDebug(const Scene& scene)
+  void Hud::drawDebug(const Scene& scene) const
   {
     if (paused)
       print("Paused", YELLOW, 10, 10);

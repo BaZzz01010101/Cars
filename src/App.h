@@ -1,6 +1,8 @@
 #pragma once
 #include "Scene.h"
 #include "Hud.h"
+#include "Config.h"
+#include "Renderer.h"
 
 namespace game
 {
@@ -10,6 +12,7 @@ namespace game
     Config config {};
     Scene scene;
     Hud hud;
+    Renderer renderer;
 
     bool paused = false;
 

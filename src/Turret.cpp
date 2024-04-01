@@ -4,9 +4,8 @@
 
 namespace game
 {
-  Turret::Turret(const Config::Physics::Turret& config, const Model& model, const Terrain& terrain, vec3 connectionPoint, float scale) :
+  Turret::Turret(const Config::Physics::Turret& config, const Terrain& terrain, vec3 connectionPoint, float scale) :
     config(config),
-    Renderable(model),
     terrain(terrain),
     connectionPoint(connectionPoint),
     scale(scale)
@@ -55,15 +54,5 @@ namespace game
     //if (!terrain.traceRay(pos, forward(), FLT_MAX, &currentTarget, nullptr, nullptr))
       currentTarget = position + 1000 * forward();
   }
-
-  void Turret::draw(bool drawWires)
-  {
-    Matrix transform = MatrixMultiply(MatrixMultiply(QuaternionToMatrix(rotation), MatrixScale(scale, scale, scale)), MatrixTranslate(position.x, position.y, position.z));
-    Renderable::draw(transform, drawWires);
-    drawDebug();
-  }
-
-  void Turret::drawDebug()
-  {}
 
 }

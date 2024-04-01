@@ -117,7 +117,7 @@
     <ClCompile Include="src\PhysicalObject.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\quat.cpp" />
-    <ClCompile Include="src\Renderable.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Sphere.cpp" />
     <ClCompile Include="src\TerrainObject.cpp" />
@@ -150,7 +150,7 @@
     <ClInclude Include="src\PhysicalObject.h" />
     <ClInclude Include="src\Object.h" />
     <ClInclude Include="src\quat.h" />
-    <ClInclude Include="src\Renderable.h" />
+    <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\TerrainObject.h" />

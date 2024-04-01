@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "App.h"
 #include "Helpers.h"
-#include "Config.h"
 
 namespace game
 {
@@ -12,17 +11,17 @@ namespace game
   App::App() :
     config(Config::DEFAULT),
     scene(config),
-    hud(config)
+    hud(config),
+    renderer(config, scene, hud)
   {
   }
 
   void App::initialize()
   {
-    InitWindow(config.graphics.screen.width, config.graphics.screen.height, config.graphics.screen.title);
-    SetTargetFPS(60);
-
+    renderer.init();
     scene.init();
     hud.init();
+    renderer.updateTerrainModel();
   }
 
   void App::run()
@@ -39,13 +38,13 @@ namespace game
       if (dt > 0)
         update(dt);
 
-      draw();
+      renderer.draw();
     }
   }
 
   void App::shutdown()
   {
-    CloseWindow();
+    renderer.shutdown();
   }
 
   void App::update(float dt)
@@ -60,20 +59,6 @@ namespace game
 
     scene.update(dt);
     hud.update();
-  }
-
-  void App::draw()
-  {
-    ClearBackground(BLACK);
-
-    BeginDrawing();
-
-    scene.draw();
-    hud.draw(scene);
-
-    drawDebug();
-
-    EndDrawing();
   }
 
   void App::togglePaused()
@@ -114,19 +99,28 @@ namespace game
       scene.slowMotion = !scene.slowMotion;
 
     if (IsKeyPressed(KEY_T))
-      scene.drawWires = !scene.drawWires;
+      renderer.drawWires = !renderer.drawWires;
 
     if (IsKeyPressed(KEY_R))
       player.rotation = player.rotation * quat::fromEuler(PI / 2, 0, 0);
 
     if (IsKeyPressed(KEY_ZERO))
+    {
       scene.regenerateTerrain(Terrain::Normal);
+      renderer.updateTerrainModel();
+    }
 
     if (IsKeyPressed(KEY_ONE))
+    {
       scene.regenerateTerrain(Terrain::Debug1);
+      renderer.updateTerrainModel();
+    }
 
     if (IsKeyPressed(KEY_TWO))
+    {
       scene.regenerateTerrain(Terrain::Debug2);
+      renderer.updateTerrainModel();
+    }
 
     if (IsKeyPressed(KEY_F1))
       scene.reset(vec3::zero, quat::identity);
@@ -147,7 +141,7 @@ namespace game
 
     if (IsKeyPressed(KEY_F4))
     {
-      scene.getPlayer().syncState({
+      PlayerState playerState = {
         .uid = 0,
         .position = {-1, 7, 0},
         .rotation = quat::identity.rotatedByYAngle(PI / 2),
@@ -157,7 +151,11 @@ namespace game
         .gunPitch = 0.5,
         .cannonYaw = -PI / 2,
         .cannonPitch = -0.5,
-        });
+      };
+
+      playerState.position.y = 2 + scene.terrain.getHeight(playerState.position.x, playerState.position.z, nullptr);
+
+      scene.getPlayer().syncState(playerState);
     }
   }
 

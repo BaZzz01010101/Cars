@@ -8,7 +8,6 @@
     <ClCompile Include="src\Terrain.cpp" />
     <ClCompile Include="src\quat.cpp" />
     <ClCompile Include="src\TerrainObject.cpp" />
-    <ClCompile Include="src\Renderable.cpp" />
     <ClCompile Include="src\CollisionGeometry.cpp" />
     <ClCompile Include="src\GridWalker.cpp" />
     <ClCompile Include="src\Config.cpp" />
@@ -22,7 +21,6 @@
     <ClInclude Include="src\Terrain.h" />
     <ClInclude Include="src\quat.h" />
     <ClInclude Include="src\TerrainObject.h" />
-    <ClInclude Include="src\Renderable.h" />
     <ClInclude Include="src\CollisionGeometry.h" />
     <ClInclude Include="src\SemiVector.hpp" />
     <ClInclude Include="src\GridWalker.h" />

@@ -4,10 +4,9 @@
 
 namespace game
 {
-  Wheel::Wheel(const Config& config, bool isFrontWheel, const Model& model, const Terrain& terrain, vec3 connectionPoint, const char* debugName) :
+  Wheel::Wheel(const Config& config, bool isFrontWheel, const Terrain& terrain, vec3 connectionPoint, const char* debugName) :
     config(config),
     wheelConfig(isFrontWheel ? config.physics.frontWheels : config.physics.rearWheels),
-    Renderable(model),
     terrain(terrain),
     connectionPoint(connectionPoint),
     debugName(debugName)
@@ -106,27 +105,6 @@ namespace game
     nForce = vec3::zero;
     frictionForce = vec3::zero;
     frictionVelocity = vec3::zero;
-  }
-
-  void Wheel::draw(bool drawWires)
-  {
-    Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation * wheelRotation), MatrixTranslate(position.x, position.y + suspensionOffset, position.z));
-    Renderable::draw(transform, drawWires);
-    //drawDebug();
-  }
-
-  void Wheel::drawDebug()
-  {
-    if (isGrounded)
-    {
-      vec3 bottom = position + vec3 { 0, -wheelConfig.radius + 0.2f, 0 };
-      //DrawSphere(bottom, 0.3f, ORANGE);
-
-      //drawVector(bottom, velocity, LIME);
-      drawVector(bottom, frictionVelocity, GREEN);
-      drawVector(position, 0.001f * suspecsionForce, RED);
-      drawVector(bottom, 0.001f * frictionForce, ORANGE);
-    }
   }
 
 }

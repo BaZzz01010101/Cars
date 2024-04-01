@@ -12,14 +12,14 @@ namespace game
 
     Font font {};
     Texture crosshairsTexture {};
-    DebugGraphs debugGraphs {};
+    mutable DebugGraphs debugGraphs {};
     bool crosshairsTextureLoaded = false;
     bool paused = false;
 
-    Color lastColor = WHITE;
-    int lastPosX = 0;
-    int lastPosY = 0;
-    int lastFontSize = 10;
+    mutable Color lastColor = WHITE;
+    mutable int lastPosX = 0;
+    mutable int lastPosY = 0;
+    mutable int lastFontSize = 10;
 
     Hud(const Config& config);
     ~Hud();
@@ -30,36 +30,36 @@ namespace game
 
     void init();
 
-    void print(const char* text);
-    void print(const char* text, Color color);
-    void print(const char* text, Color color, int posX);
-    void print(const char* text, Color color, int posX, int posY);
-    void print(const char* text, Color color, int posX, int posY, int fontSize);
+    void print(const char* text) const;
+    void print(const char* text, Color color) const;
+    void print(const char* text, Color color, int posX) const;
+    void print(const char* text, Color color, int posX, int posY) const;
+    void print(const char* text, Color color, int posX, int posY, int fontSize) const;
 
-    void printIf(bool condition, const char* text);
-    void printIf(bool condition, const char* text, Color color);
-    void printIf(bool condition, const char* text, Color color, int posX);
-    void printIf(bool condition, const char* text, Color color, int posX, int posY);
-    void printIf(bool condition, const char* text, Color color, int posX, int posY, int fontSize);
+    void printIf(bool condition, const char* text) const;
+    void printIf(bool condition, const char* text, Color color) const;
+    void printIf(bool condition, const char* text, Color color, int posX) const;
+    void printIf(bool condition, const char* text, Color color, int posX, int posY) const;
+    void printIf(bool condition, const char* text, Color color, int posX, int posY, int fontSize) const;
 
-    void print(const char* title, vec3 v);
-    void print(const char* title, vec3 v, Color color);
-    void print(const char* title, vec3 v, Color color, int posX);
-    void print(const char* title, vec3 v, Color color, int posX, int posY);
-    void print(const char* title, vec3 v, Color color, int posX, int posY, int fontSize);
+    void print(const char* title, vec3 v) const;
+    void print(const char* title, vec3 v, Color color) const;
+    void print(const char* title, vec3 v, Color color, int posX) const;
+    void print(const char* title, vec3 v, Color color, int posX, int posY) const;
+    void print(const char* title, vec3 v, Color color, int posX, int posY, int fontSize) const;
 
-    void print(const char* title, float f);
-    void print(const char* title, float f, Color color);
-    void print(const char* title, float f, Color color, int posX);
-    void print(const char* title, float f, Color color, int posX, int posY);
-    void print(const char* title, float f, Color color, int posX, int posY, int fontSize);
+    void print(const char* title, float f) const;
+    void print(const char* title, float f, Color color) const;
+    void print(const char* title, float f, Color color, int posX) const;
+    void print(const char* title, float f, Color color, int posX, int posY) const;
+    void print(const char* title, float f, Color color, int posX, int posY, int fontSize) const;
 
     void update();
-    void draw(const Scene& scene);
-    void drawCrossHairs(const Scene& scene);
-    void drawTurretCrossHair(const CustomCamera& camera, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color);
-    void drawCrossHair(vec2 position, int textureIndex, float srcSize, float dstSize, Color color);
-    void drawDebug(const Scene& scene);
+    void draw(const Scene& scene) const;
+    void drawCrossHairs(const Scene& scene) const;
+    void drawTurretCrossHair(const CustomCamera& camera, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color) const;
+    void drawCrossHair(vec2 position, int textureIndex, float srcSize, float dstSize, Color color) const;
+    void drawDebug(const Scene& scene) const;
   };
 
 }

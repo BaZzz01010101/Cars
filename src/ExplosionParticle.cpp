@@ -35,13 +35,4 @@ namespace game{
     lifeTime -= dt;
   }
 
-  void ExplosionParticle::draw() const
-  {
-    vec3 v0 = position + vertices[0].rotatedBy(rotation);
-    vec3 v1 = position + vertices[1].rotatedBy(rotation);
-    vec3 v2 = position + vertices[2].rotatedBy(rotation);
-    DrawTriangle3D(v0, v1, v2, WHITE);
-    DrawTriangle3D(v0, v2, v1, WHITE);
-  }
-
 }

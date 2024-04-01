@@ -3,7 +3,6 @@
 #include "Turret.h"
 #include "Wheel.h"
 #include "Config.h"
-#include "Renderable.h"
 #include "PhysicalObject.h"
 #include "CustomCamera.h"
 #include "PlayerControl.h"
@@ -11,7 +10,7 @@
 
 namespace game
 {
-  struct Car : public Renderable, public PhysicalObject
+  struct Car : public PhysicalObject
   {
     friend struct Hud;
 
@@ -36,14 +35,13 @@ namespace game
     float steeringSpeed = 0;
     float steeringAngle = 0;
 
-    Car(const Config& config, const Model& carModel, const Model& wheelModel, const Model& gunModel, const Model& cannonModel, const Terrain& terrain);
+    Car(const Config& config, const Terrain& terrain);
     Car(Car&) = delete;
     Car(Car&&) = delete;
     Car& operator=(Car&) = delete;
     Car& operator=(Car&&) = delete;
 
     void update(float dt);
-    void draw(bool drawWires);
     void updateControl(const PlayerControl& playerControl);
     void syncState(const PlayerState& playerState);
     void resetToPosition(vec3 position, quat rotation);
@@ -53,7 +51,6 @@ namespace game
     void updateCollisions(float dt);
     vec3 getAutoAlignmentMoment(float dt);
     void updateEngine(float dt);
-    void drawDebug();
   };
 
 }

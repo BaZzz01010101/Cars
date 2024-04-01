@@ -176,7 +176,6 @@
     <ClCompile Include="src\GridWalker.cpp" />
     <ClCompile Include="src\Helpers.cpp" />
     <ClCompile Include="src\quat.cpp" />
-    <ClCompile Include="src\Renderable.cpp" />
     <ClCompile Include="src\Sphere.cpp" />
     <ClCompile Include="src\Terrain.cpp" />
     <ClCompile Include="src\TerrainObject.cpp" />
@@ -191,7 +190,6 @@
     <ClInclude Include="src\GridWalker.h" />
     <ClInclude Include="src\Helpers.h" />
     <ClInclude Include="src\quat.h" />
-    <ClInclude Include="src\Renderable.h" />
     <ClInclude Include="src\SemiVector.hpp" />
     <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\Terrain.h" />

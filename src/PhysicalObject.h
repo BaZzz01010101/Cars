@@ -14,9 +14,7 @@ namespace game
     vec3 moment = vec3::zero;
 
     void update(float dt);
-
     void resetForces();
-
     void applyGlobalForceAtLocalPoint(vec3 globalForce, vec3 localPoint);
     void applyGlobalForceAtGlobalPoint(vec3 force, vec3 point);
     void applyGlobalForceAtCenterOfMass(vec3 force);

@@ -3,13 +3,8 @@
 namespace game
 {
 
-  class CGEditor
+  struct CGEditor
   {
-  public:
-    void update(float dt);
-    void draw(vec3 position, quat rotation, float scale = 1) const;
-
-  private:
     static constexpr int COUNT = 10;
     int index = 0;
 
@@ -25,6 +20,9 @@ namespace game
       { { 0, 5, 0 }, 1 },
       { { 0, 5, 0 }, 1 },
     };
+
+    void update(float dt);
+    void draw(vec3 position, quat rotation, float scale = 1) const;
   };
 
 }

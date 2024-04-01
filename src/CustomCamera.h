@@ -5,10 +5,13 @@
 namespace game
 {
 
-  class CustomCamera
+  struct CustomCamera
   {
-  public:
+    const Config& config {};
     Camera camera {};
+
+    float yaw = 0;
+    float pitch = 0;
     vec3 position = vec3::zero;
     vec3 direction = vec3::zero;
 
@@ -21,13 +24,7 @@ namespace game
     void update(float dt, const Terrain& terrain, vec3 playerPosition);
     void reset(vec3 playerPosition);
 
-    operator Camera() const { return camera; }
-
-  private:
-    const Config& config {};
-
-    float yaw = 0;
-    float pitch = 0;
+    inline operator Camera() const { return camera; }
   };
 
 }

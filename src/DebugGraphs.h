@@ -17,11 +17,8 @@ namespace game
     DebugGraph(std::string name, Color color);
 
     void logValue(float value);
-
     float getValue(int i);
-
     void draw(Font font, float posX, float posY, float width, float height, bool pureGraph, const char* title = nullptr);
-
     void reset();
   };
 
@@ -34,17 +31,11 @@ namespace game
     DebugGraphs();
 
     void logValue(std::string name, Color color, float value);
-
     void draw(Font font, float posX, float posY, float width, float height);
-
     bool get(const char* name, DebugGraph** graph);
-
     void selectNext();
-
     void selectPrev();
-
     void updateControl();
-
     void reset();
   };
 

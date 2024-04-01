@@ -6,10 +6,20 @@
 namespace game
 {
 
-  class Hud
+  struct Hud
   {
-  public:
+    const Config& config {};
+
+    Font font {};
+    Texture crosshairsTexture {};
+    DebugGraphs debugGraphs {};
+    bool crosshairsTextureLoaded = false;
     bool paused = false;
+
+    Color lastColor = WHITE;
+    int lastPosX = 0;
+    int lastPosY = 0;
+    int lastFontSize = 10;
 
     Hud(const Config& config);
     ~Hud();
@@ -47,22 +57,8 @@ namespace game
     void update();
     void draw(const Scene& scene);
     void drawCrossHairs(const Scene& scene);
-
     void drawTurretCrossHair(const CustomCamera& camera, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color);
-
-  private:
-    const Config& config {};
-    Font font {};
-    Texture crosshairsTexture {};
-    bool crosshairsTextureLoaded = false;
-    Color lastColor = WHITE;
-    int lastPosX = 0;
-    int lastPosY = 0;
-    int lastFontSize = 10;
-    DebugGraphs debugGraphs {};
-
     void drawCrossHair(vec2 position, int textureIndex, float srcSize, float dstSize, Color color);
-
     void drawDebug(const Scene& scene);
   };
 

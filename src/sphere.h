@@ -12,5 +12,4 @@ namespace game
     bool collideWith(Sphere other, vec3* collisionPoint, vec3* collisionNormal, float* penetration) const;
   };
 
-
 }

@@ -75,30 +75,8 @@ namespace game
     updateCollisions(dt);
 
     PhysicalObject::update(dt);
+
     updateWheels(dt);
-    updateTurrets(dt);
-  }
-
-  void Car::updateWheels(float dt)
-  {
-    float maxCorrectionAngle = (frontLeftWheel.connectionPoint - 0.5f * (rearLeftWheel.connectionPoint + rearRightWheel.connectionPoint)).getYAngle();
-    float correctionAngle = fabs(mapRangeClamped(steeringAngle, -PI / 2, PI / 2, -maxCorrectionAngle, maxCorrectionAngle));
-
-    float frontPower = 1.0;
-    float rearPower = 1.0;
-    float contactsCount = std::max(1.0f, float(frontLeftWheel.isGrounded + frontRightWheel.isGrounded + rearLeftWheel.isGrounded + rearRightWheel.isGrounded));
-    float sharedMass = mass / contactsCount;
-
-    float frontLeftSteeringAngle = steeringAngle + correctionAngle;
-    float frontRightSteeringAngle = steeringAngle - correctionAngle;
-    frontLeftWheel.update(dt, *this, frontLeftSteeringAngle, sharedMass, rearPower * enginePower, handBreaked);
-    frontRightWheel.update(dt, *this, frontLeftSteeringAngle, sharedMass, rearPower * enginePower, handBreaked);
-    rearLeftWheel.update(dt, *this, 0, sharedMass, rearPower * enginePower, handBreaked);
-    rearRightWheel.update(dt, *this, 0, sharedMass, rearPower * enginePower, handBreaked);
-  }
-
-  void Car::updateTurrets(float dt)
-  {
     gun.update(dt, *this);
     cannon.update(dt, *this);
   }
@@ -254,6 +232,26 @@ namespace game
     //float maxSteeringSpeed = mapRangeClamped(velocity.length(), 0, carConfig.maxSpeed, carConfig.maxSteeringSpeed, carConfig.maxSteeringSpeed * 0.5f);
 
     steeringAngle = moveTo(steeringAngle, steeringTarget, carConfig.maxSteeringSpeed * steeringDirection * dt);
+  }
+
+  void Car::updateWheels(float dt)
+  {
+    float maxCorrectionAngle = (frontLeftWheel.connectionPoint - 0.5f * (rearLeftWheel.connectionPoint + rearRightWheel.connectionPoint)).getYAngle();
+    float correctionAngle = fabs(mapRangeClamped(steeringAngle, -PI / 2, PI / 2, -maxCorrectionAngle, maxCorrectionAngle));
+
+    // TODO: Move to config the power coefficients for front and rear wheels
+    float frontPower = 1.0f * enginePower;
+    float rearPower = 1.0f * enginePower;
+    float contactsCount = std::max(1.0f, float(frontLeftWheel.isGrounded + frontRightWheel.isGrounded + rearLeftWheel.isGrounded + rearRightWheel.isGrounded));
+    float sharedMass = mass / contactsCount;
+    float frontLeftSteeringAngle = steeringAngle + correctionAngle;
+    float frontRightSteeringAngle = steeringAngle - correctionAngle;
+
+    // TODO: Implement in config the mass sharing coefficient between front and rear wheels
+    frontLeftWheel.update(dt, *this, frontLeftSteeringAngle, sharedMass, frontPower, handBreaked);
+    frontRightWheel.update(dt, *this, frontRightSteeringAngle, sharedMass, frontPower, handBreaked);
+    rearLeftWheel.update(dt, *this, 0, sharedMass, rearPower, handBreaked);
+    rearRightWheel.update(dt, *this, 0, sharedMass, rearPower, handBreaked);
   }
 
   void Car::draw(bool drawWires)

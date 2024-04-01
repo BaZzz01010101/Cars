@@ -7,6 +7,8 @@ namespace game
 
   struct TerrainObject : public Renderable
   {
+    Matrix transform;
+
     TerrainObject(const Model& model, vec3 position, float angle, float scale);
     TerrainObject(TerrainObject&) = delete;
     TerrainObject(TerrainObject&&) = delete;
@@ -14,8 +16,6 @@ namespace game
     TerrainObject& operator=(TerrainObject&&) = delete;
 
     void draw(bool drawWires);
-
-    Matrix transform;
   };
 
 }

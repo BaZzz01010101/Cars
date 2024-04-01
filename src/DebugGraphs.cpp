@@ -5,11 +5,11 @@
 namespace game
 {
 
-  inline DebugGraph::DebugGraph(std::string name, Color color)
+  DebugGraph::DebugGraph(std::string name, Color color)
     : name(name), color(color), graph(GRAPH_SIZE, 0)
   {}
 
-  inline void DebugGraph::logValue(float value)
+  void DebugGraph::logValue(float value)
   {
     graph[graphPos] = value;
     graphPos = (graphPos + 1) % GRAPH_SIZE;
@@ -17,12 +17,12 @@ namespace game
     maxValue = std::max(maxValue, value);
   }
 
-  inline float DebugGraph::getValue(int i)
+  float DebugGraph::getValue(int i)
   {
     return graph[(graphPos + i) % GRAPH_SIZE];
   }
 
-  inline void DebugGraph::draw(Font font, float posX, float posY, float width, float height, bool pureGraph, const char* title)
+  void DebugGraph::draw(Font font, float posX, float posY, float width, float height, bool pureGraph, const char* title)
   {
     if (!pureGraph)
       DrawRectangle(int(posX), int(posY), int(width), int(height), Fade(BLACK, 0.5f));

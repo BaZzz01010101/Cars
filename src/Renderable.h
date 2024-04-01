@@ -1,11 +1,15 @@
 #pragma once
-class Renderable
+
+namespace game
 {
-public:
-  Renderable(const Model& model);
 
-  void draw(Matrix transform, bool drawWires);
+  struct Renderable
+  {
+    const Model& model {};
 
-protected:
-  const Model& model {};
-};
+    Renderable(const Model& model);
+
+    void draw(Matrix transform, bool drawWires);
+  };
+
+}

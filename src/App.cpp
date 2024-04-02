@@ -84,7 +84,7 @@ namespace game
       .handBrake = IsKeyDown(KEY_SPACE),
     };
 
-    scene.updateLocalPlayerControl(playerControl);
+    scene.updatePlayerControl(playerControl);
   }
 
   void App::updateShortcuts()

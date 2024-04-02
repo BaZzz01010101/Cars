@@ -190,6 +190,8 @@ namespace game
   {
     verticalTrust = mass * 20 * playerControl.thrustAxis;
     handBreaked = playerControl.handBrake;
+    gunFiring = playerControl.primaryFire;
+    cannonFiring = playerControl.secondaryFire;
     enginePowerDirection = playerControl.accelerationAxis;
     steeringDirection = playerControl.steeringAxis;
     gun.expectedTarget = playerControl.target;

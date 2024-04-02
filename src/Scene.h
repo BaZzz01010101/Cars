@@ -22,13 +22,8 @@ namespace game
     Pool<Projectile, 1000> projectiles {};
     Pool<ExplosionParticle, 10000> explosionParticles {};
 
-    float timeToNextGunFire = 0;
-    float timeToNextCannonFire = 0;
-
     bool paused = false;
     bool slowMotion = false;
-    bool gunFiring = false;
-    bool cannonFiring = false;
     vec3 gunRayHit = vec3::zero;
     vec3 cannonRayHit = vec3::zero;
     int playerIndex = 0;
@@ -45,11 +40,10 @@ namespace game
     void reset(vec3 playerPosition, quat playerRotation);
     inline const Car& getPlayer() const { return cars[playerIndex]; }
     inline Car& getPlayer() { return cars[playerIndex]; }
-    void updateLocalPlayerControl(const PlayerControl& playerControl);
-    void updateRemotePlayerControl(int index, const PlayerControl& playerControl);
-    void syncRemotePlayerState(int index, const PlayerState& playerState);
+    void updatePlayerControl(const PlayerControl& playerControl);
+    void syncPlayerState(int index, const PlayerState& playerState);
     void updateGameObjects(float dt);
-    void updateFiring(float dt);
+    void updateFiring(Car& car, float dt);
     void createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position);
   };
 

@@ -29,6 +29,10 @@ namespace game
 
     float enginePower {};
     bool handBreaked {};
+    bool gunFiring = false;
+    bool cannonFiring = false;
+    float timeToNextGunFire = 0;
+    float timeToNextCannonFire = 0;
     float steeringDirection {};
     float enginePowerDirection {};
     float verticalTrust {};

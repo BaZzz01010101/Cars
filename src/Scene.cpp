@@ -23,7 +23,6 @@ namespace game
   void Scene::update(float dt)
   {
     terrain.traceCount = 0;
-    updateFiring(dt);
 
     thread_local int slowMoCounter = 0;
     const int slowMoCounterMax = 40;
@@ -39,6 +38,7 @@ namespace game
     {
       Car& car = cars[i];
       car.update(dt);
+      updateFiring(car, dt);
     }
 
     for (int i = 0; i < projectiles.capacity(); i++)
@@ -75,17 +75,17 @@ namespace game
       }
   }
 
-  void Scene::updateFiring(float dt)
+  void Scene::updateFiring(Car& car, float dt)
   {
-    if (gunFiring)
+    if (car.gunFiring)
     {
-      if (timeToNextGunFire <= 0)
+      if (car.timeToNextGunFire <= 0)
       {
         const Config::Physics::Turret& gunConfig = config.physics.gun;
         const Car& player = cars[playerIndex];
         const Turret& gun = player.gun;
 
-        float bulletOffsetfix = gunConfig.projectileSpeed * -timeToNextGunFire;
+        float bulletOffsetfix = gunConfig.projectileSpeed * -car.timeToNextGunFire;
         vec3 bulletPosition = gun.barrelPosition() + gun.forward() * bulletOffsetfix;
         vec3 barrelOffset = 0.2f * gun.left();
 
@@ -111,15 +111,15 @@ namespace game
           .type = Projectile::Type::Bullet,
           });
 
-        timeToNextGunFire += gunConfig.fireInterval;
+        car.timeToNextGunFire += gunConfig.fireInterval;
       }
     }
     else
-      timeToNextGunFire = 0;
+      car.timeToNextGunFire = 0;
 
-    if (cannonFiring)
+    if (car.cannonFiring)
     {
-      if (timeToNextCannonFire <= 0)
+      if (car.timeToNextCannonFire <= 0)
       {
         const Config::Physics::Turret& cannonConfig = config.physics.cannon;
         const Car& player = cars[playerIndex];
@@ -136,12 +136,12 @@ namespace game
           .type = Projectile::Type::Shell,
           });
 
-        timeToNextCannonFire = cannonConfig.fireInterval;
+        car.timeToNextCannonFire = cannonConfig.fireInterval;
       }
     }
 
-    timeToNextCannonFire -= dt;
-    timeToNextGunFire -= dt;
+    car.timeToNextCannonFire -= dt;
+    car.timeToNextGunFire -= dt;
   }
 
   void Scene::createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position)
@@ -176,22 +176,13 @@ namespace game
     player.resetToPosition(playerPosition, playerRotation);
   }
 
-  void Scene::updateLocalPlayerControl(const PlayerControl& playerControl)
-  {
-    gunFiring = playerControl.primaryFire;
-    cannonFiring = playerControl.secondaryFire;
-
-    Car& player = cars[playerIndex];
-    player.updateControl(playerControl);
-  }
-
-  void Scene::updateRemotePlayerControl(int index, const PlayerControl& playerControl)
+  void Scene::updatePlayerControl(const PlayerControl& playerControl)
   {
     Car& player = cars[playerIndex];
     player.updateControl(playerControl);
   }
 
-  void Scene::syncRemotePlayerState(int index, const PlayerState& playerState)
+  void Scene::syncPlayerState(int index, const PlayerState& playerState)
   {
     Car& player = cars[index];
     player.syncState(playerState);

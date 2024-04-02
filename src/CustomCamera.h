@@ -24,6 +24,8 @@ namespace game
     void update(float dt, const Terrain& terrain, vec3 playerPosition);
     void reset(vec3 playerPosition);
 
+    vec3 getTarget() const;
+
     inline operator Camera() const { return camera; }
   };
 

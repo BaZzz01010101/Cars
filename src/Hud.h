@@ -55,8 +55,8 @@ namespace game
     void print(const char* title, float f, Color color, int posX, int posY, int fontSize) const;
 
     void update();
-    void draw(const Scene& scene) const;
-    void drawCrossHairs(const Scene& scene) const;
+    void draw(const CustomCamera& camera, const Scene& scene) const;
+    void drawCrossHairs(const CustomCamera& camera, const Scene& scene) const;
     void drawTurretCrossHair(const CustomCamera& camera, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color) const;
     void drawCrossHair(vec2 position, int textureIndex, float srcSize, float dstSize, Color color) const;
     void drawDebug(const Scene& scene) const;

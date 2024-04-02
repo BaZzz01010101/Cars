@@ -17,7 +17,6 @@ namespace game
 
     const Config& config {};
 
-    CustomCamera camera;
     Terrain terrain;
     Pool<Car, 1> cars {};
     Pool<Projectile, 1000> projectiles {};
@@ -49,7 +48,6 @@ namespace game
     void updateLocalPlayerControl(const PlayerControl& playerControl);
     void updateRemotePlayerControl(int index, const PlayerControl& playerControl);
     void syncRemotePlayerState(int index, const PlayerState& playerState);
-    vec3 getCameraTarget() const;
     void updateGameObjects(float dt);
     void updateFiring(float dt);
     void createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position);

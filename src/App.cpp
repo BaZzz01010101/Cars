@@ -10,9 +10,10 @@ namespace game
 
   App::App() :
     config(Config::DEFAULT),
+    camera(config),
     scene(config),
     hud(config),
-    renderer(config, scene, hud)
+    renderer(config, camera, scene, hud)
   {
   }
 
@@ -33,10 +34,12 @@ namespace game
 
       float dt = GetFrameTime();
 
-      dt = clamp(dt, 0.0f, 0.1f);
+      dt = clamp(dt, EPSILON, 0.1f);
 
-      if (dt > 0)
-        update(dt);
+      update(dt);
+
+      const Car& player = scene.getPlayer();
+      camera.update(dt, scene.terrain, player.position);
 
       renderer.draw();
     }
@@ -68,10 +71,6 @@ namespace game
     hud.paused = paused;
   }
 
-  void App::drawDebug()
-  {
-  }
-
   void App::updatePlayerControl()
   {
     PlayerControl playerControl = {
@@ -79,7 +78,7 @@ namespace game
       .steeringAxis = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D)),
       .accelerationAxis = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S)),
       .thrustAxis = float(IsKeyDown(KEY_LEFT_SHIFT)),
-      .target = scene.getCameraTarget(),
+      .target = camera.getTarget(),
       .primaryFire = IsMouseButtonDown(MOUSE_LEFT_BUTTON),
       .secondaryFire = IsMouseButtonDown(MOUSE_RIGHT_BUTTON),
       .handBrake = IsKeyDown(KEY_SPACE),

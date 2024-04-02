@@ -156,13 +156,13 @@ namespace game
     debugGraphs.updateControl();
   }
 
-  void Hud::draw(const Scene& scene) const
+  void Hud::draw(const CustomCamera& camera, const Scene& scene) const
   {
-    drawCrossHairs(scene);
+    drawCrossHairs(camera, scene);
     drawDebug(scene);
   }
 
-  void Hud::drawCrossHairs(const Scene& scene) const
+  void Hud::drawCrossHairs(const CustomCamera& camera, const Scene& scene) const
   {
     int screenWidth = config.graphics.screen.width;
     int screenHeight = config.graphics.screen.height;
@@ -176,8 +176,8 @@ namespace game
 
     const Car& player = scene.getPlayer();
 
-    drawTurretCrossHair(scene.camera, player.cannon, 1, srcSize, dstSize, color);
-    drawTurretCrossHair(scene.camera, player.gun, 2, srcSize, dstSize, color);
+    drawTurretCrossHair(camera, player.cannon, 1, srcSize, dstSize, color);
+    drawTurretCrossHair(camera, player.gun, 2, srcSize, dstSize, color);
   }
 
   void Hud::drawTurretCrossHair(const CustomCamera& camera, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color) const

@@ -10,6 +10,7 @@ namespace game
   struct App
   {
     Config config {};
+    CustomCamera camera;
     Scene scene;
     Hud hud;
     Renderer renderer;
@@ -24,8 +25,6 @@ namespace game
     void togglePaused();
     void update(float dt);
     void updateShortcuts();
-    void draw();
-    void drawDebug();
     void updatePlayerControl();
   };
 

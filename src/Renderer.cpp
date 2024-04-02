@@ -6,7 +6,8 @@
 namespace game
 {
 
-  Renderer::Renderer(const Config& config, const Scene& scene, const Hud& hud) :
+  Renderer::Renderer(const Config& config, const CustomCamera& camera, const Scene& scene, const Hud& hud) :
+    camera(camera),
     config(config),
     scene(scene),
     hud(hud)
@@ -32,7 +33,7 @@ namespace game
 
     BeginDrawing();
 
-    BeginMode3D(scene.camera);
+    BeginMode3D(camera);
 
     drawTerrain();
 
@@ -59,7 +60,7 @@ namespace game
 
     EndMode3D();
 
-    hud.draw(scene);
+    hud.draw(camera, scene);
 
     EndDrawing();
   }

@@ -6,8 +6,7 @@ namespace game
 {
   Scene::Scene(const Config& config) :
     terrain(config),
-    config(config),
-    camera(config)
+    config(config)
   {
   }
 
@@ -32,9 +31,6 @@ namespace game
 
     if (!paused && (!slowMotion || slowMoCounter == 0))
       updateGameObjects(dt);
-
-    Car& player = cars[playerIndex];
-    camera.update(dt, terrain, player.position);
   }
 
   void Scene::updateGameObjects(float dt)
@@ -178,7 +174,6 @@ namespace game
     playerPosition.y = terrainY + 2;
     Car& player = cars[playerIndex];
     player.resetToPosition(playerPosition, playerRotation);
-    camera.reset(playerPosition);
   }
 
   void Scene::updateLocalPlayerControl(const PlayerControl& playerControl)
@@ -200,11 +195,6 @@ namespace game
   {
     Car& player = cars[index];
     player.syncState(playerState);
-  }
-
-  vec3 Scene::getCameraTarget() const
-  {
-    return camera.position + camera.direction * 1000;
   }
 
 }

@@ -9,6 +9,7 @@ namespace game
   struct Renderer
   {
     const Config& config;
+    const CustomCamera& camera;
     const Scene& scene;
     const Hud& hud;
 
@@ -30,7 +31,7 @@ namespace game
 
     bool drawWires = false;
 
-    Renderer(const Config& config, const Scene& scene, const Hud& hud);
+    Renderer(const Config& config, const CustomCamera& camera, const Scene& scene, const Hud& hud);
     Renderer(Renderer&) = delete;
     Renderer(Renderer&&) = delete;
     Renderer& operator=(Renderer&) = delete;
@@ -55,7 +56,6 @@ namespace game
     void loadResources();
     void unloadResources();
     void updateTerrainModel();
-
     void visualizeTerrainRayTracing(vec3 origin, vec3 directionNormalized, float distance) const;
   };
 

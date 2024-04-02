@@ -57,4 +57,9 @@ namespace game
     camera.up = { 0, 1, 0 };
   }
 
+  vec3 CustomCamera::getTarget() const
+  {
+    return position + direction * 1000;
+  }
+
 }

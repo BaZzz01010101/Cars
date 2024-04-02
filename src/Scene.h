@@ -41,7 +41,8 @@ namespace game
     inline const Car& getPlayer() const { return cars[playerIndex]; }
     inline Car& getPlayer() { return cars[playerIndex]; }
     void updatePlayerControl(const PlayerControl& playerControl);
-    void syncPlayerState(int index, const PlayerState& playerState);
+    void syncPlayerState(const PlayerState& playerState);
+    void getPlayerState(int index, PlayerState* playerState) const;
     void updateGameObjects(float dt);
     void updateFiring(Car& car, float dt);
     void createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position);

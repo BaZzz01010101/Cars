@@ -30,6 +30,21 @@ namespace game
       return -1;
     }
 
+    template <typename... Args>
+    int tryAdd(int index, Args&&... args)
+    {
+      if (!alive[index])
+      {
+        new (&object(index)) Type(std::forward<Args>(args)...);
+        alive[index] = true;
+        aliveCount++;
+
+        return index;
+      }
+
+      return -1;
+    }
+
     void remove(int index)
     {
       _ASSERT(index >= 0 && index < Capacity);

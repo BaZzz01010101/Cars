@@ -27,6 +27,7 @@ namespace game
     Wheel rearLeftWheel;
     Wheel rearRightWheel;
 
+    int uid {};
     float enginePower {};
     bool handBreaked {};
     bool gunFiring = false;

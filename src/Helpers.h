@@ -6,8 +6,8 @@ namespace game
   extern int gSeed;
   const int FAST_RAND_MAX = 0x7fffffff;
 
-  template<class T>
-  T clamp(T val, T min, T max)
+  template<typename T1, typename T2>
+  T1 clamp(T1 val, T2 min, T2 max)
   {
     return std::min(std::max(val, min), max);
   }

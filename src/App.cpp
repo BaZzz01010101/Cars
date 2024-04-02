@@ -27,16 +27,24 @@ namespace game
 
   void App::run()
   {
+    PlayerState playerState;
+
     while (!WindowShouldClose())
     {
       updatePlayerControl();
       updateShortcuts();
+
+      while (connection.readPlayerState(&playerState))
+        scene.syncPlayerState(playerState);
 
       float dt = GetFrameTime();
 
       dt = clamp(dt, EPSILON, 0.1f);
 
       update(dt);
+
+      scene.getPlayerState(scene.playerIndex, &playerState);
+      connection.writePlayerState(playerState);
 
       const Car& player = scene.getPlayer();
       camera.update(dt, scene.terrain, player.position);

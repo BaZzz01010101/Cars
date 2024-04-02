@@ -14,6 +14,11 @@
 #include <cmath>
 #include <array>
 #include <functional>
+#include <csignal>
+#include <thread>
+#include <chrono>
+
+using namespace std::chrono;
 
 #include "raylib.h"
 #include "raymath.h"

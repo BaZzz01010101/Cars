@@ -5,6 +5,7 @@ namespace game
 
   struct PlayerState
   {
+    int index {};
     int uid {};
     vec3 position {};
     quat rotation {};

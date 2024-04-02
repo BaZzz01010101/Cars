@@ -65,7 +65,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>raylibd.lib;glfw3d.lib;Winmm.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>MSVCRT</IgnoreSpecificDefaultLibraries>
@@ -101,6 +101,7 @@
     <ClCompile Include="src\box2.cpp" />
     <ClCompile Include="src\CGEditor.cpp" />
     <ClCompile Include="src\CollisionGeometry.cpp" />
+    <ClCompile Include="src\Connection.cpp" />
     <ClCompile Include="src\ExplosionParticle.cpp" />
     <ClCompile Include="src\GridWalker.cpp" />
     <ClCompile Include="src\PlayerControl.cpp" />
@@ -119,6 +120,7 @@
     <ClCompile Include="src\quat.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\ServerApp.cpp" />
     <ClCompile Include="src\Sphere.cpp" />
     <ClCompile Include="src\TerrainObject.cpp" />
     <ClCompile Include="src\Terrain.cpp" />
@@ -133,6 +135,7 @@
     <ClInclude Include="src\box2.h" />
     <ClInclude Include="src\CGEditor.h" />
     <ClInclude Include="src\CollisionGeometry.h" />
+    <ClInclude Include="src\Connection.h" />
     <ClInclude Include="src\ExplosionParticle.h" />
     <ClInclude Include="src\GridWalker.h" />
     <ClInclude Include="src\PlayerControl.h" />
@@ -150,8 +153,10 @@
     <ClInclude Include="src\PhysicalObject.h" />
     <ClInclude Include="src\Object.h" />
     <ClInclude Include="src\quat.h" />
+    <ClInclude Include="src\Queue.hpp" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\ServerApp.h" />
     <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\TerrainObject.h" />
     <ClInclude Include="src\Terrain.h" />

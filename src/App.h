@@ -1,8 +1,9 @@
 #pragma once
+#include "Config.h"
 #include "Scene.h"
 #include "Hud.h"
-#include "Config.h"
 #include "Renderer.h"
+#include "Connection.h"
 
 namespace game
 {
@@ -14,6 +15,7 @@ namespace game
     Scene scene;
     Hud hud;
     Renderer renderer;
+    Connection connection {};
 
     bool paused = false;
 

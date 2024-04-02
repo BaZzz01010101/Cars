@@ -182,10 +182,33 @@ namespace game
     player.updateControl(playerControl);
   }
 
-  void Scene::syncPlayerState(int index, const PlayerState& playerState)
+  void Scene::syncPlayerState(const PlayerState& playerState)
   {
-    Car& player = cars[index];
-    player.syncState(playerState);
+    Car& player = cars[playerState.index];
+  
+    if(player.uid == playerState.uid)
+      player.syncState(playerState);
+  }
+
+  void Scene::getPlayerState(int index, PlayerState* playerState) const
+  {
+    if (!playerState)
+      return;
+
+    const Car& player = cars[index];
+
+    *playerState = {
+      .index = index,
+      .uid = player.uid,
+      .position = player.position,
+      .rotation = player.rotation,
+      .velocity = player.velocity,
+      .angularVelocity = player.angularVelocity,
+      .gunYaw = player.gun.yaw,
+      .gunPitch = player.gun.pitch,
+      .cannonYaw = player.cannon.yaw,
+      .cannonPitch = player.cannon.pitch,
+    };
   }
 
 }

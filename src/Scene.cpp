@@ -45,14 +45,15 @@ namespace game
       if (projectiles.isAlive(i))
       {
         Projectile& projectile = projectiles[i];
-        vec3 begin = projectile.position;
         projectile.update(dt);
-        vec3 end = projectile.position;
+        vec3 direction = projectile.position - projectile.lastPosition;
+        float distance = direction.length();
+        direction /= distance;
         vec3 hitPosition, normal;
 
         if (projectile.lifeTime < 0)
           projectiles.remove(i);
-        else if (terrain.traceRay(begin, (end - begin).normalized(), (end - begin).length(), &hitPosition, &normal, nullptr))
+        else if (terrain.traceRay(projectile.position, direction, distance, &hitPosition, &normal, nullptr))
         {
           projectiles.remove(i);
 
@@ -88,10 +89,15 @@ namespace game
         float bulletOffsetfix = gunConfig.projectileSpeed * -car.timeToNextGunFire;
         vec3 bulletPosition = gun.barrelPosition() + gun.forward() * bulletOffsetfix;
         vec3 barrelOffset = 0.2f * gun.left();
+        vec3 position1 = bulletPosition + barrelOffset;
+        vec3 position2 = bulletPosition - barrelOffset;
+        vec3 velocity = player.velocity + gun.forward() * gunConfig.projectileSpeed;
 
         projectiles.tryAdd(Projectile {
-          .position = bulletPosition + barrelOffset,
-          .velocity = player.velocity + gun.forward() * gunConfig.projectileSpeed,
+          .lastPosition = position1,
+          .lastVelocity = velocity,
+          .position = position1,
+          .velocity = velocity,
           .gravity = config.physics.gravity,
           .lifeTime = gunConfig.projectileLifeTime,
           .size = 0.05f,
@@ -101,8 +107,10 @@ namespace game
           });
 
         projectiles.tryAdd(Projectile {
-          .position = bulletPosition - barrelOffset,
-          .velocity = player.velocity + gun.forward() * gunConfig.projectileSpeed,
+          .lastPosition = position2,
+          .lastVelocity = velocity,
+          .position = position2,
+          .velocity = velocity,
           .gravity = config.physics.gravity,
           .lifeTime = gunConfig.projectileLifeTime,
           .size = 0.05f,
@@ -124,10 +132,14 @@ namespace game
         const Config::Physics::Turret& cannonConfig = config.physics.cannon;
         const Car& player = cars[playerIndex];
         const Turret& cannon = player.cannon;
+        vec3 position = cannon.barrelPosition();
+        vec3 velocity = player.velocity + cannon.forward() * cannonConfig.projectileSpeed;
 
         projectiles.tryAdd(Projectile {
-          .position = cannon.barrelPosition(),
-          .velocity = player.velocity + cannon.forward() * cannonConfig.projectileSpeed,
+          .lastPosition = position,
+          .lastVelocity = velocity,
+          .position = position,
+          .velocity = velocity,
           .gravity = config.physics.gravity,
           .lifeTime = cannonConfig.projectileLifeTime,
           .size = 0.2f,

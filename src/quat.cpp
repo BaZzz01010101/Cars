@@ -54,6 +54,11 @@ namespace game
     return quat { x, y, z, w }.normalized();
   }
 
+  quat quat::slerp(quat from, quat to, float factor)
+  {
+    return QuaternionSlerp(from, to, factor);
+  }
+
   quat::quat(Quaternion q) : Quaternion { q }
   {}
 

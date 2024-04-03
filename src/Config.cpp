@@ -7,7 +7,7 @@ namespace game
   Config Config::DEFAULT =
   {
     .physics = {
-      .maxDt = 0.02f,
+      .fixedDt = 0.02f,
       .gravity = 9.8f,
       .car = {
         .mass = 1500,

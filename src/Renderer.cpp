@@ -27,7 +27,7 @@ namespace game
     CloseWindow();
   }
 
-  void Renderer::draw()
+  void Renderer::draw(float lerpFactor)
   {
     ClearBackground(BLACK);
 
@@ -41,21 +41,21 @@ namespace game
       if (scene.cars.isAlive(i))
       {
         const Car& car = scene.cars[i];
-        drawCar(car);
+        drawCar(car, lerpFactor);
       }
 
     for (int i = 0; i < scene.projectiles.capacity(); i++)
       if (scene.projectiles.isAlive(i))
       {
         const Projectile& projectile = scene.projectiles[i];
-        drawProjectile(projectile);
+        drawProjectile(projectile, lerpFactor);
       }
 
     for (int i = 0; i < scene.explosionParticles.capacity(); i++)
       if (scene.explosionParticles.isAlive(i))
       {
         const ExplosionParticle& explosionParticle = scene.explosionParticles[i];
-        drawExplosionParticle(explosionParticle);
+        drawExplosionParticle(explosionParticle, lerpFactor);
       }
 
     EndMode3D();
@@ -65,39 +65,40 @@ namespace game
     EndDrawing();
   }
 
-  void Renderer::drawCar(const Car& car)
+  void Renderer::drawCar(const Car& car, float lerpFactor)
   {
-    vec3 position = car.position;
-    quat rotation = car.rotation;
+    vec3 position = vec3::lerp(car.lastPosition, car.position, lerpFactor);
+    quat rotation = quat::slerp(car.lastRotation, car.rotation, lerpFactor);
     Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation), MatrixTranslate(position.x, position.y, position.z));
 
     drawModel(carModel, transform);
 
-    drawWheel(car.frontLeftWheel);
-    drawWheel(car.frontRightWheel);
-    drawWheel(car.rearLeftWheel);
-    drawWheel(car.rearRightWheel);
+    drawWheel(car.frontLeftWheel, lerpFactor);
+    drawWheel(car.frontRightWheel, lerpFactor);
+    drawWheel(car.rearLeftWheel, lerpFactor);
+    drawWheel(car.rearRightWheel, lerpFactor);
 
-    drawTurret(car.gun);
-    drawTurret(car.cannon);
+    drawTurret(car.gun, lerpFactor);
+    drawTurret(car.cannon, lerpFactor);
 
     drawCarDebug(car);
   }
 
-  void Renderer::drawWheel(const Wheel& wheel)
+  void Renderer::drawWheel(const Wheel& wheel, float lerpFactor)
   {
-    vec3 position = wheel.position;
-    Matrix transform = MatrixMultiply(QuaternionToMatrix(wheel.rotation * wheel.wheelRotation), MatrixTranslate(position.x, position.y + wheel.suspensionOffset, position.z));
+    vec3 position = vec3::lerp(wheel.lastPosition, wheel.position, lerpFactor);
+    quat rotation = quat::slerp(wheel.lastRotation, wheel.rotation, lerpFactor);
+    Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation), MatrixTranslate(position.x, position.y, position.z));
 
     drawModel(wheelModel, transform);
 
     drawWheelDebug(wheel);
   }
 
-  void Renderer::drawTurret(const Turret& turret)
+  void Renderer::drawTurret(const Turret& turret, float lerpFactor)
   {
-    vec3 position = turret.position;
-    quat rotation = turret.rotation;
+    vec3 position = vec3::lerp(turret.lastPosition, turret.position, lerpFactor);
+    quat rotation = quat::slerp(turret.lastRotation, turret.rotation, lerpFactor);
     float scale = turret.scale;
     Matrix transform = MatrixMultiply(MatrixMultiply(QuaternionToMatrix(rotation), MatrixScale(scale, scale, scale)), MatrixTranslate(position.x, position.y, position.z));
 
@@ -117,19 +118,19 @@ namespace game
     }
   }
 
-  void Renderer::drawProjectile(const Projectile& projectile)
+  void Renderer::drawProjectile(const Projectile& projectile, float lerpFactor)
   {
-    vec3 position = projectile.position;
-    vec3 velocity = projectile.velocity;
+    vec3 position = vec3::lerp(projectile.lastPosition, projectile.position, lerpFactor);
+    vec3 velocity = vec3::lerp(projectile.lastVelocity, projectile.velocity, lerpFactor);
     float size = projectile.size;
 
     DrawCapsule(position, position + 0.1f * size * velocity, size, 5, 2, WHITE);
   }
 
-  void Renderer::drawExplosionParticle(const ExplosionParticle& explosionParticle)
+  void Renderer::drawExplosionParticle(const ExplosionParticle& explosionParticle, float lerpFactor)
   {
-    vec3 position = explosionParticle.position;
-    quat rotation = explosionParticle.rotation;
+    vec3 position = vec3::lerp(explosionParticle.lastPosition, explosionParticle.position, lerpFactor);
+    quat rotation = quat::slerp(explosionParticle.lastRotation, explosionParticle.rotation, lerpFactor);
     const vec3(&vertices)[3] = explosionParticle.vertices;
 
     vec3 v0 = position + vertices[0].rotatedBy(rotation);

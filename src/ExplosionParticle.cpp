@@ -8,11 +8,14 @@ namespace game{
     vec2 v0 = vec2::randomInRing(minSize, maxSize);
     vec2 v1 = vec2::randomInRing(minSize, maxSize);
     vec2 v2 = -(v1 + v0).normalized() * randf(minSize, maxSize);
+    quat rotation = quat::random();
 
     return {
+      .lastPosition = position,
+      .lastRotation = rotation,
       .position = position,
       .velocity = vec3::randomInHollowSphere(minSpeed, maxSpeed),
-      .rotation = quat::random(),
+      .rotation = rotation,
       .angularVelocity = vec3::randomInHollowSphere(minAngularSpeed, maxAngularSpeed),
       .lifeTime = randf(minLifeTime, maxLifeTime),
       .gravity = gravity,
@@ -26,6 +29,9 @@ namespace game{
 
   void ExplosionParticle::update(float dt)
   {
+    lastPosition = position;
+    lastRotation = rotation;
+
     position += velocity * dt;
     velocity -= 0.5f * velocity * dt;
     velocity.y -= gravity * dt;

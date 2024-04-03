@@ -7,7 +7,7 @@ namespace game
   {
     struct Physics
     {
-      float maxDt;
+      float fixedDt;
       float gravity;
 
       struct Car

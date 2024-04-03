@@ -27,7 +27,9 @@ namespace game
 
   void App::run()
   {
-    PlayerState playerState;
+    PlayerState playerState {};
+    float dtAccumulator = 0;
+    float fixedDt = config.physics.fixedDt;
 
     while (!WindowShouldClose())
     {
@@ -39,17 +41,25 @@ namespace game
 
       float dt = GetFrameTime();
 
-      dt = clamp(dt, EPSILON, 0.1f);
+      dtAccumulator += dt;
 
-      update(dt);
+      while (dtAccumulator > fixedDt)
+      {
+        // TODO: consider possible optimizations in physics calculations
+        // by getting rid of 'dt' parameter in 'update' methods and by using fixed 'dt' from config
+        update(fixedDt);
+        dtAccumulator -= fixedDt;
+      }
 
       scene.getPlayerState(scene.playerIndex, &playerState);
       connection.writePlayerState(playerState);
 
+      float lerpFactor = dtAccumulator / fixedDt;
       const Car& player = scene.getPlayer();
-      camera.update(dt, scene.terrain, player.position);
+      vec3 playerPosition = vec3::lerp(player.lastPosition, player.position, lerpFactor);
+      camera.update(dt, scene.terrain, playerPosition);
 
-      renderer.draw();
+      renderer.draw(lerpFactor);
     }
   }
 
@@ -60,7 +70,7 @@ namespace game
 
   void App::update(float dt)
   {
-    if (dt > config.physics.maxDt)
+    if (dt > config.physics.fixedDt)
     {
       update(0.5f * dt);
       update(0.5f * dt);

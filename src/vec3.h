@@ -19,6 +19,7 @@ namespace game
     static vec3 randomInHollowSphere(float innerRadius, float outerRadius);
     static vec3 randomInCube(float size);
     static vec3 randomInBox(float xSize, float ySize, float zSize);
+    static vec3 lerp(vec3 from, vec3 to, float factor);
 
     vec3() = default;
     vec3(Vector3 v);

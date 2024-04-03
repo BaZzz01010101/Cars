@@ -25,6 +25,8 @@ namespace game
 
   void Car::resetToPosition(vec3 position, quat rotation)
   {
+    lastPosition = position;
+    lastRotation = rotation;
     this->position = position;
     this->rotation = rotation;
     velocity = vec3::zero;
@@ -63,8 +65,6 @@ namespace game
 
     updateEngine(dt);
     updateSteering(dt);
-
-    quat wheelRotation = rotation * quat::fromEuler(steeringAngle, 0, 0);
 
     applyGlobalForceAtLocalPoint(frontLeftWheel.suspecsionForce, frontLeftWheel.connectionPoint);
     applyGlobalForceAtLocalPoint(frontRightWheel.suspecsionForce, frontRightWheel.connectionPoint);

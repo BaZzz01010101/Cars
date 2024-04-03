@@ -21,7 +21,7 @@ namespace game
   void ServerApp::run()
   {
     signal(SIGINT, [](int) { exit = true; });
-    nanoseconds dt = milliseconds(int(1000 * config.physics.maxDt));
+    nanoseconds dt = milliseconds(int(1000 * config.physics.fixedDt));
     nanoseconds maxSleep = milliseconds(0);
 
     for (int i = 0; i < 100; i++)
@@ -50,7 +50,7 @@ namespace game
         while(connection.readPlayerState(&playerState))
           scene.syncPlayerState(playerState);
 
-        scene.update(config.physics.maxDt);
+        scene.update(config.physics.fixedDt);
 
         for(int i=0; i< scene.cars.capacity(); i++)
           if(scene.cars.isAlive(i))

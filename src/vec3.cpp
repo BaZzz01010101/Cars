@@ -90,6 +90,11 @@ namespace game
     };
   }
 
+  vec3 vec3::lerp(vec3 from, vec3 to, float factor)
+  {
+    return from + (to - from) * factor;
+  }
+
   vec3::vec3(Vector3 v) : Vector3 { v }
   {}
 

@@ -16,6 +16,9 @@ namespace game
 
   void Wheel::update(float dt, const DynamicObject& parent, float steeringAngle, float sharedMass, float enginePower, bool handBreaked)
   {
+    lastPosition = position;
+    lastRotation = rotation;
+
     vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
     position = parent.position + globalConnectionPoint;
     rotation = parent.rotation * quat::fromYAngle(steeringAngle);
@@ -91,10 +94,15 @@ namespace game
 
     suspensionOffset = clamp(suspensionOffset, -wheelConfig.maxSuspensionOffset, wheelConfig.maxSuspensionOffset);
     wheelRotation.rotateByXAngle(wheelRotationSpeed * dt);
+    
+    position.y += suspensionOffset;
+    rotation = rotation * wheelRotation;
   }
 
   void Wheel::reset()
   {
+    lastPosition = vec3::zero;
+    lastRotation = quat::identity;
     position = vec3::zero;
     rotation = quat::identity;
     velocity = vec3::zero;

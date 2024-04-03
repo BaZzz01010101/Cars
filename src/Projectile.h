@@ -13,6 +13,9 @@ namespace game
       Shell,
     };
 
+    vec3 lastPosition = vec3::zero;
+    vec3 lastVelocity = vec3::zero;
+
     vec3 position = vec3::zero;
     vec3 velocity = vec3::zero;
     float gravity = 0;

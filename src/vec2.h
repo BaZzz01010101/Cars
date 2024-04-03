@@ -13,6 +13,7 @@ namespace game
     static vec2 randomOnCircleSurface(float radius);
     static vec2 randomInRing(float innerRadius, float outerRadius);
     static vec2 randomInSquare(float size);
+    static vec2 lerp(vec2 from, vec2 to, float factor);
 
     vec2() = default;
     vec2(Vector2 v);

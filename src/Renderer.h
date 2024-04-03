@@ -39,13 +39,13 @@ namespace game
 
     void init();
     void shutdown();
-    void draw();
-    void drawCar(const Car& car);
-    void drawWheel(const Wheel& wheel);
-    void drawTurret(const Turret& turret);
+    void draw(float lerpFactor);
+    void drawCar(const Car& car, float lerpFactor);
+    void drawWheel(const Wheel& wheel, float lerpFactor);
+    void drawTurret(const Turret& turret, float lerpFactor);
     void drawModel(const Model& model, const Matrix& transform);
-    void drawProjectile(const Projectile& projectile);
-    void drawExplosionParticle(const ExplosionParticle& explosionParticle);
+    void drawProjectile(const Projectile& projectile, float lerpFactor);
+    void drawExplosionParticle(const ExplosionParticle& explosionParticle, float lerpFactor);
     void drawTerrain();
     void drawTerrainObject(const TerrainObject& terrainObject);
 

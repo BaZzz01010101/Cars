@@ -13,6 +13,9 @@ namespace game
 
   void Turret::reset()
   {
+    lastPosition = vec3::zero;
+    lastRotation = quat::identity;
+
     position = vec3::zero;
     rotation = quat::identity;
     yaw = 0;
@@ -32,6 +35,9 @@ namespace game
 
   void Turret::update(float dt, const Object& parent)
   {
+    lastPosition = position;
+    lastRotation = rotation;
+
     float targetYaw, targetPitch;
     vec3 pos = position + vec3 { 0, config.barrelPosition.y, 0 }.rotatedBy(rotation);
     (expectedTarget - pos).rotatedBy(parent.rotation.inverted()).yawPitch(&targetYaw, &targetPitch);

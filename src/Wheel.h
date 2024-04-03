@@ -1,11 +1,11 @@
 #pragma once
 #include "Terrain.h"
 #include "Config.h"
-#include "PhysicalObject.h"
+#include "DynamicObject.h"
 
 namespace game
 {
-  struct Wheel : public Object
+  struct Wheel : public DynamicObject
   {
     friend struct Hud;
 

@@ -1,12 +1,12 @@
 #pragma once
-#include "Object.h"
+#include "DynamicObject.h"
 #include "Config.h"
 #include "Terrain.h"
 
 namespace game
 {
 
-  struct Turret : public Object
+  struct Turret : public DynamicObject
   {
     const Config::Physics::Turret& config {};
     const Terrain& terrain;

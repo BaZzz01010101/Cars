@@ -52,7 +52,7 @@ namespace game
 
         scene.update(config.physics.maxDt);
 
-        for(int i=0; i< scene.cars.count(); i++)
+        for(int i=0; i< scene.cars.capacity(); i++)
           if(scene.cars.isAlive(i))
           {
             scene.getPlayerState(i, &playerState);

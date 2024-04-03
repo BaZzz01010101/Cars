@@ -221,7 +221,7 @@ namespace game
     vec3 closestHitPosition, closestHitNormal;
     float closestHitDistance = FLT_MAX;
 
-    for (int i = 0; i < objectCollisionGeometries.count(); i++)
+    for (int i = 0; i < objectCollisionGeometries.capacity(); i++)
       if (objectCollisionGeometries.isAlive(i))
       {
         const CollisionGeometry& geometry = objectCollisionGeometries[i];

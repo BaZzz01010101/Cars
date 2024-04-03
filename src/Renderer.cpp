@@ -37,21 +37,21 @@ namespace game
 
     drawTerrain();
 
-    for (int i = 0; i < scene.cars.count(); i++)
+    for (int i = 0; i < scene.cars.capacity(); i++)
       if (scene.cars.isAlive(i))
       {
         const Car& car = scene.cars[i];
         drawCar(car);
       }
 
-    for (int i = 0; i < scene.projectiles.count(); i++)
+    for (int i = 0; i < scene.projectiles.capacity(); i++)
       if (scene.projectiles.isAlive(i))
       {
         const Projectile& projectile = scene.projectiles[i];
         drawProjectile(projectile);
       }
 
-    for (int i = 0; i < scene.explosionParticles.count(); i++)
+    for (int i = 0; i < scene.explosionParticles.capacity(); i++)
       if (scene.explosionParticles.isAlive(i))
       {
         const ExplosionParticle& explosionParticle = scene.explosionParticles[i];
@@ -178,9 +178,9 @@ namespace game
 
   void Renderer::drawTerrainDebug()
   {
-    //for (int i = 0; i < objectCollisionGeometries.count(); i++)
-    //  if (objectCollisionGeometries.isAlive(i))
-    //    objectCollisionGeometries.get(i).drawDebug();
+    //for (int i = 0; i < scene.terrain.objectCollisionGeometries.capacity(); i++)
+    //  if (scene.terrain.objectCollisionGeometries.isAlive(i))
+    //    scene.terrain.objectCollisionGeometries.get(i).drawDebug();
 
     //std::vector<std::pair<vec3, vec3>> lines =
     //{

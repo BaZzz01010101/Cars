@@ -26,4 +26,18 @@
 #include "vec3.h"
 #include "Sphere.h"
 
+#if defined(_WIN32)           
+#define NOGDI             // All GDI defines and routines
+#define NOUSER            // All USER defines and routines
+#define NOMINMAX         // Macros min(a,b) and max(a,b)
+#endif
+
+#include "RakPeerInterface.h"
+#include "MessageIdentifiers.h"
+
+#if defined(_WIN32)           // raylib uses these names as function parameters
+#undef near
+#undef far
+#endif
+
 using namespace std::chrono;

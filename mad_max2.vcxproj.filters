@@ -40,6 +40,7 @@
     <ClCompile Include="src\math\vec3.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="src\Server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.h" />
@@ -91,6 +92,7 @@
     <ClInclude Include="src\containers\SemiVector.hpp">
       <Filter>containers</Filter>
     </ClInclude>
+    <ClInclude Include="src\Server.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

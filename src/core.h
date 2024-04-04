@@ -18,8 +18,6 @@
 #include <thread>
 #include <chrono>
 
-using namespace std::chrono;
-
 #include "raylib.h"
 #include "raymath.h"
 #include "rlgl.h"
@@ -27,3 +25,5 @@ using namespace std::chrono;
 #include "vec2.h"
 #include "vec3.h"
 #include "Sphere.h"
+
+using namespace std::chrono;

@@ -1,4 +1,4 @@
-#include "pch.h"
+#include "core.h"
 #include "CppUnitTest.h"
 #include "Terrain.h"
 #include "Helpers.h"

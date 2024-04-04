@@ -1,12 +1,15 @@
 #pragma once
 
-template <typename T, int N>
-class SemiVector
+namespace game
 {
+
+  template <typename T, int N>
+  class SemiVector
+  {
   public:
     int add(T value)
     {
-      if(count < N)
+      if (count < N)
         arr[count] = value;
       else
         vec.push_back(value);
@@ -53,9 +56,10 @@ class SemiVector
       return count;
     }
 
-private:
-  int count = 0;
-  std::array<T, N> arr;
-  std::vector<T> vec;
-};
+  private:
+    int count = 0;
+    std::array<T, N> arr;
+    std::vector<T> vec;
+  };
 
+}

@@ -1,13 +1,15 @@
 #include "core.h"
 #include "ServerApp.h"
 #include "Helpers.h"
+#include "PlayerJoin.h"
+#include "PlayerLeave.h"
 
 namespace game
 {
-  volatile bool ServerApp::exit = false;
-
   ServerApp::ServerApp() :
+    exit(false),
     config(Config::DEFAULT),
+    network(config, *this),
     scene(config)
   {
   }
@@ -16,13 +18,13 @@ namespace game
   {
     printf("Server started:\n");
     scene.init();
+    network.start();
   }
 
   void ServerApp::run()
   {
-    signal(SIGINT, [](int) { exit = true; });
-    nanoseconds dt = milliseconds(int(1000 * config.physics.fixedDt));
-    nanoseconds maxSleep = milliseconds(0);
+    nanoseconds fixedDt(uint64_t(nanoseconds::period::den * config.physics.fixedDt));
+    nanoseconds maxSleep(0);
 
     for (int i = 0; i < 100; i++)
     {
@@ -34,36 +36,115 @@ namespace game
     maxSleep *= 2;
 
     time_point tp0 = clock.now();
-    PlayerState playerState;
 
     while (!exit)
     {
       time_point tp1 = clock.now();
       nanoseconds elapsed = tp1 - tp0;
 
-      if (elapsed < dt - maxSleep)
+      if (elapsed < fixedDt - maxSleep)
         std::this_thread::sleep_for(milliseconds(1));
-      else if(elapsed >= dt)
+      else if (elapsed >= fixedDt)
       {
-        tp0 += dt;
-
-        while(connection.readPlayerState(&playerState))
-          scene.syncPlayerState(playerState);
+        tp0 += fixedDt;
 
         scene.update(config.physics.fixedDt);
-
-        for(int i=0; i< scene.cars.capacity(); i++)
-          if(scene.cars.isAlive(i))
-          {
-            scene.getPlayerState(i, &playerState);
-            connection.writePlayerState(playerState);
-          }
+        sendPlayerStates();
+        network.update();
       }
     }
   }
 
   void ServerApp::shutdown()
   {
+    network.stop();
+  }
+
+  void ServerApp::sendPlayerStates()
+  {
+    PlayerState playerState;
+
+    for (int i = 0; i < scene.cars.capacity(); i++)
+      if (scene.cars.isAlive(i))
+      {
+        scene.getPlayerState(i, &playerState);
+        BitStream stream;
+        playerState.writeTo(stream);
+        network.broadcastExcept(stream, playerState.guid, false);
+      }
+  }
+
+  void ServerApp::onClientConnected(uint64_t guid)
+  {
+    if (scene.cars.count() >= config.multiplayer.maxPlayers)
+    {
+      printf("SERVER_APP: OnClientConnected: %" PRIu64 ". Disconnecting! Players limit reached.\n", guid);
+      network.disconnectClient(guid, true);
+
+      return;
+    }
+
+    int playerIndex = scene.cars.tryAdd(guid, config, scene.terrain);
+
+    if (playerIndex < 0)
+    {
+      printf("SERVER_APP: OnClientConnected: %" PRIu64 ". Disconnecting! Players pool overflow.\n", guid);
+      network.disconnectClient(guid, true);
+
+      return;
+    }
+
+    printf("SERVER_APP: OnClientConnected: %" PRIu64 ". Players: %i\n", guid, scene.cars.count());
+    scene.playerIndex = playerIndex;
+    Car& player = scene.getPlayer();
+    float x = randf(-10, 10);
+    float z = randf(-10, 10);
+    vec3 normal;
+    float y = scene.terrain.getHeight(x, z, &normal);
+    player.position = { x, y + 3, z };
+    player.rotation = quat::fromAxisAngle(normal, randf(2.0f * PI));
+
+    PlayerJoin playerJoin = {
+      .guid = guid,
+      .position = player.position,
+      .rotation = player.rotation,
+    };
+
+    BitStream stream;
+    playerJoin.writeTo(stream);
+    network.broadcast(stream, true);
+  }
+
+  void ServerApp::onClientDisconnected(uint64_t guid)
+  {
+    printf("SERVER_APP: OnClientDisconnected: %" PRIu64 "\n", guid);
+
+    for (int i = 0; i < scene.cars.capacity(); i++)
+      if (scene.cars.isAlive(i) && scene.cars[i].guid == guid)
+      {
+        scene.cars.remove(i);
+        break;
+      }
+
+    printf("SERVER_APP: Players left: %i\n", scene.cars.count());
+
+    PlayerLeave playerLeave = {
+      .guid = guid,
+    };
+
+    BitStream stream;
+    playerLeave.writeTo(stream);
+    network.broadcast(stream, true);
+  }
+
+  void ServerApp::onPlayerControl(const PlayerControl& playerControl)
+  {
+    scene.updatePlayerControl(playerControl);
+  }
+
+  void ServerApp::onPlayerState(const PlayerState& playerState)
+  {
+    scene.syncPlayerState(playerState, SYNC_FACTOR);
   }
 
 }

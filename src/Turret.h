@@ -27,7 +27,7 @@ namespace game
     void reset();
     vec3 barrelPosition() const;
     void update(float dt, const Object& parent);
-    void syncState(float yaw, float pitch);
+    void syncState(float yaw, float pitch, float syncFactor);
   };
 
 }

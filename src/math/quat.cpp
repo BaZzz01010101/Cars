@@ -70,6 +70,16 @@ namespace game
     return QuaternionMultiply(*this, q);
   }
 
+  bool quat::operator==(quat q) const
+  {
+    return x == q.x && y == q.y && z == q.z && w == q.w;
+  }
+
+  bool quat::operator!=(quat q) const
+  {
+      return !(*this == q);
+  }
+
   quat quat::inverted() const
   {
     return QuaternionInvert(*this);

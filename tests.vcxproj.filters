@@ -21,6 +21,18 @@
     <ClCompile Include="src\math\vec3.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="src\dto\PlayerControl.cpp">
+      <Filter>dto</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dto\PlayerJoin.cpp">
+      <Filter>dto</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dto\PlayerLeave.cpp">
+      <Filter>dto</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dto\PlayerState.cpp">
+      <Filter>dto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Helpers.h" />
@@ -43,10 +55,25 @@
     <ClInclude Include="src\math\vec3.h">
       <Filter>math</Filter>
     </ClInclude>
+    <ClInclude Include="src\dto\PlayerControl.h">
+      <Filter>dto</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dto\PlayerJoin.h">
+      <Filter>dto</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dto\PlayerLeave.h">
+      <Filter>dto</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dto\PlayerState.h">
+      <Filter>dto</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
       <UniqueIdentifier>{8bcf724a-9b17-43ca-930c-e6f491d38283}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dto">
+      <UniqueIdentifier>{4372f9e7-325b-43f0-87cb-5122fbacd905}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

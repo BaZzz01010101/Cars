@@ -144,6 +144,14 @@ namespace game
       Sphere rockSpheres[10];
     } collisionGeometries;
 
-    static Config DEFAULT;
+    struct Multiplayer
+    {
+      const char* serverAddress;
+      int serverPort;
+      const char* serverPassword;
+      int maxPlayers;
+    } multiplayer;
+
+    static const Config DEFAULT;
   };
 }

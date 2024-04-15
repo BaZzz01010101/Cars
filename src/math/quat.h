@@ -22,6 +22,8 @@ namespace game
     operator Quaternion() const;
 
     quat operator*(quat q) const;
+    bool operator==(quat q) const;
+    bool operator!=(quat q) const;
 
     quat inverted() const;
     void invert();

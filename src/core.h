@@ -17,6 +17,7 @@
 #include <csignal>
 #include <thread>
 #include <chrono>
+#include <cinttypes>
 
 #include "raylib.h"
 #include "raymath.h"
@@ -34,6 +35,9 @@
 
 #include "RakPeerInterface.h"
 #include "MessageIdentifiers.h"
+#include "RakNetTypes.h"
+#include "BitStream.h"
+#include "MessageType.hpp"
 
 #if defined(_WIN32)           // raylib uses these names as function parameters
 #undef near
@@ -41,3 +45,4 @@
 #endif
 
 using namespace std::chrono;
+using namespace RakNet;

@@ -5,7 +5,8 @@
 
 namespace game
 {
-  Car::Car(const Config& config, const Terrain& terrain) :
+  Car::Car(uint64_t guid, const Config& config, const Terrain& terrain) :
+    guid(guid),
     config(config),
     carConfig(config.physics.car),
     gravity(config.physics.gravity),
@@ -198,14 +199,14 @@ namespace game
     cannon.expectedTarget = playerControl.target;
   }
 
-  void Car::syncState(const PlayerState& playerState)
+  void Car::syncState(const PlayerState& playerState, float syncFactor)
   {
-    position = playerState.position;
-    velocity = playerState.velocity;
-    rotation = playerState.rotation;
-    angularVelocity = playerState.angularVelocity;
-    gun.syncState(playerState.gunYaw, playerState.gunPitch);
-    cannon.syncState(playerState.cannonYaw, playerState.cannonPitch);
+    position = vec3::lerp(position, playerState.position, syncFactor);
+    velocity = vec3::lerp(velocity, playerState.velocity, syncFactor);
+    rotation = quat::slerp(rotation, playerState.rotation, syncFactor);
+    angularVelocity = vec3::lerp(angularVelocity, playerState.angularVelocity, syncFactor);
+    gun.syncState(playerState.gunYaw, playerState.gunPitch, syncFactor);
+    cannon.syncState(playerState.cannonYaw, playerState.cannonPitch, syncFactor);
   }
 
   void Car::updateEngine(float dt)

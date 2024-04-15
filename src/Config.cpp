@@ -4,7 +4,7 @@
 namespace game
 {
 
-  Config Config::DEFAULT =
+  const Config Config::DEFAULT =
   {
     .physics = {
       .fixedDt = 0.02f,
@@ -196,6 +196,12 @@ namespace game
         {{  0.424f,  1.715f, -1.137f }, 1.764f },
         {{  0.479f,  2.540f,  0.769f }, 1.567f },
       },
+    },
+    .multiplayer = {
+      .serverAddress = "127.0.0.1",
+      .serverPort = 60000,
+      .serverPassword = "^p3pSHwaj&uy59EU9T&H",
+      .maxPlayers = 4,
     }
   };
 

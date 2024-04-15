@@ -229,5 +229,6 @@ namespace game
     print("Explosion particles: ", (float)scene.explosionParticles.count(), GREEN);
 
     print("Trace count:", (float)scene.terrain.traceCount, WHITE);
+    print("Players", (float)scene.cars.count(), LIGHTGRAY);
   }
 }

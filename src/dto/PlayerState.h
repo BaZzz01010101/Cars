@@ -1,12 +1,12 @@
 #pragma once
 
-namespace game
+namespace dto
 {
+  using namespace game;
 
   struct PlayerState
   {
-    int index {};
-    int uid {};
+    uint64_t guid {};
     vec3 position {};
     quat rotation {};
     vec3 velocity {};
@@ -15,6 +15,10 @@ namespace game
     float gunPitch {};
     float cannonYaw {};
     float cannonPitch {};
+
+    void readFrom(BitStream& stream);
+    void writeTo(BitStream& stream) const;
+    bool operator==(const PlayerState&) const = default;
   };
 
 }

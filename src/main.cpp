@@ -18,8 +18,11 @@ int main(int argc, char* argv[])
       delete app;
     });
 
-    std::thread server([]() {
+    volatile bool* serverExit = nullptr;
+
+    std::thread server([&]() {
       ServerApp* app = new ServerApp();
+      serverExit = &app->exit;
 
       app->initialize();
       app->run();
@@ -29,9 +32,16 @@ int main(int argc, char* argv[])
     });
 
     app.join();
-    server.join();
+
+    if (!serverExit)
+      server.detach();
+    else
+    {
+      *serverExit = true;
+      server.join();
+    }
   }
-  else if(argc > 1 && !strcmp(argv[1], "-server"))
+  else if (argc > 1 && !strcmp(argv[1], "-server"))
   {
     ServerApp* app = new ServerApp();
 

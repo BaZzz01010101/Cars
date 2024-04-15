@@ -10,6 +10,8 @@
 
 namespace game
 {
+  using namespace dto;
+
   struct Car : public PhysicalObject
   {
     friend struct Hud;
@@ -27,7 +29,7 @@ namespace game
     Wheel rearLeftWheel;
     Wheel rearRightWheel;
 
-    int uid {};
+    uint64_t guid {};
     float enginePower {};
     bool handBreaked {};
     bool gunFiring = false;
@@ -40,7 +42,7 @@ namespace game
     float steeringSpeed = 0;
     float steeringAngle = 0;
 
-    Car(const Config& config, const Terrain& terrain);
+    Car(uint64_t guid, const Config& config, const Terrain& terrain);
     Car(Car&) = delete;
     Car(Car&&) = delete;
     Car& operator=(Car&) = delete;
@@ -48,7 +50,7 @@ namespace game
 
     void update(float dt);
     void updateControl(const PlayerControl& playerControl);
-    void syncState(const PlayerState& playerState);
+    void syncState(const PlayerState& playerState, float syncFactor);
     void resetToPosition(vec3 position, quat rotation);
     bool traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const;
     void updateSteering(float dt);

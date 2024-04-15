@@ -1,11 +1,12 @@
 #pragma once
 
-namespace game
+namespace dto
 {
+  using namespace game;
 
   struct PlayerControl
   {
-    int uid {};
+    uint64_t guid {};
     float steeringAxis {};
     float accelerationAxis {};
     float thrustAxis {};
@@ -13,6 +14,10 @@ namespace game
     bool primaryFire {};
     bool secondaryFire {};
     bool handBrake {};
+
+    void readFrom(BitStream& stream);
+    void writeTo(BitStream& stream) const;
+    bool operator==(const PlayerControl&) const = default;
   };
 
 }

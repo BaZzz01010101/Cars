@@ -49,14 +49,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);3rd_party\raylib\include;3rd_party/raknet/include;src;src/math;src/containers</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);3rd_party\raylib\include;3rd_party/raknet/include;src;src/math;src/containers;src/dto;</IncludePath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\test\</IntDir>
     <LibraryPath>3rd_party\raylib\lib\;3rd_party\glfw\lib\;3rd_party\raknet\lib\;$(Platform)\$(Configuration)\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);3rd_party\raylib\include;3rd_party/raknet/include;src;src/math;src/containers</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);3rd_party\raylib\include;3rd_party/raknet/include;src;src/math;src/containers;src/dto;</IncludePath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\test\</IntDir>
     <LibraryPath>3rd_party\raylib\lib\;3rd_party\glfw\lib\;3rd_party\raknet\lib\;$(Platform)\$(Configuration)\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
@@ -69,6 +69,7 @@
       <PreprocessorDefinitions>UNIT_TEST;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -87,6 +88,7 @@
       <PreprocessorDefinitions>UNIT_TEST;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -99,6 +101,10 @@
   <ItemGroup>
     <ClCompile Include="src\CollisionGeometry.cpp" />
     <ClCompile Include="src\Config.cpp" />
+    <ClCompile Include="src\dto\PlayerControl.cpp" />
+    <ClCompile Include="src\dto\PlayerJoin.cpp" />
+    <ClCompile Include="src\dto\PlayerLeave.cpp" />
+    <ClCompile Include="src\dto\PlayerState.cpp" />
     <ClCompile Include="src\GridWalker.cpp" />
     <ClCompile Include="src\Helpers.cpp" />
     <ClCompile Include="src\math\box2.cpp" />
@@ -113,6 +119,10 @@
   <ItemGroup>
     <ClInclude Include="src\CollisionGeometry.h" />
     <ClInclude Include="src\Config.h" />
+    <ClInclude Include="src\dto\PlayerControl.h" />
+    <ClInclude Include="src\dto\PlayerJoin.h" />
+    <ClInclude Include="src\dto\PlayerLeave.h" />
+    <ClInclude Include="src\dto\PlayerState.h" />
     <ClInclude Include="src\GridWalker.h" />
     <ClInclude Include="src\Helpers.h" />
     <ClInclude Include="src\core.h" />

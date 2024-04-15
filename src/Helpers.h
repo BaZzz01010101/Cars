@@ -18,6 +18,12 @@ namespace game
     return val * val;
   }
 
+  template<class T>
+  T lerp(T from, T to, float factor)
+  {
+    return static_cast<T>((1 - factor) * from + factor * to);
+  }
+
   template <typename T>
   constexpr T sqrt_helper(T x, T lo, T hi)
   {

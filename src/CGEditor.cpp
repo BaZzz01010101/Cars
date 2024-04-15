@@ -3,6 +3,7 @@
 
 namespace game
 {
+  // TODO: Move to helpers folder
   void CGEditor::update(float dt)
   {
     if (IsKeyDown(KEY_KP_0))

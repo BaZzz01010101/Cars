@@ -18,7 +18,7 @@ namespace game
     const Config& config {};
 
     Terrain terrain;
-    Pool<Car, 1> cars {};
+    Pool<Car, 4> cars {};
     Pool<Projectile, 1000> projectiles {};
     Pool<ExplosionParticle, 10000> explosionParticles {};
 
@@ -41,7 +41,7 @@ namespace game
     inline const Car& getPlayer() const { return cars[playerIndex]; }
     inline Car& getPlayer() { return cars[playerIndex]; }
     void updatePlayerControl(const PlayerControl& playerControl);
-    void syncPlayerState(const PlayerState& playerState);
+    void syncPlayerState(const PlayerState& playerState, float syncFactor);
     void getPlayerState(int index, PlayerState* playerState) const;
     void updateGameObjects(float dt);
     void updateFiring(Car& car, float dt);

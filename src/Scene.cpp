@@ -13,11 +13,6 @@ namespace game
   void Scene::init()
   {
     terrain.init();
-
-    playerIndex = cars.tryAdd(config, terrain);
-    Car& player = cars[playerIndex];
-    float h = terrain.getHeight(0, 0);
-    player.position = { 0, h + 2, 0 };
   }
 
   void Scene::update(float dt)
@@ -35,11 +30,12 @@ namespace game
   void Scene::updateGameObjects(float dt)
   {
     for (int i = 0; i < cars.capacity(); i++)
-    {
-      Car& car = cars[i];
-      car.update(dt);
-      updateFiring(car, dt);
-    }
+      if (cars.isAlive(i))
+      {
+        Car& car = cars[i];
+        car.update(dt);
+        updateFiring(car, dt);
+      }
 
     for (int i = 0; i < projectiles.capacity(); i++)
       if (projectiles.isAlive(i))
@@ -83,15 +79,14 @@ namespace game
       if (car.timeToNextGunFire <= 0)
       {
         const Config::Physics::Turret& gunConfig = config.physics.gun;
-        const Car& player = cars[playerIndex];
-        const Turret& gun = player.gun;
+        const Turret& gun = car.gun;
 
         float bulletOffsetfix = gunConfig.projectileSpeed * -car.timeToNextGunFire;
         vec3 bulletPosition = gun.barrelPosition() + gun.forward() * bulletOffsetfix;
         vec3 barrelOffset = 0.2f * gun.left();
         vec3 position1 = bulletPosition + barrelOffset;
         vec3 position2 = bulletPosition - barrelOffset;
-        vec3 velocity = player.velocity + gun.forward() * gunConfig.projectileSpeed;
+        vec3 velocity = car.velocity + gun.forward() * gunConfig.projectileSpeed;
 
         projectiles.tryAdd(Projectile {
           .lastPosition = position1,
@@ -130,10 +125,9 @@ namespace game
       if (car.timeToNextCannonFire <= 0)
       {
         const Config::Physics::Turret& cannonConfig = config.physics.cannon;
-        const Car& player = cars[playerIndex];
-        const Turret& cannon = player.cannon;
+        const Turret& cannon = car.cannon;
         vec3 position = cannon.barrelPosition();
-        vec3 velocity = player.velocity + cannon.forward() * cannonConfig.projectileSpeed;
+        vec3 velocity = car.velocity + cannon.forward() * cannonConfig.projectileSpeed;
 
         projectiles.tryAdd(Projectile {
           .lastPosition = position,
@@ -190,16 +184,38 @@ namespace game
 
   void Scene::updatePlayerControl(const PlayerControl& playerControl)
   {
-    Car& player = cars[playerIndex];
-    player.updateControl(playerControl);
+    for (int i = 0; i < cars.capacity(); i++)
+      if (cars.isAlive(i) && cars[i].guid == playerControl.guid)
+      {
+        cars[i].updateControl(playerControl);
+        return;
+      }
+
+    int index = cars.tryAdd(playerControl.guid, config, terrain);
+
+    if (index >= 0)
+    {
+      Car& car = cars[index];
+      car.updateControl(playerControl);
+    }
   }
 
-  void Scene::syncPlayerState(const PlayerState& playerState)
+  void Scene::syncPlayerState(const PlayerState& playerState, float syncFactor)
   {
-    Car& player = cars[playerState.index];
-  
-    if(player.uid == playerState.uid)
-      player.syncState(playerState);
+    for (int i = 0; i < cars.capacity(); i++)
+      if (cars.isAlive(i) && cars[i].guid == playerState.guid)
+      {
+        cars[i].syncState(playerState, syncFactor);
+        return;
+      }
+
+    int index = cars.tryAdd(playerState.guid, config, terrain);
+
+    if (index >= 0)
+    {
+      Car& car = cars[index];
+      car.syncState(playerState, syncFactor);
+    }
   }
 
   void Scene::getPlayerState(int index, PlayerState* playerState) const
@@ -210,8 +226,7 @@ namespace game
     const Car& player = cars[index];
 
     *playerState = {
-      .index = index,
-      .uid = player.uid,
+      .guid = player.guid,
       .position = player.position,
       .rotation = player.rotation,
       .velocity = player.velocity,

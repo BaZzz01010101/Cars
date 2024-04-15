@@ -3,10 +3,15 @@
 #include "Terrain.h"
 #include "Helpers.h"
 #include "SemiVector.hpp"
+#include "PlayerControl.h"
+#include "PlayerState.h"
+#include "PlayerJoin.h"
+#include "PlayerLeave.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace game;
 using namespace std;
+using namespace dto;
 
 namespace game_tests
 {
@@ -690,5 +695,81 @@ namespace game_tests
   };
 
   Terrain TerrainTest::terrain(Config::DEFAULT);
+
+  TEST_CLASS(MessagesTest)
+  {
+  private:
+    template <typename Msg>
+    void testMessage(Msg msg, MessageID expectedType)
+    {
+      BitStream stream;
+      msg.writeTo(stream);
+
+      MessageID type;
+      stream.Read(type);
+
+      Assert::IsTrue(type == expectedType);
+
+      Msg actual;
+      actual.readFrom(stream);
+
+      Assert::IsTrue(msg == actual);
+    }
+
+
+  public:
+    TEST_METHOD(PlayerControlMessage)
+    {
+      PlayerControl msg {
+        .guid = 1234567890,
+        .steeringAxis = 0.123f,
+        .accelerationAxis = 0.456f,
+        .thrustAxis = 0.789f,
+        .target = { 0.11f, 0.22f, 0.33f },
+        .primaryFire = true,
+        .secondaryFire = false,
+        .handBrake = true
+      };
+
+      testMessage(msg, ID_PLAYER_CONTROL);
+    }
+
+    TEST_METHOD(PlayerStateMessage)
+    {
+      PlayerState msg {
+        .guid = 1234567890,
+        .position = {0.1f, 0.2f, 0.3f},
+        .rotation = { 0.11f, 0.22f, 0.33f, 0.44f },
+        .velocity = { 0.111f, 0.222f, 0.333f },
+        .angularVelocity = { 0.1111f, 0.2222f, 0.3333f },
+        .gunYaw = 0.12f,
+        .gunPitch = 0.34f,
+        .cannonYaw = 0.56f,
+        .cannonPitch = 0.78f,
+      };
+
+      testMessage(msg, ID_PLAYER_STATE);
+    }
+
+    TEST_METHOD(PlayerJoinMessage)
+    {
+      PlayerJoin msg {
+        .guid = 1234567890,
+        .position = {0.1f, 0.2f, 0.3f},
+        .rotation = { 0.11f, 0.22f, 0.33f, 0.44f },
+      };
+
+      testMessage(msg, ID_PLAYER_JOIN);
+    }
+
+    TEST_METHOD(PlayerLeaveMessage)
+    {
+      PlayerLeave msg {
+        .guid = 1234567890,
+      };
+
+      testMessage(msg, ID_PLAYER_LEAVE);
+    }
+  };
 
 }

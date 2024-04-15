@@ -4,11 +4,8 @@
     <ClCompile Include="src\App.cpp" />
     <ClCompile Include="src\CGEditor.cpp" />
     <ClCompile Include="src\CollisionGeometry.cpp" />
-    <ClCompile Include="src\Connection.cpp" />
     <ClCompile Include="src\ExplosionParticle.cpp" />
     <ClCompile Include="src\GridWalker.cpp" />
-    <ClCompile Include="src\PlayerControl.cpp" />
-    <ClCompile Include="src\PlayerState.cpp" />
     <ClCompile Include="src\Projectile.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\CustomCamera.cpp" />
@@ -40,18 +37,32 @@
     <ClCompile Include="src\math\vec3.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="src\Server.cpp" />
+    <ClCompile Include="src\network\RakNetClient.cpp">
+      <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="src\network\RakNetServer.cpp">
+      <Filter>network</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dto\PlayerControl.cpp">
+      <Filter>dto</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dto\PlayerJoin.cpp">
+      <Filter>dto</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dto\PlayerLeave.cpp">
+      <Filter>dto</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dto\PlayerState.cpp">
+      <Filter>dto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.h" />
     <ClInclude Include="src\BoolArray.hpp" />
     <ClInclude Include="src\CGEditor.h" />
     <ClInclude Include="src\CollisionGeometry.h" />
-    <ClInclude Include="src\Connection.h" />
     <ClInclude Include="src\ExplosionParticle.h" />
     <ClInclude Include="src\GridWalker.h" />
-    <ClInclude Include="src\PlayerControl.h" />
-    <ClInclude Include="src\PlayerState.h" />
     <ClInclude Include="src\Projectile.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\CustomCamera.h" />
@@ -92,7 +103,31 @@
     <ClInclude Include="src\containers\SemiVector.hpp">
       <Filter>containers</Filter>
     </ClInclude>
-    <ClInclude Include="src\Server.h" />
+    <ClInclude Include="src\MessageType.hpp" />
+    <ClInclude Include="src\network\RakNetClient.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="src\network\RakNetServer.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="src\network\IServerMessageHandler.h">
+      <Filter>network</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dto\PlayerControl.h">
+      <Filter>dto</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dto\PlayerJoin.h">
+      <Filter>dto</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dto\PlayerLeave.h">
+      <Filter>dto</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dto\PlayerState.h">
+      <Filter>dto</Filter>
+    </ClInclude>
+    <ClInclude Include="src\network\IClientMessageHandler.h">
+      <Filter>network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -100,6 +135,12 @@
     </Filter>
     <Filter Include="containers">
       <UniqueIdentifier>{d62e93ce-ed83-45eb-b170-90739d0d12d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="network">
+      <UniqueIdentifier>{e281a92a-6b9c-4fb1-a652-9c18510f5881}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dto">
+      <UniqueIdentifier>{c1cfaba5-69d4-4ceb-bd68-36da9a5059c6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

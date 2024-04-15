@@ -4,6 +4,7 @@
 
 namespace game
 {
+  // TODO: Move to helpers folder
   GridWalker::GridWalker(const box2&& spaceBounds, float cellSize) :
     spaceBounds(spaceBounds),
     spaceOrigin(-spaceBounds.min),

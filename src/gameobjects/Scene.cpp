@@ -34,7 +34,7 @@ namespace game
       {
         Car& car = cars[i];
         car.update(dt);
-        updateFiring(car, dt);
+        updateFiring(i, dt);
       }
 
     for (int i = 0; i < projectiles.capacity(); i++)
@@ -46,11 +46,11 @@ namespace game
         float distance = direction.length();
         direction /= distance;
         vec3 hitPosition, normal;
-        const Car* hitCar = nullptr;
+        int hitCarIndex = -1;
 
         if (projectile.lifeTime < 0)
           projectiles.remove(i);
-        else if (traceRay(projectile.position, direction, distance, projectile.ownerIndex, &hitPosition, &normal, nullptr, &hitCar))
+        else if (traceRay(projectile.position, direction, distance, projectile.ownerIndex, &hitPosition, &normal, nullptr, &hitCarIndex))
         {
           projectiles.remove(i);
 
@@ -59,6 +59,19 @@ namespace game
             config.graphics.shellExplosionParticles;
 
           createExplosion(explosionConfig, hitPosition);
+
+          if (hitCarIndex >= 0)
+          {
+            Car& hitCar = cars[hitCarIndex];
+            hitCar.velocity += (hitCar.position - hitPosition).normalized() * projectile.baseDamage * 0.01f;
+
+            int newHealth = std::max(hitCar.health - projectile.baseDamage, 0);
+
+            if (hitCar.health > 0 && newHealth == 0)
+              createExplosion(config.graphics.carExplosionParticles, hitCar.position);
+
+            hitCar.health = newHealth;
+          }
         }
       }
 
@@ -73,8 +86,10 @@ namespace game
       }
   }
 
-  void Scene::updateFiring(Car& car, float dt)
+  void Scene::updateFiring(int carIndex, float dt)
   {
+    Car& car = cars[carIndex];
+
     if (car.gunFiring)
     {
       if (car.timeToNextGunFire <= 0)
@@ -97,8 +112,8 @@ namespace game
           .gravity = config.physics.gravity,
           .lifeTime = gunConfig.projectileLifeTime,
           .size = 0.05f,
-          .ownerIndex = playerIndex,
-          .damage = gunConfig.baseDamage,
+          .ownerIndex = carIndex,
+          .baseDamage = gunConfig.baseDamage,
           .type = Projectile::Type::Bullet,
           });
 
@@ -110,8 +125,8 @@ namespace game
           .gravity = config.physics.gravity,
           .lifeTime = gunConfig.projectileLifeTime,
           .size = 0.05f,
-          .ownerIndex = playerIndex,
-          .damage = gunConfig.baseDamage,
+          .ownerIndex = carIndex,
+          .baseDamage = gunConfig.baseDamage,
           .type = Projectile::Type::Bullet,
           });
 
@@ -138,8 +153,8 @@ namespace game
           .gravity = config.physics.gravity,
           .lifeTime = cannonConfig.projectileLifeTime,
           .size = 0.2f,
-          .ownerIndex = playerIndex,
-          .damage = cannonConfig.baseDamage,
+          .ownerIndex = carIndex,
+          .baseDamage = cannonConfig.baseDamage,
           .type = Projectile::Type::Shell,
           });
 
@@ -168,7 +183,7 @@ namespace game
       ));
   }
 
-  bool Scene::traceRay(vec3 origin, vec3 directionNormalized, float distance, int excludePlayerIndex, vec3* hitPosition, vec3* hitNormal, float* hitDistance, const Car** hitCar) const
+  bool Scene::traceRay(vec3 origin, vec3 directionNormalized, float distance, int excludePlayerIndex, vec3* hitPosition, vec3* hitNormal, float* hitDistance, int* hitCarIndex) const
   {
     vec3 closestsHitPosition = vec3::zero;
     vec3 closestsHitNormal = vec3::zero;
@@ -196,8 +211,8 @@ namespace game
           closestsHitNormal = currentHitNormal;
           closestsHitDistance = currentHitDistance;
 
-          if (hitCar)
-            *hitCar = &car;
+          if (hitCarIndex)
+            *hitCarIndex = i;
         }
       }
 

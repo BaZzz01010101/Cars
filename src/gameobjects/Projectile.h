@@ -22,7 +22,7 @@ namespace game
     float lifeTime = 0;
     float size = 0;
     int ownerIndex = 0;
-    float damage = 0;
+    int baseDamage = 0;
     Type type = Type::UNKNOWN;
 
     void update(float dt);

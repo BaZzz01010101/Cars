@@ -99,8 +99,22 @@ namespace game
 
   PlayerControl App::getLocalPlayerControl()
   {
+    const Car& player = scene.getPlayer();
+
+    if (player.health == 0)
+      return PlayerControl {
+        .guid = player.guid,
+        .steeringAxis = 0.0f,
+        .accelerationAxis = 0.0f,
+        .thrustAxis = 0.0f,
+        .target = camera.getTarget(),
+        .primaryFire = false,
+        .secondaryFire = false,
+        .handBrake = true,
+    };
+
     return PlayerControl {
-      .guid = scene.getPlayer().guid,
+      .guid = player.guid,
       .steeringAxis = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D)),
       .accelerationAxis = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S)),
       .thrustAxis = float(IsKeyDown(KEY_LEFT_SHIFT)),

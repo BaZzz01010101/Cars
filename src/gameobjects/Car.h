@@ -42,6 +42,7 @@ namespace game
     float verticalTrust {};
     float steeringSpeed = 0;
     float steeringAngle = 0;
+    int health = 0;
 
     Car(uint64_t guid, const Config& config, const Scene& scene);
     Car(Car&) = delete;

@@ -11,6 +11,7 @@ namespace game
     config(config),
     carConfig(config.physics.car),
     gravity(config.physics.gravity),
+    health(config.physics.car.maxHealth),
     gun(config.physics.gun, scene.terrain, config.physics.car.connectionPoints.weapon.gun, 1),
     cannon(config.physics.cannon, scene.terrain, config.physics.car.connectionPoints.weapon.cannon, 2),
     frontLeftWheel(config, true, scene.terrain, config.physics.car.connectionPoints.wheels.frontLeft, "FrontLeftWheel"),

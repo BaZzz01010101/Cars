@@ -48,9 +48,9 @@ namespace game
     void syncPlayerState(const PlayerState& playerState, float syncFactor);
     void getPlayerState(int index, PlayerState* playerState) const;
     void updateGameObjects(float dt);
-    void updateFiring(Car& car, float dt);
+    void updateFiring(int carIndex, float dt);
     void createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position);
-    bool traceRay(vec3 origin, vec3 directionNormalized, float distance, int excludePlayerIndex, vec3* hitPosition, vec3* hitNormal, float* hitDistance, const Car** hitCar) const;
+    bool traceRay(vec3 origin, vec3 directionNormalized, float distance, int excludePlayerIndex, vec3* hitPosition, vec3* hitNormal, float* hitDistance, int* hitCarIndex) const;
   };
 
 }

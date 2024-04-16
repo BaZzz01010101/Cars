@@ -21,6 +21,7 @@ namespace game
         .carAligningForce = 15,
         .bodyFriction = 0.5f,
         .aerodynamicKoef = 5.7f,
+        .maxHealth = 1000,
         .connectionPoints = {
           .wheels = {
             .frontLeft = { 0.97f, -0.36f, 1.34f },
@@ -115,7 +116,7 @@ namespace game
         .maxLifeTime = 1.0f,
       },
       .shellExplosionParticles = {
-        .count = 100,
+        .count = 50,
         .minSize = 0.3f,
         .maxSize = 0.5f,
         .minSpeed = 10,
@@ -124,6 +125,17 @@ namespace game
         .maxAngularSpeed = 8 * PI,
         .minLifeTime = 1.0f,
         .maxLifeTime = 2.0f,
+      },
+      .carExplosionParticles = {
+        .count = 200,
+        .minSize = 0.5f,
+        .maxSize = 1.0f,
+        .minSpeed = 10,
+        .maxSpeed = 50,
+        .minAngularSpeed = PI,
+        .maxAngularSpeed = 8 * PI,
+        .minLifeTime = 2.0f,
+        .maxLifeTime = 5.0f,
       },
       .resources = {
         .fontPath = "resources/fonts/JetBrainsMono-Bold.ttf",

@@ -24,6 +24,7 @@ namespace game
         float bodyFriction;
         float aerodynamicKoef;
         float speedSteeringDrop;
+        int maxHealth;
 
         struct
         {
@@ -65,7 +66,7 @@ namespace game
         float bodyFriction;
         float fireInterval;
         float projectileSpeed;
-        float baseDamage;
+        int baseDamage;
         float projectileLifeTime;
         vec3 barrelPosition;
       } gun, cannon;
@@ -115,7 +116,7 @@ namespace game
         float maxAngularSpeed;
         float minLifeTime;
         float maxLifeTime;
-      } bulletExplosionParticles, shellExplosionParticles;
+      } bulletExplosionParticles, shellExplosionParticles, carExplosionParticles;
 
       struct Resources
       {

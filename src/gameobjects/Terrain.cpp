@@ -489,7 +489,7 @@ namespace game
     }
   }
 
-  CollisionGeometry Terrain::createCollisionGeometry(const Sphere(*spheres)[10], vec3 position, float angle, float scale)
+  Terrain::CollisionGeometry Terrain::createCollisionGeometry(const Sphere(*spheres)[10], vec3 position, float angle, float scale)
   {
     quat rotation = quat::fromYAngle(angle);
     CollisionGeometry cg;

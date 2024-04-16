@@ -99,7 +99,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\collisions\CollisionGeometry.cpp" />
     <ClCompile Include="src\collisions\Sphere.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\dto\PlayerControl.cpp" />
@@ -117,7 +116,7 @@
     <ClCompile Include="src\tests\tests.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\collisions\CollisionGeometry.h" />
+    <ClInclude Include="src\collisions\CollisionGeometry.hpp" />
     <ClInclude Include="src\collisions\Sphere.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\dto\PlayerControl.h" />

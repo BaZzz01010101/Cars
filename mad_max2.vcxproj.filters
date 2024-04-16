@@ -44,9 +44,6 @@
     <ClCompile Include="src\helpers\Helpers.cpp">
       <Filter>helpers</Filter>
     </ClCompile>
-    <ClCompile Include="src\collisions\CollisionGeometry.cpp">
-      <Filter>collisions</Filter>
-    </ClCompile>
     <ClCompile Include="src\collisions\Sphere.cpp">
       <Filter>collisions</Filter>
     </ClCompile>
@@ -158,7 +155,7 @@
     <ClInclude Include="src\collections\SemiVector.hpp">
       <Filter>collections</Filter>
     </ClInclude>
-    <ClInclude Include="src\collisions\CollisionGeometry.h">
+    <ClInclude Include="src\collisions\CollisionGeometry.hpp">
       <Filter>collisions</Filter>
     </ClInclude>
     <ClInclude Include="src\collisions\Sphere.h">

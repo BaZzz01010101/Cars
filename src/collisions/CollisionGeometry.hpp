@@ -1,15 +1,28 @@
-#include "core.h"
-#include "CollisionGeometry.h"
-#include "Helpers.h"
+#pragma once
+#include "SemiVector.hpp"
 
 namespace game
 {
-  void CollisionGeometry::add(vec3 position, float radius)
+
+  template <int StaticSize>
+  struct CollisionGeometry
+  {
+    SemiVector<Sphere, StaticSize> spheres;
+
+    void add(vec3 position, float radius);
+    bool traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const;
+    bool collideWith(Sphere sphere, vec3* collisionPoint, vec3* collisionNormal, float* penetration) const;
+    std::pair<vec3, vec3> getBounds() const;
+  };
+
+  template <int StaticSize>
+  void CollisionGeometry<StaticSize>::add(vec3 position, float radius)
   {
     spheres.add({ position, radius });
   }
 
-  bool CollisionGeometry::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
+  template <int StaticSize>
+  bool CollisionGeometry<StaticSize>::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
   {
     float closestDistance = FLT_MAX;
     vec3 closestHitPosition {};
@@ -42,7 +55,8 @@ namespace game
     return true;
   }
 
-  bool CollisionGeometry::collideWith(Sphere sphere, vec3* collisionPoint, vec3* collisionNormal, float* penetration) const
+  template <int StaticSize>
+  bool CollisionGeometry<StaticSize>::collideWith(Sphere sphere, vec3* collisionPoint, vec3* collisionNormal, float* penetration) const
   {
     float avgPenetration = 0;
     vec3 avgCollisionPosition {};
@@ -58,7 +72,7 @@ namespace game
         collisionCount++;
       }
 
-    if(collisionCount == 0)
+    if (collisionCount == 0)
       return false;
 
     if (collisionPoint)
@@ -73,7 +87,8 @@ namespace game
     return true;
   }
 
-  std::pair<vec3, vec3> CollisionGeometry::getBounds() const
+  template <int StaticSize>
+  std::pair<vec3, vec3> CollisionGeometry<StaticSize>::getBounds() const
   {
     vec3 min = vec3::max;
     vec3 max = vec3::min;

@@ -241,6 +241,11 @@ namespace game
     *this = normalized();
   }
 
+  bool vec3::isNormalized() const
+  {
+      return fabsf(sqLength() - 1) < EPSILON;
+  }
+
   bool vec3::isZero() const
   {
     return x == 0 && y == 0 && z == 0;

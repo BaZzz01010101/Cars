@@ -26,7 +26,7 @@ namespace network
     static constexpr int DISCONNECTION_TIMEOUT = 5;
     const Config& config;
     IServerMessageHandler& messageHandler;
-    RakNet::RakPeerInterface* peer = nullptr;
+    RakPeerInterface* peer = nullptr;
     Packet* packet = nullptr;
     std::unordered_map<uint64_t, time_point<steady_clock>> lastMessageTimes {};
     int maxConnections = 0;

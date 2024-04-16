@@ -50,6 +50,7 @@ namespace game
     float length() const;
     vec3 normalized() const;
     void normalize();
+    bool isNormalized() const;
     bool isZero() const;
     bool isAlmostZero(float delta) const;
     vec3 reflected(vec3 normal) const;

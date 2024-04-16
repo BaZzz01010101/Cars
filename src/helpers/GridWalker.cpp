@@ -20,6 +20,8 @@ namespace game
 
   bool GridWalker::walkByLine(vec3 origin, vec3 directionNormalized, float distance, Callback callback)
   {
+    assert(directionNormalized.isNormalized());
+
     distance = (distance < 0) ? FLT_MAX : distance;
 
     if (directionNormalized.isZero() || distance < EPSILON)

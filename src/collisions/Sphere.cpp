@@ -7,6 +7,8 @@ namespace game
 
   bool Sphere::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
   {
+    assert(directionNormalized.isNormalized());
+
     vec3 originToCenter = center - origin;
     float originToCenterSqLength = originToCenter.sqLength();
     float sqRadius = sqr(radius);

@@ -1,14 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\Helpers.cpp" />
     <ClCompile Include="src\tests\tests.cpp" />
-    <ClCompile Include="src\Terrain.cpp" />
-    <ClCompile Include="src\TerrainObject.cpp" />
-    <ClCompile Include="src\CollisionGeometry.cpp" />
-    <ClCompile Include="src\GridWalker.cpp" />
     <ClCompile Include="src\Config.cpp" />
-    <ClCompile Include="src\Sphere.cpp" />
     <ClCompile Include="src\math\box2.cpp">
       <Filter>math</Filter>
     </ClCompile>
@@ -33,15 +27,27 @@
     <ClCompile Include="src\dto\PlayerState.cpp">
       <Filter>dto</Filter>
     </ClCompile>
+    <ClCompile Include="src\helpers\GridWalker.cpp">
+      <Filter>helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\helpers\Helpers.cpp">
+      <Filter>helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gameobjects\TerrainObject.cpp">
+      <Filter>gameobjects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\collisions\CollisionGeometry.cpp">
+      <Filter>collisions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\collisions\Sphere.cpp">
+      <Filter>collisions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gameobjects\Terrain.cpp">
+      <Filter>gameobjects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Helpers.h" />
-    <ClInclude Include="src\Terrain.h" />
-    <ClInclude Include="src\TerrainObject.h" />
-    <ClInclude Include="src\CollisionGeometry.h" />
-    <ClInclude Include="src\GridWalker.h" />
     <ClInclude Include="src\Config.h" />
-    <ClInclude Include="src\Sphere.h" />
     <ClInclude Include="src\core.h" />
     <ClInclude Include="src\math\box2.h">
       <Filter>math</Filter>
@@ -67,6 +73,24 @@
     <ClInclude Include="src\dto\PlayerState.h">
       <Filter>dto</Filter>
     </ClInclude>
+    <ClInclude Include="src\helpers\GridWalker.h">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\helpers\Helpers.h">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameobjects\TerrainObject.h">
+      <Filter>gameobjects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collisions\CollisionGeometry.h">
+      <Filter>collisions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collisions\Sphere.h">
+      <Filter>collisions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gameobjects\Terrain.h">
+      <Filter>gameobjects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -74,6 +98,15 @@
     </Filter>
     <Filter Include="dto">
       <UniqueIdentifier>{4372f9e7-325b-43f0-87cb-5122fbacd905}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="helpers">
+      <UniqueIdentifier>{97aa626b-306a-4396-9be6-91d5679b5722}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gameobjects">
+      <UniqueIdentifier>{d7a91ad4-8a64-4854-b59a-e5b63d3d4e30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collisions">
+      <UniqueIdentifier>{bca8a621-7584-49c2-a668-12189b38c35b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

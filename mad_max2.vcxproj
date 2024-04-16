@@ -44,12 +44,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);3rd_party\raylib\include;3rd_party/raknet/include;src;src/math;src/containers;src/network;src/containers;src/dto;</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);3rd_party/raylib/include;3rd_party/raknet/include;src;src/collections;src/collisions;src/dto;src/gameobjects;src/graphics;src/helpers;src/math;src/network</IncludePath>
     <LibraryPath>3rd_party\raylib\lib\;3rd_party\glfw\lib\;3rd_party\raknet\lib\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);3rd_party\raylib\include;3rd_party/raknet/include;src;src/math;src/containers;src/network;src/containers;src/dto;</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);3rd_party/raylib/include;3rd_party/raknet/include;src;src/collections;src/collisions;src/dto;src/gameobjects;src/graphics;src/helpers;src/math;src/network</IncludePath>
     <LibraryPath>3rd_party\raylib\lib\;3rd_party\glfw\lib\;3rd_party\raknet\lib\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -96,82 +96,82 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\App.cpp" />
-    <ClCompile Include="src\CGEditor.cpp" />
-    <ClCompile Include="src\CollisionGeometry.cpp" />
+    <ClCompile Include="src\collisions\CollisionGeometry.cpp" />
+    <ClCompile Include="src\collisions\Sphere.cpp" />
     <ClCompile Include="src\dto\PlayerControl.cpp" />
     <ClCompile Include="src\dto\PlayerJoin.cpp" />
     <ClCompile Include="src\dto\PlayerLeave.cpp" />
     <ClCompile Include="src\dto\PlayerState.cpp" />
-    <ClCompile Include="src\ExplosionParticle.cpp" />
-    <ClCompile Include="src\GridWalker.cpp" />
+    <ClCompile Include="src\gameobjects\Car.cpp" />
+    <ClCompile Include="src\gameobjects\DynamicObject.cpp" />
+    <ClCompile Include="src\gameobjects\ExplosionParticle.cpp" />
+    <ClCompile Include="src\gameobjects\Object.cpp" />
+    <ClCompile Include="src\gameobjects\PhysicalObject.cpp" />
+    <ClCompile Include="src\gameobjects\Projectile.cpp" />
+    <ClCompile Include="src\gameobjects\Scene.cpp" />
+    <ClCompile Include="src\gameobjects\Terrain.cpp" />
+    <ClCompile Include="src\gameobjects\TerrainObject.cpp" />
+    <ClCompile Include="src\gameobjects\Turret.cpp" />
+    <ClCompile Include="src\gameobjects\Wheel.cpp" />
+    <ClCompile Include="src\graphics\CustomCamera.cpp" />
+    <ClCompile Include="src\graphics\Hud.cpp" />
+    <ClCompile Include="src\graphics\Renderer.cpp" />
+    <ClCompile Include="src\helpers\CGEditor.cpp" />
+    <ClCompile Include="src\helpers\DebugGraphs.cpp" />
+    <ClCompile Include="src\helpers\GridWalker.cpp" />
+    <ClCompile Include="src\helpers\Helpers.cpp" />
     <ClCompile Include="src\math\box2.cpp" />
     <ClCompile Include="src\math\quat.cpp" />
     <ClCompile Include="src\math\vec2.cpp" />
     <ClCompile Include="src\math\vec3.cpp" />
     <ClCompile Include="src\network\RakNetClient.cpp" />
     <ClCompile Include="src\network\RakNetServer.cpp" />
-    <ClCompile Include="src\Projectile.cpp" />
     <ClCompile Include="src\Config.cpp" />
-    <ClCompile Include="src\CustomCamera.cpp" />
-    <ClCompile Include="src\DebugGraphs.cpp" />
-    <ClCompile Include="src\Helpers.cpp" />
-    <ClCompile Include="src\Hud.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Car.cpp" />
-    <ClCompile Include="src\DynamicObject.cpp" />
-    <ClCompile Include="src\PhysicalObject.cpp" />
-    <ClCompile Include="src\Object.cpp" />
-    <ClCompile Include="src\Renderer.cpp" />
-    <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\ServerApp.cpp" />
-    <ClCompile Include="src\Sphere.cpp" />
-    <ClCompile Include="src\TerrainObject.cpp" />
-    <ClCompile Include="src\Terrain.cpp" />
-    <ClCompile Include="src\Turret.cpp" />
-    <ClCompile Include="src\Wheel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.h" />
-    <ClInclude Include="src\BoolArray.hpp" />
-    <ClInclude Include="src\CGEditor.h" />
-    <ClInclude Include="src\CollisionGeometry.h" />
-    <ClInclude Include="src\containers\Pool.hpp" />
-    <ClInclude Include="src\containers\Queue.hpp" />
-    <ClInclude Include="src\containers\SemiVector.hpp" />
+    <ClInclude Include="src\collections\BoolArray.hpp" />
+    <ClInclude Include="src\collections\Pool.hpp" />
+    <ClInclude Include="src\collections\Queue.hpp" />
+    <ClInclude Include="src\collections\SemiVector.hpp" />
+    <ClInclude Include="src\collisions\CollisionGeometry.h" />
+    <ClInclude Include="src\collisions\Sphere.h" />
     <ClInclude Include="src\dto\PlayerControl.h" />
     <ClInclude Include="src\dto\PlayerJoin.h" />
     <ClInclude Include="src\dto\PlayerLeave.h" />
     <ClInclude Include="src\dto\PlayerState.h" />
-    <ClInclude Include="src\ExplosionParticle.h" />
-    <ClInclude Include="src\GridWalker.h" />
+    <ClInclude Include="src\gameobjects\Car.h" />
+    <ClInclude Include="src\gameobjects\DynamicObject.h" />
+    <ClInclude Include="src\gameobjects\ExplosionParticle.h" />
+    <ClInclude Include="src\gameobjects\Object.h" />
+    <ClInclude Include="src\gameobjects\PhysicalObject.h" />
+    <ClInclude Include="src\gameobjects\Projectile.h" />
+    <ClInclude Include="src\gameobjects\Scene.h" />
+    <ClInclude Include="src\gameobjects\Terrain.h" />
+    <ClInclude Include="src\gameobjects\TerrainObject.h" />
+    <ClInclude Include="src\gameobjects\Turret.h" />
+    <ClInclude Include="src\gameobjects\Wheel.h" />
+    <ClInclude Include="src\graphics\CustomCamera.h" />
+    <ClInclude Include="src\graphics\Hud.h" />
+    <ClInclude Include="src\graphics\Renderer.h" />
+    <ClInclude Include="src\helpers\CGEditor.h" />
+    <ClInclude Include="src\helpers\DebugGraphs.h" />
+    <ClInclude Include="src\helpers\GridWalker.h" />
+    <ClInclude Include="src\helpers\Helpers.h" />
     <ClInclude Include="src\math\box2.h" />
     <ClInclude Include="src\math\quat.h" />
     <ClInclude Include="src\math\vec2.h" />
     <ClInclude Include="src\math\vec3.h" />
-    <ClInclude Include="src\MessageType.hpp" />
     <ClInclude Include="src\network\IClientMessageHandler.h" />
+    <ClInclude Include="src\network\MessageType.hpp" />
     <ClInclude Include="src\network\RakNetClient.h" />
     <ClInclude Include="src\network\IServerMessageHandler.h" />
     <ClInclude Include="src\network\RakNetServer.h" />
-    <ClInclude Include="src\Projectile.h" />
     <ClInclude Include="src\Config.h" />
-    <ClInclude Include="src\CustomCamera.h" />
-    <ClInclude Include="src\DebugGraphs.h" />
-    <ClInclude Include="src\Helpers.h" />
-    <ClInclude Include="src\Hud.h" />
-    <ClInclude Include="src\DynamicObject.h" />
     <ClInclude Include="src\core.h" />
-    <ClInclude Include="src\Car.h" />
-    <ClInclude Include="src\PhysicalObject.h" />
-    <ClInclude Include="src\Object.h" />
-    <ClInclude Include="src\Renderer.h" />
-    <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\ServerApp.h" />
-    <ClInclude Include="src\Sphere.h" />
-    <ClInclude Include="src\TerrainObject.h" />
-    <ClInclude Include="src\Terrain.h" />
-    <ClInclude Include="src\Turret.h" />
-    <ClInclude Include="src\Wheel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

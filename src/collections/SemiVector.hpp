@@ -59,6 +59,9 @@ namespace game
   private:
     int count = 0;
     std::array<T, N> arr;
+    // TODO: optimize this because vector takes 3 pointers and on x64 it's 24 bytes
+    // Probably it would be better to use some union of std::array and std::vector and
+    // replace the 1st by the 2nd if the array size is exceeded
     std::vector<T> vec;
   };
 

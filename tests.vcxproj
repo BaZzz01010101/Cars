@@ -49,14 +49,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);3rd_party\raylib\include;3rd_party/raknet/include;src;src/math;src/containers;src/dto;</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);3rd_party/raylib/include;3rd_party/raknet/include;src;src/collections;src/collisions;src/dto;src/gameobjects;src/graphics;src/helpers;src/math;src/network</IncludePath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\test\</IntDir>
     <LibraryPath>3rd_party\raylib\lib\;3rd_party\glfw\lib\;3rd_party\raknet\lib\;$(Platform)\$(Configuration)\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);3rd_party\raylib\include;3rd_party/raknet/include;src;src/math;src/containers;src/dto;</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);3rd_party/raylib/include;3rd_party/raknet/include;src;src/collections;src/collisions;src/dto;src/gameobjects;src/graphics;src/helpers;src/math;src/network</IncludePath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\test\</IntDir>
     <LibraryPath>3rd_party\raylib\lib\;3rd_party\glfw\lib\;3rd_party\raknet\lib\;$(Platform)\$(Configuration)\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
@@ -99,40 +99,40 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\CollisionGeometry.cpp" />
+    <ClCompile Include="src\collisions\CollisionGeometry.cpp" />
+    <ClCompile Include="src\collisions\Sphere.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\dto\PlayerControl.cpp" />
     <ClCompile Include="src\dto\PlayerJoin.cpp" />
     <ClCompile Include="src\dto\PlayerLeave.cpp" />
     <ClCompile Include="src\dto\PlayerState.cpp" />
-    <ClCompile Include="src\GridWalker.cpp" />
-    <ClCompile Include="src\Helpers.cpp" />
+    <ClCompile Include="src\gameobjects\Terrain.cpp" />
+    <ClCompile Include="src\gameobjects\TerrainObject.cpp" />
+    <ClCompile Include="src\helpers\GridWalker.cpp" />
+    <ClCompile Include="src\helpers\Helpers.cpp" />
     <ClCompile Include="src\math\box2.cpp" />
     <ClCompile Include="src\math\quat.cpp" />
     <ClCompile Include="src\math\vec2.cpp" />
     <ClCompile Include="src\math\vec3.cpp" />
-    <ClCompile Include="src\Sphere.cpp" />
-    <ClCompile Include="src\Terrain.cpp" />
-    <ClCompile Include="src\TerrainObject.cpp" />
     <ClCompile Include="src\tests\tests.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\CollisionGeometry.h" />
+    <ClInclude Include="src\collisions\CollisionGeometry.h" />
+    <ClInclude Include="src\collisions\Sphere.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\dto\PlayerControl.h" />
     <ClInclude Include="src\dto\PlayerJoin.h" />
     <ClInclude Include="src\dto\PlayerLeave.h" />
     <ClInclude Include="src\dto\PlayerState.h" />
-    <ClInclude Include="src\GridWalker.h" />
-    <ClInclude Include="src\Helpers.h" />
     <ClInclude Include="src\core.h" />
+    <ClInclude Include="src\gameobjects\Terrain.h" />
+    <ClInclude Include="src\gameobjects\TerrainObject.h" />
+    <ClInclude Include="src\helpers\GridWalker.h" />
+    <ClInclude Include="src\helpers\Helpers.h" />
     <ClInclude Include="src\math\box2.h" />
     <ClInclude Include="src\math\quat.h" />
     <ClInclude Include="src\math\vec2.h" />
     <ClInclude Include="src\math\vec3.h" />
-    <ClInclude Include="src\Sphere.h" />
-    <ClInclude Include="src\Terrain.h" />
-    <ClInclude Include="src\TerrainObject.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

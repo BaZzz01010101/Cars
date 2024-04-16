@@ -2,6 +2,7 @@
 #include "Car.h"
 #include "Helpers.h"
 #include "PlayerControl.h"
+#include "Scene.h"
 
 namespace game
 {

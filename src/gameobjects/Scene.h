@@ -17,10 +17,14 @@ namespace game
 
     const Config& config {};
 
+    static constexpr int MAX_CARS = 4;
+    static constexpr int MAX_PROJECTILES = 1000;
+    static constexpr int MAX_EXPLOSION_PARTICLES = 10000;
+
     Terrain terrain;
-    Pool<Car, 4> cars {};
-    Pool<Projectile, 1000> projectiles {};
-    Pool<ExplosionParticle, 10000> explosionParticles {};
+    Pool<Car, MAX_CARS> cars {};
+    Pool<Projectile, MAX_PROJECTILES> projectiles {};
+    Pool<ExplosionParticle, MAX_EXPLOSION_PARTICLES> explosionParticles {};
 
     bool paused = false;
     bool slowMotion = false;
@@ -46,6 +50,7 @@ namespace game
     void updateGameObjects(float dt);
     void updateFiring(Car& car, float dt);
     void createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position);
+    bool traceRay(vec3 origin, vec3 directionNormalized, float distance, int excludePlayerIndex, vec3* hitPosition, vec3* hitNormal, float* hitDistance, const Car** hitCar) const;
   };
 
 }

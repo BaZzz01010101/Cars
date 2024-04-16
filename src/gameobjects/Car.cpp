@@ -23,9 +23,6 @@ namespace game
     vec3 size = { 2.04f, 2.32f, 4.56f };
     float radius = (size.x + size.y + size.z) / 6;
     momentOfInertia = 0.5f * mass * sqr(radius);
-
-    for (Sphere s : config.collisionGeometries.carSpheres)
-      collisionGeometry.add(s.center, s.radius);
   }
 
   void Car::resetToPosition(vec3 position, quat rotation)
@@ -49,6 +46,45 @@ namespace game
 
   bool Car::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
   {
+    vec3 closestHitPosition = vec3::zero;
+    vec3 closestHitNormal = vec3::zero;
+    float closestHitDistance = FLT_MAX;
+
+    vec3 currentHitPosition = vec3::zero;
+    vec3 currentHitNormal = vec3::zero;
+    float currentHitDistance = FLT_MAX;
+    
+    const Sphere(&carSpheres)[4] = config.collisionGeometries.carSpheres;
+
+    for (const Sphere sphere : carSpheres)
+    {
+      Sphere worldSphere = {
+        position + sphere.center.rotatedBy(rotation),
+        sphere.radius
+      };
+
+      if (worldSphere.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestHitDistance)
+      {
+        closestHitPosition = currentHitPosition;
+        closestHitNormal = currentHitNormal;
+        closestHitDistance = currentHitDistance;
+      }
+    }
+
+    if (closestHitDistance < distance)
+    {
+      if (hitPosition)
+        *hitPosition = closestHitPosition;
+
+      if (hitNormal)
+        *hitNormal = closestHitNormal;
+
+      if (hitDistance)
+        *hitDistance = closestHitDistance;
+
+      return true;
+    }
+
     return false;
   }
 
@@ -98,24 +134,20 @@ namespace game
     typedef std::tuple<vec3, vec3, float> Hit;
     std::vector<Hit> hits;
 
-    typedef std::pair<vec3, vec3> ForceAndPoint;
-    std::vector<ForceAndPoint> frictionForces;
-    std::vector<ForceAndPoint> nForces;
-    float div = 0;
-
-    std::vector<Sphere> otherCarSpheres;
-    otherCarSpheres.reserve((scene.cars.count() - 1) * COLLISION_GEOMETRY_STATIC_SIZE);
+    const Sphere (&carSpheres)[4] = config.collisionGeometries.carSpheres;
+    constexpr int MAX_SPHERES = (Scene::MAX_CARS - 1) * sizeof(carSpheres) / sizeof(carSpheres[0]);
+    std::vector<Sphere> worldCarSpheres;
+    worldCarSpheres.reserve(MAX_SPHERES);
 
     for (int i = 0; i < scene.cars.capacity(); i++)
       if (scene.cars.isAlive(i) && &scene.cars[i] != this)
       {
         const Car& car = scene.cars[i];
-        const auto& spheres = car.collisionGeometry.spheres;
 
-        for (int j = 0; j < spheres.size(); j++)
-          otherCarSpheres.push_back({
-            .center = car.position + spheres[j].center.rotatedBy(car.rotation),
-            .radius = spheres[j].radius
+        for (const Sphere& s : carSpheres)
+          worldCarSpheres.push_back({
+            .center = car.position + s.center.rotatedBy(car.rotation),
+            .radius = s.radius
           });
       }
 
@@ -136,7 +168,7 @@ namespace game
         hits.push_back({ carPoint, collisionNormal, penetration });
       }
 
-      for(const Sphere& s : otherCarSpheres)
+      for (const Sphere& s : worldCarSpheres)
         if (s.collideWith(worldSphere, &collisionPoint, &collisionNormal, &penetration))
         {
           vec3 carPoint = collisionPoint - collisionNormal * penetration - position;
@@ -158,6 +190,11 @@ namespace game
       if (penetration > 0)
         hits.push_back({ carPoint, normal, penetration });
     }
+
+    typedef std::pair<vec3, vec3> ForceAndPoint;
+    std::vector<ForceAndPoint> frictionForces;
+    std::vector<ForceAndPoint> nForces;
+    float div = 0;
 
     for (auto [point, normal, penetration] : hits)
     {

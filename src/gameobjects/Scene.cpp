@@ -46,10 +46,11 @@ namespace game
         float distance = direction.length();
         direction /= distance;
         vec3 hitPosition, normal;
+        const Car* hitCar = nullptr;
 
         if (projectile.lifeTime < 0)
           projectiles.remove(i);
-        else if (terrain.traceRay(projectile.position, direction, distance, &hitPosition, &normal, nullptr))
+        else if (traceRay(projectile.position, direction, distance, projectile.ownerIndex, &hitPosition, &normal, nullptr, &hitCar))
         {
           projectiles.remove(i);
 
@@ -165,6 +166,56 @@ namespace game
         config.maxLifeTime,
         this->config.physics.gravity
       ));
+  }
+
+  bool Scene::traceRay(vec3 origin, vec3 directionNormalized, float distance, int excludePlayerIndex, vec3* hitPosition, vec3* hitNormal, float* hitDistance, const Car** hitCar) const
+  {
+    vec3 closestsHitPosition = vec3::zero;
+    vec3 closestsHitNormal = vec3::zero;
+    float closestsHitDistance = FLT_MAX;
+
+    vec3 currentHitPosition = vec3::zero;
+    vec3 currentHitNormal = vec3::zero;
+    float currentHitDistance = FLT_MAX;
+
+    if(terrain.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestsHitDistance)
+    {
+      closestsHitPosition = currentHitPosition;
+      closestsHitNormal = currentHitNormal;
+      closestsHitDistance = currentHitDistance;
+    }
+
+    for(int i = 0; i < cars.capacity(); i++)
+      if(cars.isAlive(i) && i != excludePlayerIndex)
+      {
+        const Car& car = cars[i];
+
+        if(car.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestsHitDistance)
+        {
+          closestsHitPosition = currentHitPosition;
+          closestsHitNormal = currentHitNormal;
+          closestsHitDistance = currentHitDistance;
+
+          if (hitCar)
+            *hitCar = &car;
+        }
+      }
+
+    if (closestsHitDistance != FLT_MAX)
+    {
+      if(hitPosition)
+        *hitPosition = closestsHitPosition;
+
+      if(hitNormal)
+        *hitNormal = closestsHitNormal;
+
+      if(hitDistance)
+        *hitDistance = closestsHitDistance;
+
+      return true;
+    }
+
+    return false;
   }
 
   void Scene::regenerateTerrain(Terrain::Mode mode)

@@ -17,10 +17,6 @@ namespace game
   {
     friend struct Hud;
 
-    static constexpr int COLLISION_GEOMETRY_STATIC_SIZE = 4;
-
-    typedef CollisionGeometry<COLLISION_GEOMETRY_STATIC_SIZE> CollisionGeometry;
-
     const Config& config {};
     const Config::Physics::Car& carConfig {};
     const float& gravity {};
@@ -33,8 +29,6 @@ namespace game
     Wheel frontRightWheel;
     Wheel rearLeftWheel;
     Wheel rearRightWheel;
-
-    CollisionGeometry collisionGeometry;
 
     uint64_t guid {};
     float enginePower {};

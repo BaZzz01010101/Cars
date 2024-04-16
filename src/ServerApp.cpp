@@ -84,7 +84,7 @@ namespace game
       return;
     }
 
-    int playerIndex = scene.cars.tryAdd(guid, config, scene.terrain);
+    int playerIndex = scene.cars.tryAdd(guid, config, scene);
 
     if (playerIndex < 0)
     {

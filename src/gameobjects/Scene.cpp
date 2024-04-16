@@ -191,7 +191,7 @@ namespace game
         return;
       }
 
-    int index = cars.tryAdd(playerControl.guid, config, terrain);
+    int index = cars.tryAdd(playerControl.guid, config, *this);
 
     if (index >= 0)
     {
@@ -209,7 +209,7 @@ namespace game
         return;
       }
 
-    int index = cars.tryAdd(playerState.guid, config, terrain);
+    int index = cars.tryAdd(playerState.guid, config, *this);
 
     if (index >= 0)
     {

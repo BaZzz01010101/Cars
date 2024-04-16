@@ -6,23 +6,26 @@
 
 namespace game
 {
-  Car::Car(uint64_t guid, const Config& config, const Terrain& terrain) :
+  Car::Car(uint64_t guid, const Config& config, const Scene& scene) :
     guid(guid),
     config(config),
     carConfig(config.physics.car),
     gravity(config.physics.gravity),
-    gun(config.physics.gun, terrain, config.physics.car.connectionPoints.weapon.gun, 1),
-    cannon(config.physics.cannon, terrain, config.physics.car.connectionPoints.weapon.cannon, 2),
-    frontLeftWheel(config, true, terrain, config.physics.car.connectionPoints.wheels.frontLeft, "FrontLeftWheel"),
-    frontRightWheel(config, true, terrain, config.physics.car.connectionPoints.wheels.frontRight, "FrontRightWheel"),
-    rearLeftWheel(config, false, terrain, config.physics.car.connectionPoints.wheels.rearLeft, "RearLeftWheel"),
-    rearRightWheel(config, false, terrain, config.physics.car.connectionPoints.wheels.rearRight, "RearRightWheel"),
-    terrain(terrain)
+    gun(config.physics.gun, scene.terrain, config.physics.car.connectionPoints.weapon.gun, 1),
+    cannon(config.physics.cannon, scene.terrain, config.physics.car.connectionPoints.weapon.cannon, 2),
+    frontLeftWheel(config, true, scene.terrain, config.physics.car.connectionPoints.wheels.frontLeft, "FrontLeftWheel"),
+    frontRightWheel(config, true, scene.terrain, config.physics.car.connectionPoints.wheels.frontRight, "FrontRightWheel"),
+    rearLeftWheel(config, false, scene.terrain, config.physics.car.connectionPoints.wheels.rearLeft, "RearLeftWheel"),
+    rearRightWheel(config, false, scene.terrain, config.physics.car.connectionPoints.wheels.rearRight, "RearRightWheel"),
+    scene(scene)
   {
     mass = config.physics.car.mass;
     vec3 size = { 2.04f, 2.32f, 4.56f };
     float radius = (size.x + size.y + size.z) / 6;
     momentOfInertia = 0.5f * mass * sqr(radius);
+
+    for (Sphere s : config.collisionGeometries.carSpheres)
+      collisionGeometry.add(s.center, s.radius);
   }
 
   void Car::resetToPosition(vec3 position, quat rotation)
@@ -100,6 +103,22 @@ namespace game
     std::vector<ForceAndPoint> nForces;
     float div = 0;
 
+    std::vector<Sphere> otherCarSpheres;
+    otherCarSpheres.reserve((scene.cars.count() - 1) * COLLISION_GEOMETRY_STATIC_SIZE);
+
+    for (int i = 0; i < scene.cars.capacity(); i++)
+      if (scene.cars.isAlive(i) && &scene.cars[i] != this)
+      {
+        const Car& car = scene.cars[i];
+        const auto& spheres = car.collisionGeometry.spheres;
+
+        for (int j = 0; j < spheres.size(); j++)
+          otherCarSpheres.push_back({
+            .center = car.position + spheres[j].center.rotatedBy(car.rotation),
+            .radius = spheres[j].radius
+          });
+      }
+
     for (Sphere sphere : collisionSpheres)
     {
       Sphere worldSphere = {
@@ -111,11 +130,18 @@ namespace game
       vec3 collisionNormal {};
       float penetration = 0;
 
-      if (terrain.collideSphereWithObjects(worldSphere, &collisionPoint, &collisionNormal, &penetration))
+      if (scene.terrain.collideSphereWithObjects(worldSphere, &collisionPoint, &collisionNormal, &penetration))
       {
         vec3 carPoint = collisionPoint - collisionNormal * penetration - position;
         hits.push_back({ carPoint, collisionNormal, penetration });
       }
+
+      for(const Sphere& s : otherCarSpheres)
+        if (s.collideWith(worldSphere, &collisionPoint, &collisionNormal, &penetration))
+        {
+          vec3 carPoint = collisionPoint - collisionNormal * penetration - position;
+          hits.push_back({ carPoint, collisionNormal, penetration });
+        }
     }
 
     for (vec3 pt : collisionPoints)
@@ -126,7 +152,7 @@ namespace game
 
       const float MAX_PENETRATION = 0.1f;
 
-      float terrainY = terrain.getHeight(carPointGlobal.x, carPointGlobal.z, &normal);
+      float terrainY = scene.terrain.getHeight(carPointGlobal.x, carPointGlobal.z, &normal);
       float penetration = std::max(terrainY - carPointGlobal.y, 0.0f);
 
       if (penetration > 0)

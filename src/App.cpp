@@ -113,7 +113,7 @@ namespace game
 
   void App::onConnected(uint64_t guid)
   {
-    int playerIndex = scene.cars.tryAdd(guid, config, scene.terrain);
+    int playerIndex = scene.cars.tryAdd(guid, config, scene);
 
     if (playerIndex < 0)
     {
@@ -141,7 +141,7 @@ namespace game
 
     if (playerJoin.guid != scene.getPlayer().guid)
     {
-      int index = scene.cars.tryAdd(playerJoin.guid, config, scene.terrain);
+      int index = scene.cars.tryAdd(playerJoin.guid, config, scene);
       Car& car = scene.cars[index];
       car.position = playerJoin.position;
       car.rotation = playerJoin.rotation;

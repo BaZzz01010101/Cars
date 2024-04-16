@@ -1,5 +1,4 @@
 #pragma once
-#include "Terrain.h"
 #include "Turret.h"
 #include "Wheel.h"
 #include "Config.h"
@@ -10,16 +9,22 @@
 
 namespace game
 {
+  struct Scene;
+
   using namespace dto;
 
   struct Car : public PhysicalObject
   {
     friend struct Hud;
 
+    static constexpr int COLLISION_GEOMETRY_STATIC_SIZE = 4;
+
+    typedef CollisionGeometry<COLLISION_GEOMETRY_STATIC_SIZE> CollisionGeometry;
+
     const Config& config {};
     const Config::Physics::Car& carConfig {};
     const float& gravity {};
-    const Terrain& terrain;
+    const Scene& scene;
 
     Turret gun;
     Turret cannon;
@@ -28,6 +33,8 @@ namespace game
     Wheel frontRightWheel;
     Wheel rearLeftWheel;
     Wheel rearRightWheel;
+
+    CollisionGeometry collisionGeometry;
 
     uint64_t guid {};
     float enginePower {};
@@ -42,7 +49,7 @@ namespace game
     float steeringSpeed = 0;
     float steeringAngle = 0;
 
-    Car(uint64_t guid, const Config& config, const Terrain& terrain);
+    Car(uint64_t guid, const Config& config, const Scene& scene);
     Car(Car&) = delete;
     Car(Car&&) = delete;
     Car& operator=(Car&) = delete;

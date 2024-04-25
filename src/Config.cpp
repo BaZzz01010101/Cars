@@ -210,6 +210,7 @@ namespace game
       },
     },
     .multiplayer = {
+      //.serverAddress = "45.9.133.26",
       .serverAddress = "127.0.0.1",
       .serverPort = 60000,
       .serverPassword = "^p3pSHwaj&uy59EU9T&H",

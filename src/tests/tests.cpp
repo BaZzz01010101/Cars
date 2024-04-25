@@ -3,6 +3,7 @@
 #include "Terrain.h"
 #include "Helpers.h"
 #include "SemiVector.hpp"
+#include "Ring.hpp"
 #include "PlayerControl.h"
 #include "PlayerState.h"
 #include "PlayerJoin.h"
@@ -19,11 +20,12 @@ namespace game_tests
   class Terrain : public game::Terrain
   {
   public:
-    CGGridCell (&cgGrid)[CG_GRID_SIZE][CG_GRID_SIZE] = game::Terrain::cgGrid;
+    CGGridCell(&cgGrid)[CG_GRID_SIZE][CG_GRID_SIZE] = game::Terrain::cgGrid;
 
     Terrain(const Config& config) :
       game::Terrain(config)
-    {}
+    {
+    }
 
     bool traceRayWithTerrain(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
     {
@@ -312,6 +314,28 @@ namespace game_tests
       Assert::AreEqual(3, sv[3]);
       Assert::AreEqual(4, sv[4]);
       Assert::AreEqual(6, sv[5]);
+    }
+
+  };
+
+  TEST_CLASS(RingCollectionTest)
+  {
+  public:
+    TEST_METHOD(push_read)
+    {
+      Ring<int, 5> sv(0);
+      sv.push(1);
+      sv.push(2);
+      sv.push(3);
+      sv.push(4);
+
+      Assert::AreEqual(4, sv[0]);
+      Assert::AreEqual(2, sv[2]);
+
+      sv.push(5);
+
+      Assert::AreEqual(5, sv[0]);
+      Assert::AreEqual(3, sv[2]);
     }
 
   };

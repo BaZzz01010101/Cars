@@ -94,6 +94,9 @@
     <ClInclude Include="src\dto\WheelState.h">
       <Filter>dto</Filter>
     </ClInclude>
+    <ClInclude Include="src\collections\Ring.hpp">
+      <Filter>collections</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

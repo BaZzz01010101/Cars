@@ -115,4 +115,27 @@ namespace game
     frictionVelocity = vec3::zero;
   }
 
+  WheelState Wheel::getState() const
+  {
+    return WheelState {
+      .suspensionOffset = suspensionOffset,
+      .suspensionSpeed = suspensionSpeed,
+      .rotationSpeed = wheelRotationSpeed
+    };
+  }
+
+  void Wheel::syncState(const WheelState& wheelState, float syncFactor, float steeringAngle, const DynamicObject& parent)
+  {
+    suspensionOffset = lerp(suspensionOffset, wheelState.suspensionOffset, syncFactor);
+    suspensionSpeed = lerp(suspensionSpeed, wheelState.suspensionSpeed, syncFactor);
+    wheelRotationSpeed = lerp(wheelRotationSpeed, wheelState.rotationSpeed, syncFactor);
+    
+    vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
+    position = parent.position + globalConnectionPoint;
+    rotation = parent.rotation * quat::fromYAngle(steeringAngle);
+    velocity = parent.velocity + parent.angularVelocity.rotatedBy(rotation) % globalConnectionPoint;
+    position.y += suspensionOffset;
+    rotation = rotation * wheelRotation;
+  }
+
 }

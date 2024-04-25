@@ -230,5 +230,7 @@ namespace game
 
     print("Trace count:", (float)scene.terrain.traceCount, WHITE);
     print("Players", (float)scene.cars.count(), LIGHTGRAY);
+    print("Physical Frame Offset", (float)scene.physicalFrame - scene.serverPhysicalFrame, LIGHTGRAY);
+
   }
 }

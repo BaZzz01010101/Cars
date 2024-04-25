@@ -42,6 +42,9 @@
     <ClCompile Include="src\gameobjects\Terrain.cpp">
       <Filter>gameobjects</Filter>
     </ClCompile>
+    <ClCompile Include="src\dto\WheelState.cpp">
+      <Filter>dto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Config.h" />
@@ -88,6 +91,9 @@
     <ClInclude Include="src\gameobjects\Terrain.h">
       <Filter>gameobjects</Filter>
     </ClInclude>
+    <ClInclude Include="src\dto\WheelState.h">
+      <Filter>dto</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">
@@ -104,6 +110,9 @@
     </Filter>
     <Filter Include="collisions">
       <UniqueIdentifier>{bca8a621-7584-49c2-a668-12189b38c35b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collections">
+      <UniqueIdentifier>{1ac1986f-078b-4013-bcef-f25d8d70d41b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

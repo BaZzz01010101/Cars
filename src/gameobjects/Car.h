@@ -40,7 +40,7 @@ namespace game
     float steeringDirection {};
     float enginePowerDirection {};
     float verticalTrust {};
-    float steeringSpeed = 0;
+    float steeringMaxCorrectionAngle = 0;
     float steeringAngle = 0;
     int health = 0;
 
@@ -52,6 +52,7 @@ namespace game
 
     void update(float dt);
     void updateControl(const PlayerControl& playerControl);
+    PlayerState getState() const;
     void syncState(const PlayerState& playerState, float syncFactor);
     void resetToPosition(vec3 position, quat rotation);
     bool traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const;

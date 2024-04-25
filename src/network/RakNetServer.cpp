@@ -26,7 +26,7 @@ namespace network
     const char* password = config.multiplayer.serverPassword;
     int maxPlayers = config.multiplayer.maxPlayers;
     maxConnections = maxPlayers * 2;
-    SocketDescriptor sd(serverPort, serverAddress);
+    SocketDescriptor sd(serverPort, "");
     peer->Startup(maxConnections, &sd, 1);
     peer->SetMaximumIncomingConnections(maxConnections);
     peer->SetIncomingPassword(password, (int)strlen(password));
@@ -105,14 +105,6 @@ namespace network
           break;
         }
 
-        case ID_PLAYER_STATE:
-        {
-          PlayerState playerState;
-          playerState.readFrom(stream);
-          messageHandler.onPlayerState(playerState);
-        }
-        break;
-
         default:
           printf("SERVER: Unknown packet: %i\n", packet->data[0]);
           break;
@@ -132,6 +124,7 @@ namespace network
 
       if (now - time > seconds(DISCONNECTION_TIMEOUT))
       {
+        printf("SERVER: Drop hang connection: %" PRIu64 "\n", guid);
         auto toErase = it++;
         lastMessageTimes.erase(toErase);
         disconnectClient(guid, false);

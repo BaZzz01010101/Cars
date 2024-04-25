@@ -27,10 +27,14 @@ namespace game
     return position + config.barrelPosition.rotatedBy(rotation);
   }
 
-  void Turret::syncState(float yaw, float pitch, float syncFactor)
+  void Turret::syncState(float yaw, float pitch, float syncFactor, const Object& parent)
   {
     this->yaw = lerp(this->yaw, yaw, syncFactor);
     this->pitch = lerp(this->pitch, pitch, syncFactor);
+    vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
+    position = parent.position + globalConnectionPoint;
+    rotation = parent.rotation * quat::identity.rotatedByXAngle(pitch).rotatedByYAngle(yaw);
+    rotation.normalize();
   }
 
   void Turret::update(float dt, const Object& parent)

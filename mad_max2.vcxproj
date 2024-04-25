@@ -101,6 +101,7 @@
     <ClCompile Include="src\dto\PlayerJoin.cpp" />
     <ClCompile Include="src\dto\PlayerLeave.cpp" />
     <ClCompile Include="src\dto\PlayerState.cpp" />
+    <ClCompile Include="src\dto\WheelState.cpp" />
     <ClCompile Include="src\gameobjects\Car.cpp" />
     <ClCompile Include="src\gameobjects\DynamicObject.cpp" />
     <ClCompile Include="src\gameobjects\ExplosionParticle.cpp" />
@@ -141,6 +142,7 @@
     <ClInclude Include="src\dto\PlayerJoin.h" />
     <ClInclude Include="src\dto\PlayerLeave.h" />
     <ClInclude Include="src\dto\PlayerState.h" />
+    <ClInclude Include="src\dto\WheelState.h" />
     <ClInclude Include="src\gameobjects\Car.h" />
     <ClInclude Include="src\gameobjects\DynamicObject.h" />
     <ClInclude Include="src\gameobjects\ExplosionParticle.h" />

@@ -32,8 +32,8 @@ namespace game
     void shutdown();
     void togglePaused();
     void update(float dt);
-    void updateLocalPlayerControl();
     void updateShortcuts();
+    void sendLocalPlayerControl(const PlayerControl& playerControl);
     void sendLocalPlayerState();
     void updateCamera(float dt, float lerpFactor);
     PlayerControl getLocalPlayerControl();

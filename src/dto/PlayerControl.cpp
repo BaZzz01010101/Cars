@@ -6,6 +6,7 @@ namespace dto
 {
   void PlayerControl::readFrom(BitStream& stream)
   {
+    stream.Read(physicalFrame);
     stream.Read(guid);
     stream.Read(steeringAxis);
     stream.Read(accelerationAxis);
@@ -19,6 +20,7 @@ namespace dto
   void PlayerControl::writeTo(BitStream& stream) const
   {
     stream.Write(ID_PLAYER_CONTROL);
+    stream.Write(physicalFrame);
     stream.Write(guid);
     stream.Write(steeringAxis);
     stream.Write(accelerationAxis);

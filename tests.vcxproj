@@ -105,6 +105,7 @@
     <ClCompile Include="src\dto\PlayerJoin.cpp" />
     <ClCompile Include="src\dto\PlayerLeave.cpp" />
     <ClCompile Include="src\dto\PlayerState.cpp" />
+    <ClCompile Include="src\dto\WheelState.cpp" />
     <ClCompile Include="src\gameobjects\Terrain.cpp" />
     <ClCompile Include="src\gameobjects\TerrainObject.cpp" />
     <ClCompile Include="src\helpers\GridWalker.cpp" />
@@ -124,6 +125,7 @@
     <ClInclude Include="src\dto\PlayerLeave.h" />
     <ClInclude Include="src\dto\PlayerState.h" />
     <ClInclude Include="src\core.h" />
+    <ClInclude Include="src\dto\WheelState.h" />
     <ClInclude Include="src\gameobjects\Terrain.h" />
     <ClInclude Include="src\gameobjects\TerrainObject.h" />
     <ClInclude Include="src\helpers\GridWalker.h" />

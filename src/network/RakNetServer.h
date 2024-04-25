@@ -23,7 +23,7 @@ namespace network
     void update();
 
   private:
-    static constexpr int DISCONNECTION_TIMEOUT = 5;
+    static constexpr int DISCONNECTION_TIMEOUT = 30;
     const Config& config;
     IServerMessageHandler& messageHandler;
     RakPeerInterface* peer = nullptr;

@@ -92,6 +92,9 @@
     <ClCompile Include="src\gameobjects\Scene.cpp">
       <Filter>gameobjects</Filter>
     </ClCompile>
+    <ClCompile Include="src\dto\WheelState.cpp">
+      <Filter>dto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App.h" />
@@ -208,6 +211,9 @@
     </ClInclude>
     <ClInclude Include="src\gameobjects\Scene.h">
       <Filter>gameobjects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dto\WheelState.h">
+      <Filter>dto</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -24,6 +24,11 @@ namespace game
     vec3 size = { 2.04f, 2.32f, 4.56f };
     float radius = (size.x + size.y + size.z) / 6;
     momentOfInertia = 0.5f * mass * sqr(radius);
+
+    vec3 turnRadiusVector = carConfig.connectionPoints.wheels.frontLeft - 
+      0.5f * (carConfig.connectionPoints.wheels.rearLeft + carConfig.connectionPoints.wheels.rearRight);
+
+    steeringMaxCorrectionAngle = turnRadiusVector.getYAngle();
   }
 
   void Car::resetToPosition(vec3 position, quat rotation)
@@ -264,14 +269,43 @@ namespace game
     cannon.expectedTarget = playerControl.target;
   }
 
+  PlayerState Car::getState() const
+  {
+    return {
+      .position = position,
+      .rotation = rotation,
+      .velocity = velocity,
+      .angularVelocity = angularVelocity,
+      .steeringAngle = steeringAngle,
+      .frontLeftWheelState = frontLeftWheel.getState(),
+      .frontRightWheelState = frontRightWheel.getState(),
+      .rearLeftWheelState = rearLeftWheel.getState(),
+      .rearRightWheelState = rearRightWheel.getState(),
+      .gunYaw = gun.yaw,
+      .gunPitch = gun.pitch,
+      .cannonYaw = cannon.yaw,
+      .cannonPitch = cannon.pitch,
+    };
+  }
+
   void Car::syncState(const PlayerState& playerState, float syncFactor)
   {
     position = vec3::lerp(position, playerState.position, syncFactor);
     velocity = vec3::lerp(velocity, playerState.velocity, syncFactor);
     rotation = quat::slerp(rotation, playerState.rotation, syncFactor);
     angularVelocity = vec3::lerp(angularVelocity, playerState.angularVelocity, syncFactor);
-    gun.syncState(playerState.gunYaw, playerState.gunPitch, syncFactor);
-    cannon.syncState(playerState.cannonYaw, playerState.cannonPitch, syncFactor);
+    steeringAngle = lerp(steeringAngle, playerState.steeringAngle, syncFactor);
+
+    float correctionAngle = fabs(mapRangeClamped(steeringAngle, -PI / 2, PI / 2, -steeringMaxCorrectionAngle, steeringMaxCorrectionAngle));
+    float frontLeftSteeringAngle = steeringAngle + correctionAngle;
+    float frontRightSteeringAngle = steeringAngle - correctionAngle;
+    frontLeftWheel.syncState(playerState.frontLeftWheelState, syncFactor, frontLeftSteeringAngle, *this);
+    frontRightWheel.syncState(playerState.frontRightWheelState, syncFactor, frontRightSteeringAngle, *this);
+    rearLeftWheel.syncState(playerState.rearLeftWheelState, syncFactor, 0, *this);
+    rearRightWheel.syncState(playerState.rearRightWheelState, syncFactor, 0, *this);
+
+    gun.syncState(playerState.gunYaw, playerState.gunPitch, syncFactor, *this);
+    cannon.syncState(playerState.cannonYaw, playerState.cannonPitch, syncFactor, *this);
   }
 
   void Car::updateEngine(float dt)
@@ -303,8 +337,7 @@ namespace game
 
   void Car::updateWheels(float dt)
   {
-    float maxCorrectionAngle = (frontLeftWheel.connectionPoint - 0.5f * (rearLeftWheel.connectionPoint + rearRightWheel.connectionPoint)).getYAngle();
-    float correctionAngle = fabs(mapRangeClamped(steeringAngle, -PI / 2, PI / 2, -maxCorrectionAngle, maxCorrectionAngle));
+    float correctionAngle = fabs(mapRangeClamped(steeringAngle, -PI / 2, PI / 2, -steeringMaxCorrectionAngle, steeringMaxCorrectionAngle));
 
     // TODO: Move to config the power coefficients for front and rear wheels
     float frontPower = 1.0f * enginePower;

@@ -742,6 +742,7 @@ namespace game_tests
         .rotation = { 0.11f, 0.22f, 0.33f, 0.44f },
         .velocity = { 0.111f, 0.222f, 0.333f },
         .angularVelocity = { 0.1111f, 0.2222f, 0.3333f },
+        .steeringAngle = 0.1f,
         .gunYaw = 0.12f,
         .gunPitch = 0.34f,
         .cannonYaw = 0.56f,

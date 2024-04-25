@@ -35,10 +35,21 @@ namespace game
     float dtAccumulator = 0;
     float fixedDt = config.physics.fixedDt;
 
+    while (!exit && !WindowShouldClose() && scene.playerIndex < 0)
+      network.update();
+
+    // Fix bug with excessive physical frame counter promotion due to extremely high 1st rendering frame time
+    renderer.draw(0);
+    renderer.draw(0);
+
     while (!exit && !WindowShouldClose())
     {
-      updateLocalPlayerControl();
       updateShortcuts();
+
+      PlayerControl localPlayerControl = getLocalPlayerControl();
+      sendLocalPlayerControl(localPlayerControl);
+      scene.updatePlayerControl(localPlayerControl);
+
       network.update();
 
       float dt = GetFrameTime();
@@ -51,8 +62,6 @@ namespace game
         update(fixedDt);
         dtAccumulator -= fixedDt;
       }
-
-      sendLocalPlayerState();
 
       float lerpFactor = dtAccumulator / fixedDt;
       updateCamera(dt, lerpFactor);
@@ -80,16 +89,6 @@ namespace game
     hud.update();
   }
 
-  void App::updateLocalPlayerControl()
-  {
-    PlayerControl localPlayerControl = getLocalPlayerControl();
-    scene.updatePlayerControl(localPlayerControl);
-
-    BitStream localPlayerControlStream;
-    localPlayerControl.writeTo(localPlayerControlStream);
-    network.send(localPlayerControlStream);
-  }
-
   void App::togglePaused()
   {
     paused = !paused;
@@ -101,8 +100,10 @@ namespace game
   {
     const Car& player = scene.getPlayer();
 
+    // TODO: Move the logic of disabled control for dead player to server side
     if (player.health == 0)
       return PlayerControl {
+        .physicalFrame = scene.physicalFrame,
         .guid = player.guid,
         .steeringAxis = 0.0f,
         .accelerationAxis = 0.0f,
@@ -114,6 +115,7 @@ namespace game
     };
 
     return PlayerControl {
+      .physicalFrame = scene.physicalFrame,
       .guid = player.guid,
       .steeringAxis = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D)),
       .accelerationAxis = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S)),
@@ -127,20 +129,8 @@ namespace game
 
   void App::onConnected(uint64_t guid)
   {
-    int playerIndex = scene.cars.tryAdd(guid, config, scene);
-
-    if (playerIndex < 0)
-    {
-      printf("CLIENT_APP: OnConnected. Disconnecting! Players pool overflow.\n");
-      network.disconnect();
-      return;
-    }
-
     printf("CLIENT_APP: OnConnected, my guid: %" PRIu64 "\n", guid);
-    scene.playerIndex = playerIndex;
-    Car& player = scene.getPlayer();
-    float h = scene.terrain.getHeight(0, 0);
-    player.position = { 0, h + 2, 0 };
+    scene.playerGuid = guid;
   }
 
   void App::onDisconnected(uint64_t guid)
@@ -153,18 +143,23 @@ namespace game
   {
     printf("CLIENT_APP: OnPlayerJoin: %" PRIu64 "\n", playerJoin.guid);
 
-    if (playerJoin.guid != scene.getPlayer().guid)
+    int index = scene.cars.tryAdd(playerJoin.guid, config, scene);
+
+    if (index < 0)
     {
-      int index = scene.cars.tryAdd(playerJoin.guid, config, scene);
-      Car& car = scene.cars[index];
-      car.position = playerJoin.position;
-      car.rotation = playerJoin.rotation;
+      printf("CLIENT_APP: Disconnecting! Players pool overflow.\n");
+      network.disconnect();
+      return;
     }
-    else
+
+    Car& car = scene.cars[index];
+    car.position = playerJoin.position;
+    car.rotation = playerJoin.rotation;
+
+    if (playerJoin.guid == scene.playerGuid)
     {
-      Car& car = scene.getPlayer();
-      car.position = playerJoin.position;
-      car.rotation = playerJoin.rotation;
+      scene.physicalFrame = playerJoin.physicalFrame;
+      scene.playerIndex = index;
     }
   }
 
@@ -184,12 +179,13 @@ namespace game
   {
     //if (playerControl.guid != scene.getPlayer().guid)
     scene.updatePlayerControl(playerControl);
+    scene.serverPhysicalFrame = playerControl.physicalFrame;
   }
 
   void App::onPlayerState(const PlayerState& playerState)
   {
-    if (playerState.guid != scene.getPlayer().guid)
-      scene.syncPlayerState(playerState, SYNC_FACTOR);
+    scene.syncPlayerState(playerState, SYNC_FACTOR);
+    scene.serverPhysicalFrame = playerState.physicalFrame;
   }
 
   void App::updateShortcuts()
@@ -253,6 +249,7 @@ namespace game
     if (IsKeyPressed(KEY_F4))
     {
       PlayerState playerState = {
+        .physicalFrame = scene.physicalFrame,
         .guid = scene.getPlayer().guid,
         .position = {-1, 7, 0},
         .rotation = quat::identity.rotatedByYAngle(PI / 2),
@@ -270,15 +267,20 @@ namespace game
     }
   }
 
+  void App::sendLocalPlayerControl(const PlayerControl& playerControl)
+  {
+    BitStream stream;
+    playerControl.writeTo(stream);
+    network.send(stream);
+  }
+
   void App::sendLocalPlayerState()
   {
-    PlayerState playerState;
-    scene.getPlayerState(scene.playerIndex, &playerState);
+    PlayerState playerState = scene.getPlayerState(scene.playerIndex);
 
-    BitStream playerStateStream;
-    playerState.writeTo(playerStateStream);
-
-    network.send(playerStateStream);
+    BitStream stream;
+    playerState.writeTo(stream);
+    network.send(stream);
   }
 
   void App::updateCamera(float dt, float lerpFactor)

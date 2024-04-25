@@ -30,7 +30,10 @@ namespace game
     bool slowMotion = false;
     vec3 gunRayHit = vec3::zero;
     vec3 cannonRayHit = vec3::zero;
-    int playerIndex = 0;
+    int playerIndex = -1;
+    uint64_t playerGuid = 0;
+    int64_t physicalFrame = 0;
+    uint64_t serverPhysicalFrame = 0;
 
     Scene(const Config& config);
     Scene(Scene&) = delete;
@@ -46,7 +49,7 @@ namespace game
     inline Car& getPlayer() { return cars[playerIndex]; }
     void updatePlayerControl(const PlayerControl& playerControl);
     void syncPlayerState(const PlayerState& playerState, float syncFactor);
-    void getPlayerState(int index, PlayerState* playerState) const;
+    PlayerState getPlayerState(int index) const;
     void updateGameObjects(float dt);
     void updateFiring(int carIndex, float dt);
     void createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position);

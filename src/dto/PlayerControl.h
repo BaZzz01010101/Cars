@@ -6,6 +6,7 @@ namespace dto
 
   struct PlayerControl
   {
+    int64_t physicalFrame {};
     uint64_t guid {};
     float steeringAxis {};
     float accelerationAxis {};

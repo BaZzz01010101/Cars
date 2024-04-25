@@ -32,7 +32,6 @@ namespace game
     virtual void onClientConnected(uint64_t guid) override;
     virtual void onClientDisconnected(uint64_t guid) override;
     virtual void onPlayerControl(const PlayerControl& playerControl) override;
-    virtual void onPlayerState(const PlayerState& playerState) override;
   };
 
 }

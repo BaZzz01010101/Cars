@@ -62,15 +62,12 @@ namespace game
 
   void ServerApp::sendPlayerStates()
   {
-    PlayerState playerState;
-
     for (int i = 0; i < scene.cars.capacity(); i++)
       if (scene.cars.isAlive(i))
       {
-        scene.getPlayerState(i, &playerState);
         BitStream stream;
-        playerState.writeTo(stream);
-        network.broadcastExcept(stream, playerState.guid, false);
+        scene.getPlayerState(i).writeTo(stream);
+        network.broadcast(stream, false);
       }
   }
 
@@ -105,6 +102,7 @@ namespace game
     player.rotation = quat::fromAxisAngle(normal, randf(2.0f * PI));
 
     PlayerJoin playerJoin = {
+      .physicalFrame = scene.physicalFrame,
       .guid = guid,
       .position = player.position,
       .rotation = player.rotation,
@@ -140,11 +138,6 @@ namespace game
   void ServerApp::onPlayerControl(const PlayerControl& playerControl)
   {
     scene.updatePlayerControl(playerControl);
-  }
-
-  void ServerApp::onPlayerState(const PlayerState& playerState)
-  {
-    scene.syncPlayerState(playerState, SYNC_FACTOR);
   }
 
 }

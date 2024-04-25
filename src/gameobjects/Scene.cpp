@@ -17,6 +17,7 @@ namespace game
 
   void Scene::update(float dt)
   {
+    physicalFrame++;
     terrain.traceCount = 0;
 
     thread_local int slowMoCounter = 0;
@@ -63,7 +64,8 @@ namespace game
           if (hitCarIndex >= 0)
           {
             Car& hitCar = cars[hitCarIndex];
-            hitCar.velocity += (hitCar.position - hitPosition).normalized() * projectile.baseDamage * 0.01f;
+            // TODO: Move impact factor into Config
+            hitCar.velocity += (hitCar.position - hitPosition).normalized() * (float)projectile.baseDamage * 0.01f;
 
             int newHealth = std::max(hitCar.health - projectile.baseDamage, 0);
 
@@ -256,14 +258,6 @@ namespace game
         cars[i].updateControl(playerControl);
         return;
       }
-
-    int index = cars.tryAdd(playerControl.guid, config, *this);
-
-    if (index >= 0)
-    {
-      Car& car = cars[index];
-      car.updateControl(playerControl);
-    }
   }
 
   void Scene::syncPlayerState(const PlayerState& playerState, float syncFactor)
@@ -274,34 +268,17 @@ namespace game
         cars[i].syncState(playerState, syncFactor);
         return;
       }
-
-    int index = cars.tryAdd(playerState.guid, config, *this);
-
-    if (index >= 0)
-    {
-      Car& car = cars[index];
-      car.syncState(playerState, syncFactor);
-    }
   }
 
-  void Scene::getPlayerState(int index, PlayerState* playerState) const
+  PlayerState Scene::getPlayerState(int index) const
   {
-    if (!playerState)
-      return;
-
     const Car& player = cars[index];
 
-    *playerState = {
-      .guid = player.guid,
-      .position = player.position,
-      .rotation = player.rotation,
-      .velocity = player.velocity,
-      .angularVelocity = player.angularVelocity,
-      .gunYaw = player.gun.yaw,
-      .gunPitch = player.gun.pitch,
-      .cannonYaw = player.cannon.yaw,
-      .cannonPitch = player.cannon.pitch,
-    };
+    PlayerState state = player.getState();
+    state.physicalFrame = physicalFrame;
+    state.guid = player.guid;
+
+    return state;
   }
 
 }

@@ -16,6 +16,9 @@ namespace game
 
   void Renderer::init()
   {
+    SetConfigFlags(FLAG_VSYNC_HINT);
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
+    //SetConfigFlags(FLAG_FULLSCREEN_MODE);
     InitWindow(config.graphics.screen.width, config.graphics.screen.height, config.graphics.screen.title);
     SetTargetFPS(60);
     loadResources();
@@ -261,6 +264,9 @@ namespace game
     rockModel = LoadModel(config.graphics.resources.rockModelPath);
 
     terrainTexture = LoadTexture(config.graphics.resources.terrainTexturePath);
+    GenTextureMipmaps(&terrainTexture);
+    SetTextureFilter(terrainTexture, TEXTURE_FILTER_ANISOTROPIC_16X);
+
     tree1Texture = LoadTexture(config.graphics.resources.tree1TexturePath);
     tree2Texture = LoadTexture(config.graphics.resources.tree2TexturePath);
     rockTexture = LoadTexture(config.graphics.resources.rockTexturePath);
@@ -341,7 +347,7 @@ namespace game
         mesh.vertices[i * 18 + 16] = v10.y;
         mesh.vertices[i * 18 + 17] = v10.z;
 
-        const float tex_scale = Terrain::TERRAIN_SIZE / 10.0f;
+        const float tex_scale = Terrain::TERRAIN_SIZE / 100.0f;
         mesh.texcoords[i * 12 + 0] = (float)x / Terrain::GRID_SIZE * tex_scale;
         mesh.texcoords[i * 12 + 1] = (float)y / Terrain::GRID_SIZE * tex_scale;
         mesh.texcoords[i * 12 + 2] = (float)x / Terrain::GRID_SIZE * tex_scale;

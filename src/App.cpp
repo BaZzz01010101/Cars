@@ -25,48 +25,51 @@ namespace game
     scene.init();
     hud.init();
     renderer.updateTerrainModel();
+    dtAccumulator = 0;
+    paused = false;
   }
 
-  void App::run()
+  bool App::pulse()
   {
-    if (!network.connect())
-      return;
+    if (!network.isConnected() && !network.connect())
+      return false;
 
-    float dtAccumulator = 0;
-    float fixedDt = config.physics.fixedDt;
-
-    while (!exit && !WindowShouldClose() && scene.playerIndex < 0)
-      network.update();
-
-    // Fix bug with excessive physical frame counter promotion due to extremely high 1st rendering frame time
-    renderer.draw(0);
-    renderer.draw(0);
-
-    while (!exit && !WindowShouldClose())
+    if (scene.playerIndex < 0)
     {
-      updateShortcuts();
-
-      PlayerControl localPlayerControl = getLocalPlayerControl();
-      sendLocalPlayerControl(localPlayerControl);
-      scene.updatePlayerControl(localPlayerControl);
-
       network.update();
+      std::this_thread::sleep_for(milliseconds(1));
 
-      float dt = GetFrameTime();
-      dtAccumulator += dt;
+      // Fix bug with excessive high 1st rendered frame time and excessive physical frame counter promotion
+      renderer.draw(0);
 
-      while (dtAccumulator > fixedDt)
-      {
-        // TODO: consider possible optimizations in physics calculations
-        // by getting rid of 'dt' parameter in 'update' methods and by using fixed 'dt' from config
-        update(fixedDt);
-        dtAccumulator -= fixedDt;
-      }
-
-      float lerpFactor = dtAccumulator / fixedDt;
-      updateCamera(dt, lerpFactor);
-      renderer.draw(lerpFactor);
+      return !exit && !WindowShouldClose();
     }
+
+    updateShortcuts();
+
+    PlayerControl localPlayerControl = getLocalPlayerControl();
+    sendLocalPlayerControl(localPlayerControl);
+    scene.updatePlayerControl(localPlayerControl);
+
+    network.update();
+
+    float dt = GetFrameTime();
+    dtAccumulator += dt;
+    static const float fixedDt = config.physics.fixedDt;
+
+    while (dtAccumulator > fixedDt)
+    {
+      // TODO: consider possible optimizations in physics calculations
+      // by getting rid of 'dt' parameter in 'update' methods and by using fixed 'dt' from config
+      update(fixedDt);
+      dtAccumulator -= fixedDt;
+    }
+
+    float lerpFactor = dtAccumulator / fixedDt;
+    updateCamera(dt, lerpFactor);
+    renderer.draw(lerpFactor);
+
+    return !exit && !WindowShouldClose();
   }
 
   void App::shutdown()

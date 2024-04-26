@@ -19,12 +19,7 @@ namespace game
     printf("Server started:\n");
     scene.init();
     network.start();
-  }
-
-  void ServerApp::run()
-  {
-    nanoseconds fixedDt(uint64_t(nanoseconds::period::den * config.physics.fixedDt));
-    nanoseconds maxSleep(0);
+    maxSleep = nanoseconds(0);
 
     for (int i = 0; i < 100; i++)
     {
@@ -34,25 +29,28 @@ namespace game
     }
 
     maxSleep *= 2;
+    lastUpdateTime = clock.now();
+  }
 
-    time_point tp0 = clock.now();
+  bool ServerApp::pulse()
+  {
+    static const nanoseconds fixedDt(uint64_t(nanoseconds::period::den * config.physics.fixedDt));
 
-    while (!exit)
+    time_point now = clock.now();
+    nanoseconds elapsed = now - lastUpdateTime;
+
+    if (elapsed < fixedDt - maxSleep)
+      std::this_thread::sleep_for(milliseconds(1));
+    else if (elapsed >= fixedDt)
     {
-      time_point tp1 = clock.now();
-      nanoseconds elapsed = tp1 - tp0;
+      lastUpdateTime += fixedDt;
 
-      if (elapsed < fixedDt - maxSleep)
-        std::this_thread::sleep_for(milliseconds(1));
-      else if (elapsed >= fixedDt)
-      {
-        tp0 += fixedDt;
-
-        scene.update(config.physics.fixedDt);
-        sendPlayerStates();
-        network.update();
-      }
+      scene.update(config.physics.fixedDt);
+      sendPlayerStates();
+      network.update();
     }
+
+    return !exit;
   }
 
   void ServerApp::shutdown()
@@ -110,7 +108,24 @@ namespace game
 
     BitStream stream;
     playerJoin.writeTo(stream);
-    network.broadcast(stream, true);
+    network.broadcastExcept(stream, guid, true);
+
+    for (int i = 0; i < scene.cars.capacity(); i++)
+      if (scene.cars.isAlive(i))
+      {
+        Car& player = scene.cars[i];
+
+        PlayerJoin playerJoin = {
+          .physicalFrame = scene.physicalFrame,
+          .guid = player.guid,
+          .position = player.position,
+          .rotation = player.rotation,
+        };
+
+        BitStream stream;
+        playerJoin.writeTo(stream);
+        network.send(stream, guid, true);
+      }
   }
 
   void ServerApp::onClientDisconnected(uint64_t guid)

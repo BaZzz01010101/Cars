@@ -18,6 +18,7 @@ namespace network
     void stop();
     void disconnectClient(uint64_t guid, bool sendNotification);
 
+    void send(const BitStream& data, uint64_t guid, bool isReliable);
     void broadcast(const BitStream& data, bool isReliable);
     void broadcastExcept(const BitStream& data, uint64_t guid, bool isReliable);
     void update();

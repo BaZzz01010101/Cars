@@ -30,6 +30,7 @@ namespace game
     Texture rockTexture {};
 
     bool drawWires = false;
+    std::function<void()> injectionCallback {};
 
     Renderer(const Config& config, const CustomCamera& camera, const Scene& scene, const Hud& hud);
     Renderer(Renderer&) = delete;
@@ -39,6 +40,7 @@ namespace game
 
     void init();
     void shutdown();
+    void inject(std::function<void()> callback);
     void draw(float lerpFactor);
     void drawCar(const Car& car, float lerpFactor);
     void drawWheel(const Wheel& wheel, float lerpFactor);

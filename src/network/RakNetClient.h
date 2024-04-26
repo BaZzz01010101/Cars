@@ -14,6 +14,8 @@ namespace network
     RakNetClient(const Config& config, IClientMessageHandler& messageHandler);
     virtual ~RakNetClient();
 
+    bool isConnected() const;
+
     bool connect();
     void disconnect();
 

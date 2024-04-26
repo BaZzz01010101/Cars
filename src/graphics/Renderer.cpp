@@ -27,6 +27,11 @@ namespace game
     CloseWindow();
   }
 
+  void Renderer::inject(std::function<void()> callback)
+  {
+    injectionCallback = callback;
+  }
+
   void Renderer::draw(float lerpFactor)
   {
     ClearBackground(BLACK);
@@ -43,6 +48,9 @@ namespace game
         const Car& car = scene.cars[i];
         drawCar(car, lerpFactor);
       }
+
+    if (injectionCallback)
+      injectionCallback();
 
     for (int i = 0; i < scene.projectiles.capacity(); i++)
       if (scene.projectiles.isAlive(i))

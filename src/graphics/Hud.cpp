@@ -158,6 +158,9 @@ namespace game
 
   void Hud::draw(const CustomCamera& camera, const Scene& scene) const
   {
+    if (scene.playerIndex < 0)
+      return;
+
     drawCrossHairs(camera, scene);
     drawDebug(scene);
   }

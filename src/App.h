@@ -23,12 +23,13 @@ namespace game
     Renderer renderer;
     RakNetClient network;
 
+    float dtAccumulator = 0;
     bool paused = false;
 
     App();
 
     void initialize();
-    void run();
+    bool pulse();
     void shutdown();
     void togglePaused();
     void update(float dt);

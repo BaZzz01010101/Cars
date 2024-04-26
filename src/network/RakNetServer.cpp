@@ -46,6 +46,14 @@ namespace network
     peer->CloseConnection(peer->GetSystemAddressFromGuid(RakNet::RakNetGUID(guid)), sendNotification, 0, PacketPriority::LOW_PRIORITY);
   }
 
+  void RakNetServer::send(const BitStream& data, uint64_t guid, bool isReliable)
+  {
+    //printf("SERVER: Send packet: %i\n", data.GetData()[0]);
+    SystemAddress address = peer->GetSystemAddressFromGuid(RakNet::RakNetGUID(guid));
+    PacketReliability reliability = isReliable ? PacketReliability::RELIABLE_ORDERED : PacketReliability::UNRELIABLE_SEQUENCED;
+    peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, reliability, 0, address, false);
+  }
+
   void RakNetServer::broadcast(const BitStream& data, bool isReliable)
   {
     //printf("SERVER: Broadcast packet: %i\n", data.GetData()[0]);

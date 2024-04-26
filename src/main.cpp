@@ -8,45 +8,48 @@ int main(int argc, char* argv[])
 {
   if (argc > 1 && !strcmp(argv[1], "-test"))
   {
-    std::thread app([]() {
-      App* app = new App();
+    ServerApp* server = new ServerApp();
+    App* client = new App();
+    bool renderServerPlayers = true;
 
-      app->initialize();
-      app->run();
-      app->shutdown();
+    server->initialize();
+    client->initialize();
 
-      delete app;
+    client->renderer.inject([&]() {
+      if (renderServerPlayers)
+      {
+        bool dw = client->renderer.drawWires;
+        client->renderer.drawWires = true;
+
+        for (int i = 0; i < server->scene.cars.capacity(); i++)
+          if (server->scene.cars.isAlive(i))
+          {
+            const Car& car = server->scene.cars[i];
+            client->renderer.drawCar(car, 1);
+          }
+
+        client->renderer.drawWires = dw;
+      }
     });
 
-    volatile bool* serverExit = nullptr;
-
-    std::thread server([&]() {
-      ServerApp* app = new ServerApp();
-      serverExit = &app->exit;
-
-      app->initialize();
-      app->run();
-      app->shutdown();
-
-      delete app;
-    });
-
-    app.join();
-
-    if (!serverExit)
-      server.detach();
-    else
+    while (client->pulse() && server->pulse())
     {
-      *serverExit = true;
-      server.join();
+      if (IsKeyPressed(KEY_Y))
+        renderServerPlayers = !renderServerPlayers;
     }
+
+    client->shutdown();
+    server->shutdown();
+
+    delete client;
+    delete server;
   }
   else if (argc > 1 && !strcmp(argv[1], "-server"))
   {
     ServerApp* app = new ServerApp();
 
     app->initialize();
-    app->run();
+    while (app->pulse());
     app->shutdown();
 
     delete app;
@@ -56,7 +59,7 @@ int main(int argc, char* argv[])
     App* app = new App();
 
     app->initialize();
-    app->run();
+    while (app->pulse());
     app->shutdown();
 
     delete app;

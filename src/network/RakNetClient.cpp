@@ -21,6 +21,11 @@ namespace network
     RakPeerInterface::DestroyInstance(peer);
   }
 
+  bool RakNetClient::isConnected() const
+  {
+    return peer && peer->GetConnectionState(serverId) == ConnectionState::IS_CONNECTED;
+  }
+
   bool RakNetClient::connect()
   {
     const char* serverAddress = config.multiplayer.serverAddress;

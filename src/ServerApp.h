@@ -20,11 +20,13 @@ namespace game
     Scene scene;
     RakNetServer network;
     high_resolution_clock clock {};
+    nanoseconds maxSleep {};
+    time_point<steady_clock> lastUpdateTime {};
 
     ServerApp();
 
     void initialize();
-    void run();
+    bool pulse();
     void shutdown();
 
     void sendPlayerStates();

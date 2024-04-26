@@ -1,15 +1,17 @@
 #include "core.h"
-#include "App.h"
+#include "ClientApp.h"
 #include "ServerApp.h"
 
 using namespace game;
 
 int main(int argc, char* argv[])
 {
+  const Config& config = Config::DEFAULT;
+
   if (argc > 1 && !strcmp(argv[1], "-test"))
   {
-    ServerApp* server = new ServerApp();
-    App* client = new App();
+    ServerApp* server = new ServerApp(config);
+    ClientApp* client = new ClientApp(config);
     bool renderServerPlayers = true;
 
     server->initialize();
@@ -46,7 +48,7 @@ int main(int argc, char* argv[])
   }
   else if (argc > 1 && !strcmp(argv[1], "-server"))
   {
-    ServerApp* app = new ServerApp();
+    ServerApp* app = new ServerApp(config);
 
     app->initialize();
     while (app->pulse());
@@ -56,7 +58,7 @@ int main(int argc, char* argv[])
   }
   else
   {
-    App* app = new App();
+    ClientApp* app = new ClientApp(config);
 
     app->initialize();
     while (app->pulse());

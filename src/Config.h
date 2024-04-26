@@ -155,4 +155,5 @@ namespace game
 
     static const Config DEFAULT;
   };
+
 }

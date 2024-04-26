@@ -6,9 +6,9 @@
 
 namespace game
 {
-  ServerApp::ServerApp() :
+  ServerApp::ServerApp(const Config& config) :
     exit(false),
-    config(Config::DEFAULT),
+    config(config),
     network(config, *this),
     scene(config)
   {

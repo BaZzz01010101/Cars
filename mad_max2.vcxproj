@@ -95,7 +95,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\App.cpp" />
+    <ClCompile Include="src\ClientApp.cpp" />
     <ClCompile Include="src\collisions\Sphere.cpp" />
     <ClCompile Include="src\dto\PlayerControl.cpp" />
     <ClCompile Include="src\dto\PlayerJoin.cpp" />
@@ -131,7 +131,7 @@
     <ClCompile Include="src\ServerApp.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\App.h" />
+    <ClInclude Include="src\ClientApp.h" />
     <ClInclude Include="src\collections\BoolArray.hpp" />
     <ClInclude Include="src\collections\Pool.hpp" />
     <ClInclude Include="src\collections\Queue.hpp" />

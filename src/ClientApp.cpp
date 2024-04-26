@@ -1,5 +1,5 @@
 #include "core.h"
-#include "App.h"
+#include "ClientApp.h"
 #include "Helpers.h"
 
 namespace game
@@ -8,9 +8,9 @@ namespace game
   // Saving the reference to Config in every instance can lead to serious multithreading issues
   // if config will be changed from different thread
 
-  App::App() :
+  ClientApp::ClientApp(const Config& config) :
     exit(false),
-    config(Config::DEFAULT),
+    config(config),
     camera(config),
     scene(config),
     hud(config),
@@ -19,7 +19,7 @@ namespace game
   {
   }
 
-  void App::initialize()
+  void ClientApp::initialize()
   {
     renderer.init();
     scene.init();
@@ -29,7 +29,7 @@ namespace game
     paused = false;
   }
 
-  bool App::pulse()
+  bool ClientApp::pulse()
   {
     if (!network.isConnected() && !network.connect())
       return false;
@@ -48,7 +48,7 @@ namespace game
     updateShortcuts();
 
     PlayerControl localPlayerControl = getLocalPlayerControl();
-    sendLocalPlayerControl(localPlayerControl);
+    sendPlayerControl(localPlayerControl);
     scene.updatePlayerControl(localPlayerControl);
 
     network.update();
@@ -72,13 +72,13 @@ namespace game
     return !exit && !WindowShouldClose();
   }
 
-  void App::shutdown()
+  void ClientApp::shutdown()
   {
     renderer.shutdown();
     network.disconnect();
   }
 
-  void App::update(float dt)
+  void ClientApp::update(float dt)
   {
     if (dt > config.physics.fixedDt)
     {
@@ -92,14 +92,14 @@ namespace game
     hud.update();
   }
 
-  void App::togglePaused()
+  void ClientApp::togglePaused()
   {
     paused = !paused;
     scene.paused = paused;
     hud.paused = paused;
   }
 
-  PlayerControl App::getLocalPlayerControl()
+  PlayerControl ClientApp::getLocalPlayerControl()
   {
     const Car& player = scene.getPlayer();
 
@@ -130,19 +130,19 @@ namespace game
     };
   }
 
-  void App::onConnected(uint64_t guid)
+  void ClientApp::onConnected(uint64_t guid)
   {
     printf("CLIENT_APP: OnConnected, my guid: %" PRIu64 "\n", guid);
     scene.playerGuid = guid;
   }
 
-  void App::onDisconnected(uint64_t guid)
+  void ClientApp::onDisconnected(uint64_t guid)
   {
     printf("CLIENT_APP: OnDisconnected\n");
     exit = true;
   }
 
-  void App::onPlayerJoin(const PlayerJoin& playerJoin)
+  void ClientApp::onPlayerJoin(const PlayerJoin& playerJoin)
   {
     printf("CLIENT_APP: OnPlayerJoin: %" PRIu64 "\n", playerJoin.guid);
 
@@ -166,7 +166,7 @@ namespace game
     }
   }
 
-  void App::onPlayerLeave(const PlayerLeave& playerLeave)
+  void ClientApp::onPlayerLeave(const PlayerLeave& playerLeave)
   {
     printf("CLIENT_APP: OnPlayerLeave: %" PRIu64 "\n", playerLeave.guid);
 
@@ -178,20 +178,20 @@ namespace game
       }
   }
 
-  void App::onPlayerControl(const PlayerControl& playerControl)
+  void ClientApp::onPlayerControl(const PlayerControl& playerControl)
   {
     //if (playerControl.guid != scene.getPlayer().guid)
     scene.updatePlayerControl(playerControl);
     scene.serverPhysicalFrame = playerControl.physicalFrame;
   }
 
-  void App::onPlayerState(const PlayerState& playerState)
+  void ClientApp::onPlayerState(const PlayerState& playerState)
   {
     scene.syncPlayerState(playerState, SYNC_FACTOR);
     scene.serverPhysicalFrame = playerState.physicalFrame;
   }
 
-  void App::updateShortcuts()
+  void ClientApp::updateShortcuts()
   {
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_ALT) && IsKeyPressed(KEY_SPACE))
     {
@@ -270,23 +270,14 @@ namespace game
     }
   }
 
-  void App::sendLocalPlayerControl(const PlayerControl& playerControl)
+  void ClientApp::sendPlayerControl(const PlayerControl& playerControl)
   {
     BitStream stream;
     playerControl.writeTo(stream);
     network.send(stream);
   }
 
-  void App::sendLocalPlayerState()
-  {
-    PlayerState playerState = scene.getPlayerState(scene.playerIndex);
-
-    BitStream stream;
-    playerState.writeTo(stream);
-    network.send(stream);
-  }
-
-  void App::updateCamera(float dt, float lerpFactor)
+  void ClientApp::updateCamera(float dt, float lerpFactor)
   {
     const Car& player = scene.getPlayer();
     vec3 playerPosition = vec3::lerp(player.lastPosition, player.position, lerpFactor);

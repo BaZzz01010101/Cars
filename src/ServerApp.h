@@ -23,7 +23,7 @@ namespace game
     nanoseconds maxSleep {};
     time_point<steady_clock> lastUpdateTime {};
 
-    ServerApp();
+    ServerApp(const Config& config);
 
     void initialize();
     bool pulse();

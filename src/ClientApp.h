@@ -11,7 +11,7 @@ namespace game
   using namespace network;
   using namespace dto;
 
-  struct App : public IClientMessageHandler
+  struct ClientApp : public IClientMessageHandler
   {
     static constexpr float SYNC_FACTOR = 0.5f;
     volatile bool exit;
@@ -26,7 +26,7 @@ namespace game
     float dtAccumulator = 0;
     bool paused = false;
 
-    App();
+    ClientApp(const Config& config);
 
     void initialize();
     bool pulse();
@@ -34,8 +34,7 @@ namespace game
     void togglePaused();
     void update(float dt);
     void updateShortcuts();
-    void sendLocalPlayerControl(const PlayerControl& playerControl);
-    void sendLocalPlayerState();
+    void sendPlayerControl(const PlayerControl& playerControl);
     void updateCamera(float dt, float lerpFactor);
     PlayerControl getLocalPlayerControl();
 

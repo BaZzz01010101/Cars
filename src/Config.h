@@ -96,7 +96,6 @@ namespace game
         float maxPitch;
         float horzSensitivity;
         float vertSensitivity;
-        bool invertY;
       } camera;
 
       struct Hud

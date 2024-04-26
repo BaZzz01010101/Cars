@@ -14,6 +14,7 @@ namespace game
     float pitch = 0;
     vec3 position = vec3::zero;
     vec3 direction = vec3::zero;
+    bool invertY = false;
 
     CustomCamera(const Config& config);
     CustomCamera(CustomCamera&) = delete;

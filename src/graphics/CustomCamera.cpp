@@ -23,7 +23,7 @@ namespace game
     yaw -= mouseDelta.x * cameraConfig.horzSensitivity * 0.001f;
     yaw = normalizeAngle(yaw);
 
-    pitch += mouseDelta.y * cameraConfig.vertSensitivity * 0.001f * (1 - 2 * cameraConfig.invertY);
+    pitch += mouseDelta.y * cameraConfig.vertSensitivity * 0.001f * (1 - 2 * invertY);
     pitch = std::clamp(pitch, -cameraConfig.maxPitch, cameraConfig.maxPitch);
 
     quat rotation = quat::fromYAngle(yaw) * quat::fromXAngle(pitch);

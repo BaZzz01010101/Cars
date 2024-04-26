@@ -98,7 +98,6 @@ namespace game
         .maxPitch = PI * 3 / 8,
         .horzSensitivity = 1.0f,
         .vertSensitivity = 1.0f,
-        .invertY = false,
       },
       .hud = {
         .fontSize = 20,

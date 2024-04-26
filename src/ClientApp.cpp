@@ -205,6 +205,9 @@ namespace game
     if (IsKeyPressed(KEY_P))
       togglePaused();
 
+    if (IsKeyPressed(KEY_Y))
+      camera.invertY = !camera.invertY;
+
     if (IsKeyPressed(KEY_O))
       scene.slowMotion = !scene.slowMotion;
 

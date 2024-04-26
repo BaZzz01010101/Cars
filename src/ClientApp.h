@@ -1,5 +1,6 @@
 #pragma once
 #include "Config.h"
+#include "ServerConfig.h"
 #include "Scene.h"
 #include "Hud.h"
 #include "Renderer.h"
@@ -26,7 +27,7 @@ namespace game
     float dtAccumulator = 0;
     bool paused = false;
 
-    ClientApp(const Config& config);
+    ClientApp(const Config& config, const ServerConfig& serverConfig);
 
     void initialize();
     bool pulse();

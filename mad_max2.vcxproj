@@ -95,6 +95,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Args.cpp" />
     <ClCompile Include="src\ClientApp.cpp" />
     <ClCompile Include="src\collisions\Sphere.cpp" />
     <ClCompile Include="src\dto\PlayerControl.cpp" />
@@ -129,8 +130,10 @@
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ServerApp.cpp" />
+    <ClCompile Include="src\ServerConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Args.h" />
     <ClInclude Include="src\ClientApp.h" />
     <ClInclude Include="src\collections\BoolArray.hpp" />
     <ClInclude Include="src\collections\Pool.hpp" />
@@ -174,6 +177,7 @@
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\core.h" />
     <ClInclude Include="src\ServerApp.h" />
+    <ClInclude Include="src\ServerConfig.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

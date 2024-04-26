@@ -1,5 +1,6 @@
 #pragma once
 #include "Config.h"
+#include "ServerConfig.h"
 #include "Scene.h"
 #include "PlayerState.h"
 #include "Queue.hpp"
@@ -23,7 +24,9 @@ namespace game
     nanoseconds maxSleep {};
     time_point<steady_clock> lastUpdateTime {};
 
-    ServerApp(const Config& config);
+    int maxPlayers = 0;
+
+    ServerApp(const Config& config, const ServerConfig& serverConfig);
 
     void initialize();
     bool pulse();

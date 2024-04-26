@@ -9,7 +9,7 @@ using namespace dto;
 
 namespace network
 {
-  RakNetClient::RakNetClient(const Config& config, IClientMessageHandler& messageHandler) :
+  RakNetClient::RakNetClient(const ServerConfig& config, IClientMessageHandler& messageHandler) :
     config(config),
     messageHandler(messageHandler)
   {
@@ -28,9 +28,9 @@ namespace network
 
   bool RakNetClient::connect()
   {
-    const char* serverAddress = config.multiplayer.serverAddress;
-    unsigned short serverPort = config.multiplayer.serverPort;
-    const char* password = config.multiplayer.serverPassword;
+    const char* serverAddress = config.host;
+    unsigned short serverPort = config.port;
+    const char* password = config.password;
 
     printf("CLIENT: Connecting to: %s:%i\n", serverAddress, serverPort);
 

@@ -8,14 +8,14 @@ namespace game
   // Saving the reference to Config in every instance can lead to serious multithreading issues
   // if config will be changed from different thread
 
-  ClientApp::ClientApp(const Config& config) :
+  ClientApp::ClientApp(const Config& config, const ServerConfig& serverConfig) :
     exit(false),
     config(config),
     camera(config),
     scene(config),
     hud(config),
     renderer(config, camera, scene, hud),
-    network(config, *this)
+    network(serverConfig, *this)
   {
   }
 

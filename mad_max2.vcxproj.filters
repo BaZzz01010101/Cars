@@ -95,6 +95,8 @@
     <ClCompile Include="src\dto\WheelState.cpp">
       <Filter>dto</Filter>
     </ClCompile>
+    <ClCompile Include="src\Args.cpp" />
+    <ClCompile Include="src\ServerConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ClientApp.h" />
@@ -218,6 +220,8 @@
     <ClInclude Include="src\collections\Ring.hpp">
       <Filter>collections</Filter>
     </ClInclude>
+    <ClInclude Include="src\Args.h" />
+    <ClInclude Include="src\ServerConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

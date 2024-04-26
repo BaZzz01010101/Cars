@@ -147,10 +147,6 @@ namespace game
 
     struct Multiplayer
     {
-      const char* serverAddress;
-      int serverPort;
-      const char* serverPassword;
-      int maxPlayers;
     } multiplayer;
 
     static const Config DEFAULT;

@@ -6,11 +6,12 @@
 
 namespace game
 {
-  ServerApp::ServerApp(const Config& config) :
+  ServerApp::ServerApp(const Config& config, const ServerConfig& serverConfig) :
     exit(false),
     config(config),
-    network(config, *this),
-    scene(config)
+    network(serverConfig, *this),
+    scene(config),
+    maxPlayers(serverConfig.maxPlayers)
   {
   }
 
@@ -71,7 +72,7 @@ namespace game
 
   void ServerApp::onClientConnected(uint64_t guid)
   {
-    if (scene.cars.count() >= config.multiplayer.maxPlayers)
+    if (scene.cars.count() >= maxPlayers)
     {
       printf("SERVER_APP: OnClientConnected: %" PRIu64 ". Disconnecting! Players limit reached.\n", guid);
       network.disconnectClient(guid, true);

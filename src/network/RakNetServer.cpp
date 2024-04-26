@@ -4,7 +4,7 @@
 
 namespace network
 {
-  RakNetServer::RakNetServer(const Config& config, IServerMessageHandler& messageHandler) :
+  RakNetServer::RakNetServer(const ServerConfig& config, IServerMessageHandler& messageHandler) :
     config(config),
     messageHandler(messageHandler)
   {
@@ -21,17 +21,16 @@ namespace network
 
   void RakNetServer::start()
   {
-    const char* serverAddress = config.multiplayer.serverAddress;
-    unsigned short serverPort = config.multiplayer.serverPort;
-    const char* password = config.multiplayer.serverPassword;
-    int maxPlayers = config.multiplayer.maxPlayers;
-    maxConnections = maxPlayers * 2;
-    SocketDescriptor sd(serverPort, "");
+    maxConnections = config.maxPlayers * 2;
+    SocketDescriptor sd(config.port, config.host);
     peer->Startup(maxConnections, &sd, 1);
     peer->SetMaximumIncomingConnections(maxConnections);
-    peer->SetIncomingPassword(password, (int)strlen(password));
+    peer->SetIncomingPassword(config.password, (int)strlen(config.password));
 
-    printf("SERVER: Started: %s:%i. Waiting for connections...\n", serverAddress, serverPort);
+    if(config.host[0])
+      printf("SERVER: Started. Waiting for connections on %s:%i\n", config.host, config.port);
+    else
+      printf("SERVER: Started. Waiting for connections on port %i (all interfaces)\n", config.port);
   }
 
   void RakNetServer::stop()

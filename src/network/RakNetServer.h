@@ -1,5 +1,5 @@
 #pragma once
-#include "Config.h"
+#include "ServerConfig.h"
 #include "PlayerControl.h"
 #include "PlayerState.h"
 #include "IServerMessageHandler.h"
@@ -11,7 +11,7 @@ namespace network
   class RakNetServer
   {
   public:
-    RakNetServer(const Config& config, IServerMessageHandler& messageHandler);
+    RakNetServer(const ServerConfig& config, IServerMessageHandler& messageHandler);
     virtual ~RakNetServer();
 
     void start();
@@ -25,7 +25,7 @@ namespace network
 
   private:
     static constexpr int DISCONNECTION_TIMEOUT = 30;
-    const Config& config;
+    const ServerConfig& config;
     IServerMessageHandler& messageHandler;
     RakPeerInterface* peer = nullptr;
     Packet* packet = nullptr;

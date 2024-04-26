@@ -1,4 +1,5 @@
 #include "core.h"
+#include "Args.h"
 #include "ClientApp.h"
 #include "ServerApp.h"
 
@@ -6,12 +7,14 @@ using namespace game;
 
 int main(int argc, char* argv[])
 {
+  Args args(argc, argv);
+
   const Config& config = Config::DEFAULT;
 
-  if (argc > 1 && !strcmp(argv[1], "-test"))
+  if (args.mode == Args::Test)
   {
-    ServerApp* server = new ServerApp(config);
-    ClientApp* client = new ClientApp(config);
+    ServerApp* server = new ServerApp(config, args.serverConfig);
+    ClientApp* client = new ClientApp(config, args.serverConfig);
     bool renderServerPlayers = true;
 
     server->initialize();
@@ -46,9 +49,19 @@ int main(int argc, char* argv[])
     delete client;
     delete server;
   }
-  else if (argc > 1 && !strcmp(argv[1], "-server"))
+  if (args.mode == Args::Server)
   {
-    ServerApp* app = new ServerApp(config);
+    ServerApp* app = new ServerApp(config, args.serverConfig);
+
+    app->initialize();
+    while (app->pulse());
+    app->shutdown();
+
+    delete app;
+  }
+  if (args.mode == Args::Client)
+  {
+    ClientApp* app = new ClientApp(config, args.serverConfig);
 
     app->initialize();
     while (app->pulse());
@@ -58,13 +71,7 @@ int main(int argc, char* argv[])
   }
   else
   {
-    ClientApp* app = new ClientApp(config);
-
-    app->initialize();
-    while (app->pulse());
-    app->shutdown();
-
-    delete app;
+    printf("Unexpected mode in args\n");
   }
 
   return 0;

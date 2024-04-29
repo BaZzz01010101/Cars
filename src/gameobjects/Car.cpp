@@ -113,10 +113,10 @@ namespace game
     updateEngine(dt);
     updateSteering(dt);
 
-    applyGlobalForceAtLocalPoint(frontLeftWheel.suspecsionForce, frontLeftWheel.connectionPoint);
-    applyGlobalForceAtLocalPoint(frontRightWheel.suspecsionForce, frontRightWheel.connectionPoint);
-    applyGlobalForceAtLocalPoint(rearLeftWheel.suspecsionForce, rearLeftWheel.connectionPoint);
-    applyGlobalForceAtLocalPoint(rearRightWheel.suspecsionForce, rearRightWheel.connectionPoint);
+    applyGlobalForceAtLocalPoint(frontLeftWheel.suspensionForce, frontLeftWheel.connectionPoint);
+    applyGlobalForceAtLocalPoint(frontRightWheel.suspensionForce, frontRightWheel.connectionPoint);
+    applyGlobalForceAtLocalPoint(rearLeftWheel.suspensionForce, rearLeftWheel.connectionPoint);
+    applyGlobalForceAtLocalPoint(rearRightWheel.suspensionForce, rearRightWheel.connectionPoint);
 
     updateCollisions(dt);
 

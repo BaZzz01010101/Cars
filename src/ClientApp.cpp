@@ -200,8 +200,6 @@ namespace game
       network.connect();
     }
 
-    Car& player = scene.getPlayer();
-
     if (IsKeyPressed(KEY_P))
       togglePaused();
 
@@ -213,9 +211,6 @@ namespace game
 
     if (IsKeyPressed(KEY_T))
       renderer.drawWires = !renderer.drawWires;
-
-    if (IsKeyPressed(KEY_R))
-      player.rotation = player.rotation * quat::fromEuler(PI / 2, 0, 0);
 
     if (IsKeyPressed(KEY_ZERO))
     {
@@ -237,6 +232,14 @@ namespace game
 
     if (IsKeyPressed(KEY_F1))
       scene.reset(vec3::zero, quat::identity);
+
+    if (scene.playerIndex < 0)
+      return;
+
+    Car& player = scene.getPlayer();
+
+    if (IsKeyPressed(KEY_R))
+      player.rotation = player.rotation * quat::fromEuler(PI / 2, 0, 0);
 
     if (IsKeyPressed(KEY_F2))
     {
@@ -269,7 +272,7 @@ namespace game
 
       playerState.position.y = 2 + scene.terrain.getHeight(playerState.position.x, playerState.position.z, nullptr);
 
-      scene.getPlayer().syncState(playerState, 1.0f);
+      player.syncState(playerState, 1.0f);
     }
   }
 

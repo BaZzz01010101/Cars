@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 
     while (client->pulse() && server->pulse())
     {
-      if (IsKeyPressed(KEY_Y))
+      if (IsKeyPressed(KEY_U))
         renderServerPlayers = !renderServerPlayers;
     }
 

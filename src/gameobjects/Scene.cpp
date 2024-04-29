@@ -30,14 +30,6 @@ namespace game
 
   void Scene::updateGameObjects(float dt)
   {
-    for (int i = 0; i < cars.capacity(); i++)
-      if (cars.isAlive(i))
-      {
-        Car& car = cars[i];
-        car.update(dt);
-        updateFiring(i, dt);
-      }
-
     for (int i = 0; i < projectiles.capacity(); i++)
       if (projectiles.isAlive(i))
       {
@@ -75,6 +67,14 @@ namespace game
             hitCar.health = newHealth;
           }
         }
+      }
+
+    for (int i = 0; i < cars.capacity(); i++)
+      if (cars.isAlive(i))
+      {
+        Car& car = cars[i];
+        car.update(dt);
+        updateFiring(i, dt);
       }
 
     for (int i = 0; i < explosionParticles.capacity(); i++)
@@ -135,8 +135,6 @@ namespace game
         car.timeToNextGunFire += gunConfig.fireInterval;
       }
     }
-    else
-      car.timeToNextGunFire = 0;
 
     if (car.cannonFiring)
     {
@@ -166,6 +164,12 @@ namespace game
 
     car.timeToNextCannonFire -= dt;
     car.timeToNextGunFire -= dt;
+
+    if(!car.gunFiring && car.timeToNextGunFire < 0)
+      car.timeToNextGunFire = 0;
+
+    if(!car.cannonFiring && car.timeToNextCannonFire < 0)
+      car.timeToNextCannonFire = 0;
   }
 
   void Scene::createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position)

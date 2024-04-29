@@ -51,7 +51,7 @@ namespace game
 
         if (projectile.lifeTime < 0)
           projectiles.remove(i);
-        else if (traceRay(projectile.position, direction, distance, projectile.ownerIndex, &hitPosition, &normal, nullptr, &hitCarIndex))
+        else if (traceRay(projectile.lastPosition, direction, distance, projectile.ownerIndex, &hitPosition, &normal, nullptr, &hitCarIndex))
         {
           projectiles.remove(i);
 

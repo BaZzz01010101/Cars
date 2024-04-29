@@ -31,7 +31,7 @@ namespace game
           },
           .weapon = {
             .gun = { 0, 0.45f, -0.2f },
-            .cannon = { 0, 0.55f, -1.6f }
+            .cannon = { 0, 0.70f, -1.6f }
           }
         }
       },

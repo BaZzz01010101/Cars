@@ -89,8 +89,8 @@ namespace game
     drawWheel(car.rearLeftWheel, lerpFactor);
     drawWheel(car.rearRightWheel, lerpFactor);
 
-    drawTurret(car.gun, lerpFactor);
-    drawTurret(car.cannon, lerpFactor);
+    drawGun(car.gun, lerpFactor);
+    drawCannon(car.cannon, lerpFactor);
 
     drawCarDebug(car);
   }
@@ -106,14 +106,22 @@ namespace game
     drawWheelDebug(wheel);
   }
 
-  void Renderer::drawTurret(const Turret& turret, float lerpFactor)
+  void Renderer::drawGun(const Turret& turret, float lerpFactor)
   {
     vec3 position = vec3::lerp(turret.lastPosition, turret.position, lerpFactor);
     quat rotation = quat::slerp(turret.lastRotation, turret.rotation, lerpFactor);
-    float scale = turret.scale;
-    Matrix transform = MatrixMultiply(MatrixMultiply(QuaternionToMatrix(rotation), MatrixScale(scale, scale, scale)), MatrixTranslate(position.x, position.y, position.z));
+    Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation), MatrixTranslate(position.x, position.y, position.z));
 
     drawModel(gunModel, transform);
+  }
+
+  void Renderer::drawCannon(const Turret& turret, float lerpFactor)
+  {
+    vec3 position = vec3::lerp(turret.lastPosition, turret.position, lerpFactor);
+    quat rotation = quat::slerp(turret.lastRotation, turret.rotation, lerpFactor);
+    Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation), MatrixTranslate(position.x, position.y, position.z));
+
+    drawModel(cannonModel, transform);
   }
 
   void Renderer::drawModel(const Model& model, const Matrix& transform)

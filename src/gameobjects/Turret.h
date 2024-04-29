@@ -14,11 +14,10 @@ namespace game
     vec3 connectionPoint = vec3::zero;
     vec3 expectedTarget = vec3::zero;
     vec3 currentTarget = vec3::zero;
-    float scale = 0;
     float yaw = 0;
     float pitch = 0;
 
-    Turret(const Config::Physics::Turret& config, const Terrain& terrain, vec3 parentConnectionPoint, float scale);
+    Turret(const Config::Physics::Turret& config, const Terrain& terrain, vec3 parentConnectionPoint);
     Turret(Turret&) = delete;
     Turret(Turret&&) = delete;
     Turret& operator=(Turret&) = delete;

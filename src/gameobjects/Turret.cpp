@@ -4,11 +4,10 @@
 
 namespace game
 {
-  Turret::Turret(const Config::Physics::Turret& config, const Terrain& terrain, vec3 connectionPoint, float scale) :
+  Turret::Turret(const Config::Physics::Turret& config, const Terrain& terrain, vec3 connectionPoint) :
     config(config),
     terrain(terrain),
-    connectionPoint(connectionPoint),
-    scale(scale)
+    connectionPoint(connectionPoint)
   {}
 
   void Turret::reset()

@@ -96,10 +96,12 @@ namespace game
   }
 
   vec3::vec3(Vector3 v) : Vector3 { v }
-  {}
+  {
+  }
 
   vec3::vec3(float x, float y, float z) : Vector3 { x, y, z }
-  {}
+  {
+  }
 
   vec3 vec3::operator+(vec3 v) const
   {
@@ -243,7 +245,7 @@ namespace game
 
   bool vec3::isNormalized() const
   {
-      return fabsf(sqLength() - 1) < EPSILON;
+    return fabsf(sqLength() - 1) < EPSILON;
   }
 
   bool vec3::isZero() const
@@ -366,7 +368,8 @@ namespace game
 
   void vec3::yawPitch(float* yaw, float* pitch) const
   {
-    if (yaw) *yaw = atan2(x, z);
+    if (yaw)
+      *yaw = atan2(x, z);
 
     if (pitch)
     {
@@ -377,9 +380,13 @@ namespace game
 
   void vec3::yawPitchTo(vec3 target, float* yaw, float* pitch) const
   {
-    if (yaw) *yaw = atan2(target.z - z, target.x - x);
+    if (yaw)
+      *yaw = atan2(target.z - z, target.x - x);
+
     float distanceXY = sqrt((target.x - x) * (target.x - x) + (target.z - z) * (target.z - z));
-    if (pitch) *pitch = atan2(target.y - y, distanceXY);
+
+    if (pitch)
+      *pitch = atan2(target.y - y, distanceXY);
   }
 
   vec2 vec3::xy() const

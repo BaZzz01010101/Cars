@@ -34,7 +34,7 @@ namespace game
     if (!network.isConnected() && !network.connect())
       return false;
 
-    if (scene.playerIndex < 0)
+    if (scene.localPlayerIndex < 0)
     {
       network.update();
       std::this_thread::sleep_for(milliseconds(1));
@@ -101,12 +101,12 @@ namespace game
 
   PlayerControl ClientApp::getLocalPlayerControl()
   {
-    const Car& player = scene.getPlayer();
+    const Car& player = scene.getLocalPlayer();
 
     // TODO: Move the logic of disabled control for dead player to server side
     if (player.health == 0)
       return PlayerControl {
-        .physicalFrame = scene.physicalFrame,
+        .physicalFrame = scene.localPhysicalFrame,
         .guid = player.guid,
         .steeringAxis = 0.0f,
         .accelerationAxis = 0.0f,
@@ -118,7 +118,7 @@ namespace game
     };
 
     return PlayerControl {
-      .physicalFrame = scene.physicalFrame,
+      .physicalFrame = scene.localPhysicalFrame,
       .guid = player.guid,
       .steeringAxis = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D)),
       .accelerationAxis = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S)),
@@ -133,7 +133,7 @@ namespace game
   void ClientApp::onConnected(uint64_t guid)
   {
     printf("CLIENT_APP: OnConnected, my guid: %" PRIu64 "\n", guid);
-    scene.playerGuid = guid;
+    scene.localPlayerGuid = guid;
   }
 
   void ClientApp::onDisconnected(uint64_t guid)
@@ -159,10 +159,10 @@ namespace game
     car.position = playerJoin.position;
     car.rotation = playerJoin.rotation;
 
-    if (playerJoin.guid == scene.playerGuid)
+    if (playerJoin.guid == scene.localPlayerGuid)
     {
-      scene.physicalFrame = playerJoin.physicalFrame;
-      scene.playerIndex = index;
+      scene.localPhysicalFrame = playerJoin.physicalFrame;
+      scene.localPlayerIndex = index;
     }
   }
 
@@ -233,10 +233,10 @@ namespace game
     if (IsKeyPressed(KEY_F1))
       scene.reset(vec3::zero, quat::identity);
 
-    if (scene.playerIndex < 0)
+    if (scene.localPlayerIndex < 0)
       return;
 
-    Car& player = scene.getPlayer();
+    Car& player = scene.getLocalPlayer();
 
     if (IsKeyPressed(KEY_R))
       player.rotation = player.rotation * quat::fromEuler(PI / 2, 0, 0);
@@ -244,7 +244,7 @@ namespace game
     if (IsKeyPressed(KEY_F2))
     {
       scene.reset({ 0, 0, 25 }, quat::identity);
-      scene.getPlayer().rotation = quat::fromEuler(0, 0, 0.19f * PI);
+      scene.getLocalPlayer().rotation = quat::fromEuler(0, 0, 0.19f * PI);
     }
 
     if (IsKeyPressed(KEY_F3))
@@ -258,8 +258,8 @@ namespace game
     if (IsKeyPressed(KEY_F4))
     {
       PlayerState playerState = {
-        .physicalFrame = scene.physicalFrame,
-        .guid = scene.getPlayer().guid,
+        .physicalFrame = scene.localPhysicalFrame,
+        .guid = scene.getLocalPlayer().guid,
         .position = {-1, 7, 0},
         .rotation = quat::identity.rotatedByYAngle(PI / 2),
         .velocity = {randf(20, 50) * sign(randf(-1, 1)), 0, randf(20, 50) * sign(randf(-1, 1))},
@@ -285,7 +285,7 @@ namespace game
 
   void ClientApp::updateCamera(float dt, float lerpFactor)
   {
-    const Car& player = scene.getPlayer();
+    const Car& player = scene.getLocalPlayer();
     vec3 playerPosition = vec3::lerp(player.lastPosition, player.position, lerpFactor);
     camera.update(dt, scene.terrain, playerPosition);
   }

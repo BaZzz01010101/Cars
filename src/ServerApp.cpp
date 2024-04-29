@@ -91,8 +91,8 @@ namespace game
     }
 
     printf("SERVER_APP: OnClientConnected: %" PRIu64 ". Players: %i\n", guid, scene.cars.count());
-    scene.playerIndex = playerIndex;
-    Car& player = scene.getPlayer();
+    scene.localPlayerIndex = playerIndex;
+    Car& player = scene.getLocalPlayer();
     float x = randf(-10, 10);
     float z = randf(-10, 10);
     vec3 normal;
@@ -101,7 +101,7 @@ namespace game
     player.rotation = quat::fromAxisAngle(normal, randf(2.0f * PI));
 
     PlayerJoin playerJoin = {
-      .physicalFrame = scene.physicalFrame,
+      .physicalFrame = scene.localPhysicalFrame,
       .guid = guid,
       .position = player.position,
       .rotation = player.rotation,
@@ -117,7 +117,7 @@ namespace game
         Car& player = scene.cars[i];
 
         PlayerJoin playerJoin = {
-          .physicalFrame = scene.physicalFrame,
+          .physicalFrame = scene.localPhysicalFrame,
           .guid = player.guid,
           .position = player.position,
           .rotation = player.rotation,

@@ -158,7 +158,7 @@ namespace game
 
   void Hud::draw(const CustomCamera& camera, const Scene& scene) const
   {
-    if (scene.playerIndex < 0)
+    if (scene.localPlayerIndex < 0)
       return;
 
     drawCrossHairs(camera, scene);
@@ -177,7 +177,7 @@ namespace game
     vec2 center = { float(screenWidth / 2), float(screenHeight / 2) };
     drawCrossHair(center, 0, srcSize, dstSize, color);
 
-    const Car& player = scene.getPlayer();
+    const Car& player = scene.getLocalPlayer();
 
     drawTurretCrossHair(camera, player.cannon, 1, srcSize, dstSize, color);
     drawTurretCrossHair(camera, player.gun, 2, srcSize, dstSize, color);
@@ -211,7 +211,7 @@ namespace game
     else
       DrawFPS(10, 10);
 
-    const Car& player = scene.getPlayer();
+    const Car& player = scene.getLocalPlayer();
     print("Position", player.position, LIGHTGRAY, 10, 30);
     vec3 rotation;
     player.rotation.toEuler(&rotation.y, &rotation.z, &rotation.x);
@@ -233,7 +233,7 @@ namespace game
 
     print("Trace count:", (float)scene.terrain.traceCount, WHITE);
     print("Players", (float)scene.cars.count(), LIGHTGRAY);
-    print("Physical Frame Offset", (float)scene.physicalFrame - scene.serverPhysicalFrame, LIGHTGRAY);
+    print("Physical Frame Offset", (float)scene.localPhysicalFrame - scene.serverPhysicalFrame, LIGHTGRAY);
 
   }
 }

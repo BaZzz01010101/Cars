@@ -30,9 +30,9 @@ namespace game
     bool slowMotion = false;
     vec3 gunRayHit = vec3::zero;
     vec3 cannonRayHit = vec3::zero;
-    int playerIndex = -1;
-    uint64_t playerGuid = 0;
-    int64_t physicalFrame = 0;
+    int localPlayerIndex = -1;
+    uint64_t localPlayerGuid = 0;
+    int64_t localPhysicalFrame = 0;
     uint64_t serverPhysicalFrame = 0;
 
     Scene(const Config& config);
@@ -45,8 +45,8 @@ namespace game
     void update(float dt);
     void regenerateTerrain(Terrain::Mode mode);
     void reset(vec3 playerPosition, quat playerRotation);
-    inline const Car& getPlayer() const { return cars[playerIndex]; }
-    inline Car& getPlayer() { return cars[playerIndex]; }
+    inline const Car& getLocalPlayer() const { return cars[localPlayerIndex]; }
+    inline Car& getLocalPlayer() { return cars[localPlayerIndex]; }
     void updatePlayerControl(const PlayerControl& playerControl);
     void syncPlayerState(const PlayerState& playerState, float syncFactor);
     PlayerState getPlayerState(int index) const;

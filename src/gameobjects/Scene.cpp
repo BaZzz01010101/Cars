@@ -17,7 +17,7 @@ namespace game
 
   void Scene::update(float dt)
   {
-    physicalFrame++;
+    localPhysicalFrame++;
     terrain.traceCount = 0;
 
     thread_local int slowMoCounter = 0;
@@ -238,7 +238,7 @@ namespace game
   void Scene::regenerateTerrain(Terrain::Mode mode)
   {
     terrain.generate(mode);
-    Car& player = cars[playerIndex];
+    Car& player = cars[localPlayerIndex];
     reset(player.position, player.rotation);
   }
 
@@ -246,7 +246,7 @@ namespace game
   {
     float terrainY = terrain.getHeight(playerPosition.x, playerPosition.z);
     playerPosition.y = terrainY + 2;
-    Car& player = cars[playerIndex];
+    Car& player = cars[localPlayerIndex];
     player.resetToPosition(playerPosition, playerRotation);
   }
 
@@ -275,7 +275,7 @@ namespace game
     const Car& player = cars[index];
 
     PlayerState state = player.getState();
-    state.physicalFrame = physicalFrame;
+    state.physicalFrame = localPhysicalFrame;
     state.guid = player.guid;
 
     return state;

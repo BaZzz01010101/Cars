@@ -45,8 +45,6 @@ namespace game
       return !exit && !WindowShouldClose();
     }
 
-    updateShortcuts();
-
     PlayerControl localPlayerControl = getLocalPlayerControl();
     sendPlayerControl(localPlayerControl);
     scene.updatePlayerControl(localPlayerControl);
@@ -68,6 +66,8 @@ namespace game
     float lerpFactor = dtAccumulator / fixedDt;
     updateCamera(dt, lerpFactor);
     renderer.draw(lerpFactor);
+
+    updateShortcuts();
 
     return !exit && !WindowShouldClose();
   }
@@ -195,6 +195,7 @@ namespace game
   {
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_ALT) && IsKeyPressed(KEY_SPACE))
     {
+      scene.localPlayerIndex = -1;
       scene.cars.clear();
       network.disconnect();
       network.connect();

@@ -26,6 +26,14 @@ namespace game
     return position + config.barrelPosition.rotatedBy(rotation);
   }
 
+  vec3 Turret::barrelPosition(float lerpFactor) const
+  {
+    vec3 position = vec3::lerp(this->lastPosition, this->position, lerpFactor);
+    quat rotation = quat::slerp(this->lastRotation, this->rotation, lerpFactor);
+
+    return position + config.barrelPosition.rotatedBy(rotation);
+  }
+
   void Turret::syncState(float yaw, float pitch, float syncFactor, const Object& parent)
   {
     this->yaw = lerp(this->yaw, yaw, syncFactor);

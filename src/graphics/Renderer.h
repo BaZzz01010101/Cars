@@ -42,10 +42,9 @@ namespace game
     void shutdown();
     void inject(std::function<void()> callback);
     void draw(float lerpFactor);
+    void drawDebug(float lerpFactor);
     void drawCar(const Car& car, float lerpFactor);
-    void drawWheel(const Wheel& wheel, float lerpFactor);
-    void drawGun(const Turret& turret, float lerpFactor);
-    void drawCannon(const Turret& turret, float lerpFactor);
+    void drawDynamicObject(const DynamicObject& dynamicObject, const Model& model, float lerpFactor);
     void drawModel(const Model& model, const Matrix& transform);
     void drawProjectile(const Projectile& projectile, float lerpFactor);
     void drawExplosionParticle(const ExplosionParticle& explosionParticle, float lerpFactor);
@@ -53,8 +52,8 @@ namespace game
     void drawTerrainObject(const TerrainObject& terrainObject);
 
     void drawTerrainDebug();
-    void drawCarDebug(const Car& car);
-    void drawWheelDebug(const Wheel& wheel);
+    void drawCarDebug(const Car& car, float lerpFactor);
+    void drawWheelDebug(const Wheel& wheel, float lerpFactor);
 
     void loadResources();
     void unloadResources();

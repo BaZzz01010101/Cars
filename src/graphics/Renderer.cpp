@@ -52,9 +52,6 @@ namespace game
         drawCar(car, lerpFactor);
       }
 
-    if (injectionCallback)
-      injectionCallback();
-
     for (int i = 0; i < scene.projectiles.capacity(); i++)
       if (scene.projectiles.isAlive(i))
       {
@@ -69,6 +66,11 @@ namespace game
         drawExplosionParticle(explosionParticle, lerpFactor);
       }
 
+    if (injectionCallback)
+      injectionCallback();
+
+    drawDebug(lerpFactor);
+
     EndMode3D();
 
     hud.draw(camera, scene);
@@ -76,52 +78,36 @@ namespace game
     EndDrawing();
   }
 
+  void Renderer::drawDebug(float lerpFactor)
+  {
+    if (scene.localPlayerIndex < 0)
+      return;
+
+    const Car& player = scene.getLocalPlayer();
+
+    drawCarDebug(player, lerpFactor);
+  }
+
   void Renderer::drawCar(const Car& car, float lerpFactor)
   {
-    vec3 position = vec3::lerp(car.lastPosition, car.position, lerpFactor);
-    quat rotation = quat::slerp(car.lastRotation, car.rotation, lerpFactor);
-    Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation), MatrixTranslate(position.x, position.y, position.z));
+    drawDynamicObject(car, carModel, lerpFactor);
 
-    drawModel(carModel, transform);
+    drawDynamicObject(car.frontLeftWheel, wheelModel, lerpFactor);
+    drawDynamicObject(car.frontRightWheel, wheelModel, lerpFactor);
+    drawDynamicObject(car.rearLeftWheel, wheelModel, lerpFactor);
+    drawDynamicObject(car.rearRightWheel, wheelModel, lerpFactor);
 
-    drawWheel(car.frontLeftWheel, lerpFactor);
-    drawWheel(car.frontRightWheel, lerpFactor);
-    drawWheel(car.rearLeftWheel, lerpFactor);
-    drawWheel(car.rearRightWheel, lerpFactor);
-
-    drawGun(car.gun, lerpFactor);
-    drawCannon(car.cannon, lerpFactor);
-
-    drawCarDebug(car);
+    drawDynamicObject(car.gun, gunModel, lerpFactor);
+    drawDynamicObject(car.cannon, cannonModel, lerpFactor);
   }
 
-  void Renderer::drawWheel(const Wheel& wheel, float lerpFactor)
+  void Renderer::drawDynamicObject(const DynamicObject& object, const Model& model, float lerpFactor)
   {
-    vec3 position = vec3::lerp(wheel.lastPosition, wheel.position, lerpFactor);
-    quat rotation = quat::slerp(wheel.lastRotation, wheel.rotation, lerpFactor);
+    vec3 position = vec3::lerp(object.lastPosition, object.position, lerpFactor);
+    quat rotation = quat::slerp(object.lastRotation, object.rotation, lerpFactor);
     Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation), MatrixTranslate(position.x, position.y, position.z));
 
-    drawModel(wheelModel, transform);
-
-    drawWheelDebug(wheel);
-  }
-
-  void Renderer::drawGun(const Turret& turret, float lerpFactor)
-  {
-    vec3 position = vec3::lerp(turret.lastPosition, turret.position, lerpFactor);
-    quat rotation = quat::slerp(turret.lastRotation, turret.rotation, lerpFactor);
-    Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation), MatrixTranslate(position.x, position.y, position.z));
-
-    drawModel(gunModel, transform);
-  }
-
-  void Renderer::drawCannon(const Turret& turret, float lerpFactor)
-  {
-    vec3 position = vec3::lerp(turret.lastPosition, turret.position, lerpFactor);
-    quat rotation = quat::slerp(turret.lastRotation, turret.rotation, lerpFactor);
-    Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation), MatrixTranslate(position.x, position.y, position.z));
-
-    drawModel(cannonModel, transform);
+    drawModel(model, transform);
   }
 
   void Renderer::drawModel(const Model& model, const Matrix& transform)
@@ -218,9 +204,9 @@ namespace game
     //}
   }
 
-  void Renderer::drawCarDebug(const Car& car)
+  void Renderer::drawCarDebug(const Car& car, float lerpFactor)
   {
-    vec3 position = car.position;
+    vec3 position = vec3::lerp(car.lastPosition, car.position, lerpFactor);
 
     //drawVector(position, 3 * forward(), WHITE);
     //drawVector(position, 3 * left(), LIGHTGRAY);
@@ -228,32 +214,39 @@ namespace game
 
     //drawVector(position, 0.001f * suspecsionForce, RED);
     //drawVector(position, 0.5f * moment.logarithmic(), BLUE);
-    drawVector(position, 5 * vec3::forward, WHITE);
     drawVector(position, 5 * vec3::left, LIGHTGRAY);
 
     vec3 hitPosition, normal;
     float distance;
     const Turret& gun = car.gun;
-    DrawLine3D(gun.barrelPosition(), gun.barrelPosition() + gun.forward() * 10, BLUE);
 
-    if (scene.terrain.traceRay(gun.barrelPosition(), gun.forward(), 10, &hitPosition, &normal, &distance))
+    vec3 barrelPosition = gun.barrelPosition(lerpFactor);
+    DrawLine3D(barrelPosition, barrelPosition + gun.forward() * 10, BLUE);
+
+    if (scene.terrain.traceRay(barrelPosition, gun.forward(), 10, &hitPosition, &normal, &distance))
     {
       DrawSphere(hitPosition, 0.1f, YELLOW);
       DrawLine3D(hitPosition, hitPosition + normal * 5, YELLOW);
       DrawSphere(hitPosition + normal * 5, 0.1f, YELLOW);
     }
+
+    drawWheelDebug(car.frontLeftWheel, lerpFactor);
+    drawWheelDebug(car.frontRightWheel, lerpFactor);
+    drawWheelDebug(car.rearLeftWheel, lerpFactor);
+    drawWheelDebug(car.rearRightWheel, lerpFactor);
   }
 
-  void Renderer::drawWheelDebug(const Wheel& wheel)
+  void Renderer::drawWheelDebug(const Wheel& wheel, float lerpFactor)
   {
     if (wheel.isGrounded)
     {
-      vec3 bottom = wheel.position + vec3 { 0, -wheel.wheelConfig.radius + 0.2f, 0 };
+      vec3 position = vec3::lerp(wheel.lastPosition, wheel.position, lerpFactor);
+      vec3 bottom = position + vec3 { 0, -wheel.wheelConfig.radius + 0.2f, 0 };
       //DrawSphere(bottom, 0.3f, ORANGE);
 
       //drawVector(bottom, velocity, LIME);
       drawVector(bottom, wheel.frictionVelocity, GREEN);
-      drawVector(wheel.position, 0.001f * wheel.suspecsionForce, RED);
+      drawVector(position, 0.001f * wheel.suspensionForce, RED);
       drawVector(bottom, 0.001f * wheel.frictionForce, ORANGE);
     }
   }

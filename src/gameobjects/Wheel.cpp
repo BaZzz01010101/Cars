@@ -23,7 +23,7 @@ namespace game
     position = parent.position + globalConnectionPoint;
     rotation = parent.rotation * quat::fromYAngle(steeringAngle);
     velocity = parent.velocity + parent.angularVelocity.rotatedBy(rotation) % globalConnectionPoint;
-    suspecsionForce = vec3::zero;
+    suspensionForce = vec3::zero;
 
     float springForce = sqr(suspensionOffset) * wheelConfig.suspensionStiffness;
     float springForceSigned = springForce * sign(-suspensionOffset);
@@ -56,14 +56,14 @@ namespace game
       suspensionSpeed = -velocity * vec3::up;
 
       nForce = springForce * normal;
-      suspecsionForce += nForce;
+      suspensionForce += nForce;
 
       float parentNormalSpeed = velocity * normal;
 
       if (parentNormalSpeed < 0)
       {
         vec3 dampingForce = -parentNormalSpeed * sharedMass / dt * wheelConfig.suspensionDamping * normal;
-        suspecsionForce += dampingForce;
+        suspensionForce += dampingForce;
       }
 
       float frictionSpeed = (velocity.projectedOnPlane(normal) - wheelRotationSpeed * wheelConfig.radius * frictionForward).length();
@@ -83,7 +83,7 @@ namespace game
 
       frictionForce = 0.5 * (frictionForce + lastFrictionForce);
 
-      suspecsionForce += frictionForce;
+      suspensionForce += frictionForce;
 
       float targetWheelRotationSpeed = float(!handBreaked) * velocity * frictionForward / wheelConfig.radius;
       float step = (frictionForce * frictionForward) * wheelConfig.radius / momentOfInertia * dt;

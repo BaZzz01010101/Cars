@@ -17,7 +17,7 @@ namespace game
     const Terrain& terrain;
 
     vec3 connectionPoint = vec3::zero;
-    vec3 suspecsionForce = vec3::zero;
+    vec3 suspensionForce = vec3::zero;
     vec3 nForce = vec3::zero;
     vec3 frictionForce = vec3::zero;
     vec3 frictionVelocity = vec3::zero;

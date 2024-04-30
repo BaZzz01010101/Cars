@@ -43,17 +43,19 @@ namespace game
   {
     return sqrt_helper<T>(x, 0, x / 2 + 1);
   }
-  
+
   // min2 can be greater than max2
   // min1 can be greater than max1
   // min1 can be equal to max1
   float mapRangeClamped(float value, float min1, float max1, float min2, float max2);
 
   vec2 moveTo(vec2 current, vec2 target, float maxDelta);
-
   vec3 moveTo(vec3 current, vec3 target, float maxDelta);
-
   float moveTo(float current, float target, float maxDelta);
+
+  vec2 moveToRelative(vec2 current, vec2 target, float maxDeltaRelative);
+  vec3 moveToRelative(vec3 current, vec3 target, float maxDeltaRelative);
+  float moveToRelative(float current, float target, float maxDeltaRelative);
 
   float moveAngleTo(float current, float target, float maxDelta);
 

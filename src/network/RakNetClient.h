@@ -23,7 +23,7 @@ namespace network
     void update();
 
   private:
-    static constexpr int CONNECTION_TIMEOUT = 5;
+    static constexpr int CONNECTION_TIMEOUT = 10;
 
     const ServerConfig& config;
     IClientMessageHandler& messageHandler;

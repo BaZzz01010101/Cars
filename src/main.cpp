@@ -16,6 +16,8 @@ int main(int argc, char* argv[])
     ServerApp* server = new ServerApp(config, args.serverConfig);
     ClientApp* client = new ClientApp(config, args.serverConfig);
     bool renderServerPlayers = true;
+    high_resolution_clock clock {};
+    const uint64_t fixedDt = uint64_t(nanoseconds::period::den * config.physics.fixedDt);
 
     server->initialize();
     client->initialize();
@@ -30,7 +32,10 @@ int main(int argc, char* argv[])
           if (server->scene.cars.isAlive(i))
           {
             const Car& car = server->scene.cars[i];
-            client->renderer.drawCar(car, 1);
+            uint64_t timeSinceLastUpdate = duration_cast<nanoseconds>(clock.now() - server->lastUpdateTime).count();
+            float lerpFactor = float(timeSinceLastUpdate) / fixedDt;
+
+            client->renderer.drawCar(car, lerpFactor); 
           }
 
         client->renderer.drawWires = dw;

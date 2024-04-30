@@ -42,14 +42,16 @@ namespace game
 
     if (elapsed < fixedDt - maxSleep)
       std::this_thread::sleep_for(milliseconds(1));
-    else if (elapsed >= fixedDt)
+    else while (elapsed >= fixedDt)
     {
-      lastUpdateTime += fixedDt;
+      elapsed -= fixedDt;
 
       scene.update(config.physics.fixedDt);
       sendPlayerStates();
       network.update();
     }
+
+    lastUpdateTime = now - elapsed;
 
     return !exit;
   }

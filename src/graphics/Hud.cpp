@@ -5,7 +5,8 @@ namespace game
 {
   Hud::Hud(const Config& config) :
     config(config)
-  {}
+  {
+  }
 
   Hud::~Hud()
   {
@@ -179,28 +180,29 @@ namespace game
 
     const Car& player = scene.getLocalPlayer();
 
-    drawTurretCrossHair(camera, player.cannon, 1, srcSize, dstSize, color);
-    drawTurretCrossHair(camera, player.gun, 2, srcSize, dstSize, color);
+    drawTurretCrossHair(camera, scene, player.cannon, 1, srcSize, dstSize, color);
+    drawTurretCrossHair(camera, scene, player.gun, 2, srcSize, dstSize, color);
   }
 
-  void Hud::drawTurretCrossHair(const CustomCamera& camera, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color) const
+  void Hud::drawTurretCrossHair(const CustomCamera& camera, const Scene& scene, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color) const
   {
     if (camera.direction * turret.forward() > 0)
     {
-      vec3 hitPosition;
-      if(Sphere { camera.position, 1000 }.traceRay(turret.position + turret.forward() * 2000, -turret.forward(), FLT_MAX, &hitPosition, nullptr, nullptr))
-      {
-        vec2 position = GetWorldToScreen(hitPosition, camera);
-        drawCrossHair(position, textureIndex, srcSize, dstSize, color);
-      }
+      vec2 center = GetWorldToScreen(turret.target, camera);
 
-      //vec2 center = GetWorldToScreen(turret.currentTarget, camera);
-      //drawCrossHair(center, textureIndex, srcSize, dstSize, color);
+      // Fixes bug in RayLib with GetWorldToScreen returning NaN in some cases
+      // Known case is when turret.currentTarget == camera.position
+      if (center == center)
+        drawCrossHair(center, textureIndex, srcSize, dstSize, color);
     }
   }
 
   void Hud::drawCrossHair(vec2 position, int textureIndex, float srcSize, float dstSize, Color color) const
   {
+    float step = std::max(1.0f, 0.25f * (crossHairPositions[textureIndex] - position).length());
+
+    crossHairPositions[textureIndex] = moveTo(crossHairPositions[textureIndex], position, step);
+    position = crossHairPositions[textureIndex];
     DrawTexturePro(crosshairsTexture, { srcSize * textureIndex, srcSize * textureIndex, srcSize, srcSize }, { float(position.x - 0.5f * dstSize), float(position.y - 0.5f * dstSize), dstSize, dstSize }, { 0, 0 }, 0, color);
   }
 

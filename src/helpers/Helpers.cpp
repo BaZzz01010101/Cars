@@ -18,6 +18,18 @@ namespace game
     return min2 + (value - min1) * delta2 / delta1;
   }
 
+  vec2 moveTo(vec2 current, vec2 target, float maxDelta)
+  {
+    maxDelta = fabsf(maxDelta);
+    vec2 delta = target - current;
+    float len = delta.length();
+
+    if (len <= maxDelta)
+      return target;
+    else
+      return current + delta / len * maxDelta;
+  }
+
   vec3 moveTo(vec3 current, vec3 target, float maxDelta)
   {
     maxDelta = fabsf(maxDelta);

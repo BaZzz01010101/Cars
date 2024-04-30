@@ -111,11 +111,25 @@ namespace game
         .steeringAxis = 0.0f,
         .accelerationAxis = 0.0f,
         .thrustAxis = 0.0f,
-        .target = camera.getTarget(),
+        .target = player.gun.expectedTarget,
         .primaryFire = false,
         .secondaryFire = false,
         .handBrake = true,
     };
+
+    vec3 target = vec3::zero;
+    float targetDistance = 100;
+
+    // Fixes issue with crosshair twitching when targeting edge of terrain object at close/middle distance
+    // In some conditions the same target point that hit by tracing from camera eye, did not hit when traced from turret barrel
+    // So we penetrating the surface of the object by some distance to make sure that the target point is traceble from other direction
+    const float targetPenetration = 0.5f;
+
+    if (scene.traceRay(camera.position, camera.direction, FLT_MAX, scene.localPlayerIndex, nullptr, nullptr, &targetDistance, nullptr))
+      targetDistance += targetPenetration;
+
+    target = camera.position + camera.direction * targetDistance;
+
 
     return PlayerControl {
       .physicalFrame = scene.localPhysicalFrame,
@@ -123,7 +137,7 @@ namespace game
       .steeringAxis = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D)),
       .accelerationAxis = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S)),
       .thrustAxis = float(IsKeyDown(KEY_LEFT_SHIFT)),
-      .target = camera.getTarget(),
+      .target = target,
       .primaryFire = IsMouseButtonDown(MOUSE_LEFT_BUTTON),
       .secondaryFire = IsMouseButtonDown(MOUSE_RIGHT_BUTTON),
       .handBrake = IsKeyDown(KEY_SPACE),

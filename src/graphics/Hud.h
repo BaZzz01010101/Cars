@@ -16,6 +16,13 @@ namespace game
     bool crosshairsTextureLoaded = false;
     bool paused = false;
 
+    // TODO: Make enum for cross hair indexes
+    mutable vec2 crossHairPositions[3] = {
+      vec2::zero,
+      vec2::zero,
+      vec2::zero
+    };
+
     mutable Color lastColor = WHITE;
     mutable int lastPosX = 0;
     mutable int lastPosY = 0;
@@ -57,7 +64,7 @@ namespace game
     void update();
     void draw(const CustomCamera& camera, const Scene& scene) const;
     void drawCrossHairs(const CustomCamera& camera, const Scene& scene) const;
-    void drawTurretCrossHair(const CustomCamera& camera, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color) const;
+    void drawTurretCrossHair(const CustomCamera& camera, const Scene& scene, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color) const;
     void drawCrossHair(vec2 position, int textureIndex, float srcSize, float dstSize, Color color) const;
     void drawDebug(const Scene& scene) const;
   };

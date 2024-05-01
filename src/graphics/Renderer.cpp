@@ -20,7 +20,7 @@ namespace game
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     //SetConfigFlags(FLAG_FULLSCREEN_MODE);
     InitWindow(config.graphics.screen.width, config.graphics.screen.height, config.graphics.screen.title);
-    SetTargetFPS(60);
+    //SetTargetFPS(60);
     loadResources();
   }
 

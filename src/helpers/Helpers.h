@@ -56,6 +56,7 @@ namespace game
   vec2 moveToRelative(vec2 current, vec2 target, float maxDeltaRelative);
   vec3 moveToRelative(vec3 current, vec3 target, float maxDeltaRelative);
   float moveToRelative(float current, float target, float maxDeltaRelative);
+  float moveAngleToRelative(float current, float target, float maxDeltaRelative);
 
   float moveAngleTo(float current, float target, float maxDelta);
 

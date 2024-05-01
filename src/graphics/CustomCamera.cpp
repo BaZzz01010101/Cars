@@ -7,43 +7,39 @@ namespace game
   CustomCamera::CustomCamera(const Config& config) :
     config(config)
   {
-    camera.fovy = 90;
-    camera.projection = CAMERA_PERSPECTIVE;
+    reset(vec3::zero);
   }
 
   void CustomCamera::update(float dt, const Terrain& terrain, vec3 playerPosition)
   {
-    // TODO: Fix potential incorrect calculations of camera center
-    // getting mouse delta inside update can lead to incorrect calculations due to the multiple
-    // accounting of the same mouse delta in recurcive update calls in App::update because RayLib
-    // seems updating input state once per frame
     Vector2 mouseDelta = GetMouseDelta();
-    const Config::Graphics::Camera cameraConfig = config.graphics.camera;
+    static const Config::Graphics::Camera& cameraConfig = config.graphics.camera;
 
-    yaw -= mouseDelta.x * cameraConfig.horzSensitivity * 0.001f;
-    yaw = normalizeAngle(yaw);
+    expectedYaw = normalizeAngle(expectedYaw - mouseDelta.x * cameraConfig.horzSensitivity * 0.001f);
+    expectedPitch = normalizeAngle(expectedPitch - mouseDelta.y * cameraConfig.vertSensitivity * 0.001f * (1 - 2 * invertY));
+    expectedPitch = std::clamp(expectedPitch, cameraConfig.minPitch, cameraConfig.maxPitch);
 
-    pitch += mouseDelta.y * cameraConfig.vertSensitivity * 0.001f * (1 - 2 * invertY);
-    pitch = std::clamp(pitch, -cameraConfig.maxPitch, cameraConfig.maxPitch);
+    yaw = moveAngleToRelative(yaw, expectedYaw, cameraConfig.rotationSharpness * dt);
+    pitch = moveAngleToRelative(pitch, expectedPitch, cameraConfig.rotationSharpness * dt);
 
-    quat rotation = quat::fromYAngle(yaw) * quat::fromXAngle(pitch);
+    quat rotation = quat::fromXAngle(pitch).rotatedByYAngle(yaw);
 
-    vec3 focusPoint = playerPosition + vec3 { 0, cameraConfig.focusElevation, 0 };
-    position = focusPoint + vec3 { 0, 0, cameraConfig.minDistance }.rotatedBy(rotation);
-    float minYPosition = terrain.getHeight(position.x, position.z) + 0.5f;
-    position.y = std::max(position.y, minYPosition);
+    vec3 expectedFocusPosition = playerPosition + vec3 { 0, cameraConfig.focusElevation, 0 };
+    focusPosition = moveToRelative(focusPosition, expectedFocusPosition, cameraConfig.pursuitSharpness * dt);
+    vec3 focusToCameraDir = vec3::forward.rotatedBy(rotation);
+    vec3 expectedCameraPosition = focusPosition + focusToCameraDir * cameraConfig.maxDistanceFromFocus;
+    float hitDistance;
 
-    vec3 dPos = focusPoint - position;
-    float dy = dPos.y;
-    float dxz = sqrt(sqr(dPos.x) + sqr(dPos.z));
-
-    if (dy > 0 && dxz > 0)
-      pitch = std::atan2(dy, dxz);
-
-    direction = (focusPoint - position).normalized();
+    if (terrain.traceRay(focusPosition, focusToCameraDir, cameraConfig.maxDistanceFromFocus, nullptr, nullptr, &hitDistance))
+      distanceFromFocus = moveTo(distanceFromFocus, hitDistance, cameraConfig.collisionSharpness * dt);
+    else
+      distanceFromFocus = moveTo(distanceFromFocus, cameraConfig.maxDistanceFromFocus, cameraConfig.pursuitSharpness * dt);
+    
+    position = focusPosition + focusToCameraDir * distanceFromFocus;
+    direction = -focusToCameraDir;
 
     camera.position = position;
-    camera.target = focusPoint;
+    camera.target = focusPosition;
     camera.up = vec3::up;
 
     HideCursor();
@@ -52,14 +48,19 @@ namespace game
 
   void CustomCamera::reset(vec3 playerPosition)
   {
-    camera.position = playerPosition + vec3 { -4, 1, 0 };
-    camera.target = playerPosition;
-    camera.up = { 0, 1, 0 };
-  }
+    focusPosition = playerPosition + vec3::up * Terrain::TERRAIN_HEIGHT * 2;
+    position = focusPosition + vec3::up;
+    direction = -vec3::up;
+    yaw = 0;
+    pitch = -PI / 2;
+    expectedYaw = yaw;
+    expectedPitch = pitch;
 
-  vec3 CustomCamera::getTarget() const
-  {
-    return position + direction * 1000;
+    camera.position = position;
+    camera.target = playerPosition;
+    camera.up = vec3::up;
+    camera.fovy = 90;
+    camera.projection = CAMERA_PERSPECTIVE;
   }
 
 }

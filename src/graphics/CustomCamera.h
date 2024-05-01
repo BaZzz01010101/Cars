@@ -10,10 +10,14 @@ namespace game
     const Config& config {};
     Camera camera {};
 
+    float expectedYaw = 0;
+    float expectedPitch = 0;
     float yaw = 0;
     float pitch = 0;
+    vec3 focusPosition = vec3::zero;
+    float distanceFromFocus = 0;
     vec3 position = vec3::zero;
-    vec3 direction = vec3::zero;
+    vec3 direction = vec3::forward;
     bool invertY = false;
 
     CustomCamera(const Config& config);
@@ -24,8 +28,6 @@ namespace game
 
     void update(float dt, const Terrain& terrain, vec3 playerPosition);
     void reset(vec3 playerPosition);
-
-    vec3 getTarget() const;
 
     inline operator Camera() const { return camera; }
   };

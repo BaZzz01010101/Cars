@@ -92,11 +92,14 @@ namespace game
       struct Camera
       {
         float focusElevation;
-        float minDistance;
-        float maxDistance;
+        float maxDistanceFromFocus;
+        float minPitch;
         float maxPitch;
         float horzSensitivity;
         float vertSensitivity;
+        float rotationSharpness;
+        float pursuitSharpness;
+        float collisionSharpness;
       } camera;
 
       struct Hud

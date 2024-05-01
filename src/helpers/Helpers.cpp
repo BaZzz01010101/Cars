@@ -54,6 +54,18 @@ namespace game
       return current + delta / len * maxDelta;
   }
 
+  float moveAngleTo(float current, float target, float maxDelta)
+  {
+    maxDelta = fabsf(maxDelta);
+    float delta = normalizeAngle(target - current);
+    float len = fabsf(delta);
+
+    if (len <= maxDelta)
+      return target;
+    else
+      return normalizeAngle(current + sign(delta) * maxDelta);
+  }
+
   vec2 moveToRelative(vec2 current, vec2 target, float maxDeltaRelative)
   {
     maxDeltaRelative = fabsf(maxDeltaRelative);
@@ -93,10 +105,12 @@ namespace game
       return current + delta / len * maxDelta;
   }
 
-  float moveAngleTo(float current, float target, float maxDelta)
+  float moveAngleToRelative(float current, float target, float maxDeltaRelative)
   {
+    maxDeltaRelative = fabsf(maxDeltaRelative);
     float delta = normalizeAngle(target - current);
     float len = fabsf(delta);
+    float maxDelta = len * maxDeltaRelative;
 
     if (len <= maxDelta)
       return target;

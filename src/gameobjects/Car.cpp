@@ -288,7 +288,7 @@ namespace game
 
   void Car::syncState(const PlayerState& playerState, float syncFactor)
   {
-    position = vec3::lerp(position, playerState.position, syncFactor);
+    position = moveToRelative(position, playerState.position, 0.1f * syncFactor);
     velocity = vec3::lerp(velocity, playerState.velocity, syncFactor);
     rotation = quat::slerp(rotation, playerState.rotation, syncFactor);
     angularVelocity = vec3::lerp(angularVelocity, playerState.angularVelocity, syncFactor);

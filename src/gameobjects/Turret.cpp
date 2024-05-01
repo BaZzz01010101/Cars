@@ -37,11 +37,11 @@ namespace game
 
   void Turret::syncState(TurretState turretState, float syncFactor, const Object& parent)
   {
-    yaw = lerp(yaw, turretState.yaw, syncFactor);
-    pitch = lerp(pitch, turretState.pitch, syncFactor);
+    yaw = moveToRelative(yaw, turretState.yaw, 0.1f * syncFactor);
+    pitch = moveToRelative(pitch, turretState.pitch, 0.1f * syncFactor);
     vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
     position = parent.position + globalConnectionPoint;
-    rotation = parent.rotation * quat::identity.rotatedByXAngle(pitch).rotatedByYAngle(yaw);
+    rotation = parent.rotation * quat::fromXAngle(pitch).rotatedByYAngle(yaw);
     rotation.normalize();
   }
 
@@ -70,8 +70,12 @@ namespace game
 
     // TODO: This code does not support 360° rotations. Need additional checks
     // for this case to rotate turret in the right direction by shortest path
-    yaw = moveTo(yaw, expectedYaw, config.rotationSpeed * dt);
-    pitch = moveTo(pitch, expectedPitch, config.rotationSpeed * dt);
+    static constexpr float DECELERATION_ANGLE = 5 * DEG2RAD;
+    static constexpr float MIN_DECELERATION_FACTOR = 0.01f;
+    float yawDecelerationFactor = clamp(fabsf(yaw - expectedYaw) / DECELERATION_ANGLE, MIN_DECELERATION_FACTOR, 1.0f);
+    float pitchDecelerationFactor = clamp(fabsf(pitch - expectedPitch) / DECELERATION_ANGLE, MIN_DECELERATION_FACTOR, 1.0f);
+    yaw = moveTo(yaw, expectedYaw, config.rotationSpeed * dt * yawDecelerationFactor);
+    pitch = moveTo(pitch, expectedPitch, config.rotationSpeed * dt * pitchDecelerationFactor);
 
     yaw = clamp(yaw, config.minYaw, config.maxYaw);
     pitch = clamp(pitch, config.minPitch, config.maxPitch);

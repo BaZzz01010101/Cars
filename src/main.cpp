@@ -25,6 +25,9 @@ int main(int argc, char* argv[])
     client->renderer.inject([&]() {
       if (renderServerPlayers)
       {
+        uint64_t timeSinceLastUpdate = duration_cast<nanoseconds>(clock.now() - server->lastUpdateTime).count();
+        float lerpFactor = float(timeSinceLastUpdate) / fixedDt;
+
         bool dw = client->renderer.drawWires;
         client->renderer.drawWires = true;
 
@@ -32,9 +35,6 @@ int main(int argc, char* argv[])
           if (server->scene.cars.isAlive(i))
           {
             const Car& car = server->scene.cars[i];
-            uint64_t timeSinceLastUpdate = duration_cast<nanoseconds>(clock.now() - server->lastUpdateTime).count();
-            float lerpFactor = float(timeSinceLastUpdate) / fixedDt;
-
             client->renderer.drawCar(car, lerpFactor); 
           }
 

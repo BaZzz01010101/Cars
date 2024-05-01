@@ -8,6 +8,7 @@ namespace game
 
   struct Hud
   {
+    static constexpr float CROSSHAIR_MOVEMENT_SHARPNESS = 0.3f;
     const Config& config {};
 
     Font font {};

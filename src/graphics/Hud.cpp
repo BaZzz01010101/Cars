@@ -188,21 +188,21 @@ namespace game
   {
     if (camera.direction * turret.forward() > 0)
     {
-      vec2 center = GetWorldToScreen(turret.target, camera);
+      vec2 position = GetWorldToScreen(turret.target, camera);
 
       // Fixes bug in RayLib with GetWorldToScreen returning NaN in some cases
       // Known case is when turret.currentTarget == camera.position
-      if (center == center)
-        drawCrossHair(center, textureIndex, srcSize, dstSize, color);
+      if (position == position)
+      {
+        crossHairPositions[textureIndex] = moveToRelative(crossHairPositions[textureIndex], position, CROSSHAIR_MOVEMENT_SHARPNESS);
+        position = crossHairPositions[textureIndex];
+        drawCrossHair(position, textureIndex, srcSize, dstSize, color);
+      }
     }
   }
 
   void Hud::drawCrossHair(vec2 position, int textureIndex, float srcSize, float dstSize, Color color) const
   {
-    float step = std::max(1.0f, 0.25f * (crossHairPositions[textureIndex] - position).length());
-
-    crossHairPositions[textureIndex] = moveTo(crossHairPositions[textureIndex], position, step);
-    position = crossHairPositions[textureIndex];
     DrawTexturePro(crosshairsTexture, { srcSize * textureIndex, srcSize * textureIndex, srcSize, srcSize }, { float(position.x - 0.5f * dstSize), float(position.y - 0.5f * dstSize), dstSize, dstSize }, { 0, 0 }, 0, color);
   }
 

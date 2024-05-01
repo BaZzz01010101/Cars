@@ -67,8 +67,8 @@ namespace game
       }
 
       float frictionSpeed = (velocity.projectedOnPlane(normal) - wheelRotationSpeed * wheelConfig.radius * frictionForward).length();
-      float frictionKoef = wheelConfig.tireFriction + mapRangeClamped(frictionSpeed, 5, 30, 0.2f, -0.1f);
-      float maxFrictionForce = std::min(springForce * frictionKoef, sharedMass * 100);
+      float frictionKoef = wheelConfig.tireFriction + mapRangeClamped(frictionSpeed, 5, 30, 0.0f, -0.3f);
+      float maxFrictionForce = std::min(springForce * frictionKoef, sharedMass * 50);
       float gravity = config.physics.gravity;
 
       vec3 gravityVelocity = handBreaked ?

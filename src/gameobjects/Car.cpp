@@ -297,6 +297,7 @@ namespace game
     float correctionAngle = fabs(mapRangeClamped(steeringAngle, -PI / 2, PI / 2, -steeringMaxCorrectionAngle, steeringMaxCorrectionAngle));
     float frontLeftSteeringAngle = steeringAngle + correctionAngle;
     float frontRightSteeringAngle = steeringAngle - correctionAngle;
+
     frontLeftWheel.syncState(playerState.frontLeftWheelState, syncFactor, frontLeftSteeringAngle, *this);
     frontRightWheel.syncState(playerState.frontRightWheelState, syncFactor, frontRightSteeringAngle, *this);
     rearLeftWheel.syncState(playerState.rearLeftWheelState, syncFactor, 0, *this);
@@ -317,7 +318,8 @@ namespace game
 
   void Car::updateSteering(float dt)
   {
-    float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0.1f * carConfig.maxSpeed, 0.5f * carConfig.maxSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
+    float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0.25f * carConfig.maxSpeed, 0.75f * carConfig.maxSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
+    //float maxSteeringSpeed = mapRangeClamped(velocity.length(), 0, carConfig.maxSpeed, carConfig.maxSteeringSpeed, carConfig.maxSteeringSpeed * 0.5f);
     float steeringTarget;
 
     if (steeringDirection == 0.0f)
@@ -327,8 +329,6 @@ namespace game
     }
     else
       steeringTarget = maxSteeringAngle * steeringDirection;
-
-    //float maxSteeringSpeed = mapRangeClamped(velocity.length(), 0, carConfig.maxSpeed, carConfig.maxSteeringSpeed, carConfig.maxSteeringSpeed * 0.5f);
 
     steeringAngle = moveTo(steeringAngle, steeringTarget, carConfig.maxSteeringSpeed * steeringDirection * dt);
   }

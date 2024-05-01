@@ -19,10 +19,8 @@ namespace dto
     rearLeftWheelState.readFrom(stream);
     rearRightWheelState.readFrom(stream);
 
-    stream.Read(gunYaw);
-    stream.Read(gunPitch);
-    stream.Read(cannonYaw);
-    stream.Read(cannonPitch);
+    gunState.readFrom(stream);
+    cannonState.readFrom(stream);
   }
 
   void PlayerState::writeTo(BitStream& stream) const
@@ -41,9 +39,7 @@ namespace dto
     rearLeftWheelState.writeTo(stream);
     rearRightWheelState.writeTo(stream);
 
-    stream.Write(gunYaw);
-    stream.Write(gunPitch);
-    stream.Write(cannonYaw);
-    stream.Write(cannonPitch);
+    gunState.writeTo(stream);
+    cannonState.writeTo(stream);
   }
 }

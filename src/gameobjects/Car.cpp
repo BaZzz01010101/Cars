@@ -281,10 +281,8 @@ namespace game
       .frontRightWheelState = frontRightWheel.getState(),
       .rearLeftWheelState = rearLeftWheel.getState(),
       .rearRightWheelState = rearRightWheel.getState(),
-      .gunYaw = gun.yaw,
-      .gunPitch = gun.pitch,
-      .cannonYaw = cannon.yaw,
-      .cannonPitch = cannon.pitch,
+      .gunState = gun.getState(),
+      .cannonState = cannon.getState(),
     };
   }
 
@@ -304,8 +302,8 @@ namespace game
     rearLeftWheel.syncState(playerState.rearLeftWheelState, syncFactor, 0, *this);
     rearRightWheel.syncState(playerState.rearRightWheelState, syncFactor, 0, *this);
 
-    gun.syncState(playerState.gunYaw, playerState.gunPitch, syncFactor, *this);
-    cannon.syncState(playerState.cannonYaw, playerState.cannonPitch, syncFactor, *this);
+    gun.syncState(playerState.gunState, syncFactor, *this);
+    cannon.syncState(playerState.cannonState, syncFactor, *this);
   }
 
   void Car::updateEngine(float dt)

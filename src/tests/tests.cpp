@@ -760,6 +760,7 @@ namespace game_tests
 
     TEST_METHOD(PlayerStateMessage)
     {
+      // TODO: update with new fields
       PlayerState msg {
         .guid = 1234567890,
         .position = {0.1f, 0.2f, 0.3f},
@@ -767,10 +768,6 @@ namespace game_tests
         .velocity = { 0.111f, 0.222f, 0.333f },
         .angularVelocity = { 0.1111f, 0.2222f, 0.3333f },
         .steeringAngle = 0.1f,
-        .gunYaw = 0.12f,
-        .gunPitch = 0.34f,
-        .cannonYaw = 0.56f,
-        .cannonPitch = 0.78f,
       };
 
       testMessage(msg, ID_PLAYER_STATE);

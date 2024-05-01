@@ -1,5 +1,6 @@
 #pragma once
 #include "WheelState.h"
+#include "TurretState.h"
 
 namespace dto
 {
@@ -18,10 +19,9 @@ namespace dto
     WheelState frontRightWheelState {};
     WheelState rearLeftWheelState {};
     WheelState rearRightWheelState {};
-    float gunYaw {};
-    float gunPitch {};
-    float cannonYaw {};
-    float cannonPitch {};
+
+    TurretState gunState {};
+    TurretState cannonState {};
 
     void readFrom(BitStream& stream);
     void writeTo(BitStream& stream) const;

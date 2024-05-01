@@ -97,6 +97,7 @@
     </ClCompile>
     <ClCompile Include="src\Args.cpp" />
     <ClCompile Include="src\ServerConfig.cpp" />
+    <ClCompile Include="src\dto\TurretState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ClientApp.h" />
@@ -222,6 +223,7 @@
     </ClInclude>
     <ClInclude Include="src\Args.h" />
     <ClInclude Include="src\ServerConfig.h" />
+    <ClInclude Include="src\dto\TurretState.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

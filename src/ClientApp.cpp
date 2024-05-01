@@ -279,10 +279,6 @@ namespace game
         .rotation = quat::identity.rotatedByYAngle(PI / 2),
         .velocity = {randf(20, 50) * sign(randf(-1, 1)), 0, randf(20, 50) * sign(randf(-1, 1))},
         .angularVelocity = {0, 0, 0},
-        .gunYaw = PI / 2,
-        .gunPitch = 0.5,
-        .cannonYaw = -PI / 2,
-        .cannonPitch = -0.5,
       };
 
       playerState.position.y = 2 + scene.terrain.getHeight(playerState.position.x, playerState.position.z, nullptr);

@@ -45,6 +45,9 @@
     <ClCompile Include="src\dto\WheelState.cpp">
       <Filter>dto</Filter>
     </ClCompile>
+    <ClCompile Include="src\dto\TurretState.cpp">
+      <Filter>dto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Config.h" />
@@ -96,6 +99,9 @@
     </ClInclude>
     <ClInclude Include="src\collections\Ring.hpp">
       <Filter>collections</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dto\TurretState.h">
+      <Filter>dto</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

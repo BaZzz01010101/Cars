@@ -1,9 +1,11 @@
 #pragma once
 #include "DynamicObject.h"
 #include "Config.h"
+#include "TurretState.h"
 
 namespace game
 {
+  using namespace dto;
   struct Scene;
 
   struct Turret : public DynamicObject
@@ -27,7 +29,8 @@ namespace game
     vec3 barrelPosition() const;
     vec3 barrelPosition(float lerpFactor) const;
     void update(float dt, const Object& parent);
-    void syncState(float yaw, float pitch, float syncFactor, const Object& parent);
+    TurretState getState() const;
+    void syncState(TurretState turretState, float syncFactor, const Object& parent);
   };
 
 }

@@ -208,22 +208,21 @@ namespace game
   {
     vec3 position = vec3::lerp(car.lastPosition, car.position, lerpFactor);
 
-    //drawVector(position, 3 * forward(), WHITE);
-    //drawVector(position, 3 * left(), LIGHTGRAY);
-    //drawVector(position, 3 * up(), DARKGRAY);
-
-    //drawVector(position, 0.001f * suspecsionForce, RED);
-    //drawVector(position, 0.5f * moment.logarithmic(), BLUE);
-    drawVector(position, 5 * vec3::left, LIGHTGRAY);
+    drawVector(position, 6 * vec3::forward, WHITE);
+    drawVector(position, 3 * vec3::left, LIGHTGRAY);
 
     vec3 hitPosition, normal;
     float distance;
     const Turret& gun = car.gun;
 
-    vec3 barrelPosition = gun.barrelPosition(lerpFactor);
-    DrawLine3D(barrelPosition, barrelPosition + gun.forward() * 10, BLUE);
+    vec3 gunPosition = vec3::lerp(gun.lastPosition, gun.position, lerpFactor);
+    quat gunRotation = quat::slerp(gun.lastRotation, gun.rotation, lerpFactor).normalized();
 
-    if (scene.terrain.traceRay(barrelPosition, gun.forward(), 10, &hitPosition, &normal, &distance))
+    vec3 barrelPosition = gunPosition + vec3 { 0, config.physics.gun.barrelPosition.y, 0 }.rotatedBy(gunRotation);
+    vec3 gunForward = vec3::forward.rotatedBy(gunRotation);
+    DrawLine3D(barrelPosition, barrelPosition + gunForward * 100, BLUE);
+
+    if (scene.terrain.traceRay(barrelPosition, gunForward, 100, &hitPosition, &normal, &distance))
     {
       DrawSphere(hitPosition, 0.1f, YELLOW);
       DrawLine3D(hitPosition, hitPosition + normal * 5, YELLOW);

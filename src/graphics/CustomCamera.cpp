@@ -38,6 +38,12 @@ namespace game
     position = focusPosition + focusToCameraDir * distanceFromFocus;
     direction = -focusToCameraDir;
 
+    if (terrain.traceRay(position + vec3::up, -vec3::up, 2.0f, nullptr, nullptr, &hitDistance))
+    {
+      position.y += 2.0f - hitDistance;
+      direction = (focusPosition - position).normalized();
+    }
+
     camera.position = position;
     camera.target = focusPosition;
     camera.up = vec3::up;

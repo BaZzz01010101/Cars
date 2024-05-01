@@ -47,7 +47,6 @@ namespace game
 
     PlayerControl localPlayerControl = getLocalPlayerControl();
     sendPlayerControl(localPlayerControl);
-    scene.updatePlayerControl(localPlayerControl);
 
     network.update();
 
@@ -194,7 +193,6 @@ namespace game
 
   void ClientApp::onPlayerControl(const PlayerControl& playerControl)
   {
-    //if (playerControl.guid != scene.getPlayer().guid)
     scene.updatePlayerControl(playerControl);
     scene.serverPhysicalFrame = playerControl.physicalFrame;
   }

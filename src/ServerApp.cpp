@@ -156,6 +156,10 @@ namespace game
   void ServerApp::onPlayerControl(const PlayerControl& playerControl)
   {
     scene.updatePlayerControl(playerControl);
+
+    BitStream stream;
+    playerControl.writeTo(stream);
+    network.broadcast(stream, false);
   }
 
 }

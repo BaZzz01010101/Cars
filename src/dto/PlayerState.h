@@ -10,11 +10,13 @@ namespace dto
   {
     int64_t physicalFrame {};
     uint64_t guid {};
+
     vec3 position {};
     quat rotation {};
     vec3 velocity {};
     vec3 angularVelocity {};
     float steeringAngle {};
+
     WheelState frontLeftWheelState {};
     WheelState frontRightWheelState {};
     WheelState rearLeftWheelState {};

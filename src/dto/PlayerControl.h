@@ -8,10 +8,11 @@ namespace dto
   {
     int64_t physicalFrame {};
     uint64_t guid {};
+
     float steeringAxis {};
     float accelerationAxis {};
     float thrustAxis {};
-    vec3 target {};
+    vec3 target {}; // replace with targetYaw and targetPitch
     bool primaryFire {};
     bool secondaryFire {};
     bool handBrake {};

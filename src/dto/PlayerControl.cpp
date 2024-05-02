@@ -8,6 +8,7 @@ namespace dto
   {
     stream.Read(physicalFrame);
     stream.Read(guid);
+
     stream.Read(steeringAxis);
     stream.Read(accelerationAxis);
     stream.Read(thrustAxis);
@@ -22,6 +23,7 @@ namespace dto
     stream.Write(ID_PLAYER_CONTROL);
     stream.Write(physicalFrame);
     stream.Write(guid);
+
     stream.Write(steeringAxis);
     stream.Write(accelerationAxis);
     stream.Write(thrustAxis);

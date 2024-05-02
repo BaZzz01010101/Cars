@@ -745,11 +745,12 @@ namespace game_tests
     TEST_METHOD(PlayerControlMessage)
     {
       PlayerControl msg {
-        .guid = 1234567890,
-        .steeringAxis = 0.123f,
-        .accelerationAxis = 0.456f,
-        .thrustAxis = 0.789f,
-        .target = { 0.11f, 0.22f, 0.33f },
+        .physicalFrame = -1234567890123456789,
+        .guid = 9876543210987654321,
+        .steeringAxis = 0.1f,
+        .accelerationAxis = 0.2f,
+        .thrustAxis = 0.3f,
+        .target = { 0.4f, 0.5f, 0.6f },
         .primaryFire = true,
         .secondaryFire = false,
         .handBrake = true
@@ -760,14 +761,20 @@ namespace game_tests
 
     TEST_METHOD(PlayerStateMessage)
     {
-      // TODO: update with new fields
       PlayerState msg {
-        .guid = 1234567890,
-        .position = {0.1f, 0.2f, 0.3f},
-        .rotation = { 0.11f, 0.22f, 0.33f, 0.44f },
-        .velocity = { 0.111f, 0.222f, 0.333f },
-        .angularVelocity = { 0.1111f, 0.2222f, 0.3333f },
-        .steeringAngle = 0.1f,
+        .physicalFrame = -1234567890123456789,
+        .guid = 9876543210987654321,
+        .position = { 0.1f, 0.2f, 0.3f },
+        .rotation = { 0.4f, 0.5f, 0.6f, 0.7f },
+        .velocity = { 0.8f, 0.9f, 1.0f },
+        .angularVelocity = { 1.1f, 1.2f, 1.3f },
+        .steeringAngle = 1.4f,
+        .frontLeftWheelState = { 1.5f, 1.6f, 1.7f },
+        .frontRightWheelState = { 1.8f, 1.9f, 2.0f },
+        .rearLeftWheelState = { 2.1f, 2.2f, 2.3f },
+        .rearRightWheelState = { 2.4f, 2.5f, 2.6f },
+        .gunState = { 2.7f, 2.8f },
+        .cannonState = { 2.9f, 3.0f },
       };
 
       testMessage(msg, ID_PLAYER_STATE);
@@ -777,8 +784,9 @@ namespace game_tests
     {
       PlayerJoin msg {
         .guid = 1234567890,
+
         .position = {0.1f, 0.2f, 0.3f},
-        .rotation = { 0.11f, 0.22f, 0.33f, 0.44f },
+        .rotation = { 0.4f, 0.5f, 0.6f, 0.7f },
       };
 
       testMessage(msg, ID_PLAYER_JOIN);

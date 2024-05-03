@@ -94,7 +94,7 @@ namespace game
 
     if (car.gunFiring)
     {
-      if (car.timeToNextGunFire <= 0)
+      while (car.timeToNextGunFire <= 0)
       {
         const Config::Physics::Turret& gunConfig = config.physics.gun;
         const Turret& gun = car.gun;
@@ -133,6 +133,7 @@ namespace game
           });
 
         car.timeToNextGunFire += gunConfig.fireInterval;
+        car.gunRecoilForce -= gun.forward() * car.mass * 30 * gunConfig.fireInterval;
       }
     }
 
@@ -159,6 +160,7 @@ namespace game
           });
 
         car.timeToNextCannonFire = cannonConfig.fireInterval;
+        car.cannonRecoilForce -= cannon.forward() * car.mass * 10;
       }
     }
 

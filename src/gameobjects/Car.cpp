@@ -118,6 +118,12 @@ namespace game
     applyGlobalForceAtLocalPoint(rearLeftWheel.suspensionForce, rearLeftWheel.connectionPoint);
     applyGlobalForceAtLocalPoint(rearRightWheel.suspensionForce, rearRightWheel.connectionPoint);
 
+    applyGlobalForceAtLocalPoint(gunRecoilForce, gun.connectionPoint + vec3(0, gun.config.barrelElevation, 0));
+    applyGlobalForceAtLocalPoint(cannonRecoilForce, cannon.connectionPoint + vec3(0, cannon.config.barrelElevation, 0));
+
+    gunRecoilForce = moveToRelative(gunRecoilForce, vec3::zero, 20 * dt);
+    cannonRecoilForce = moveToRelative(cannonRecoilForce, vec3::zero, 20 * dt);
+
     updateCollisions(dt);
 
     PhysicalObject::update(dt);

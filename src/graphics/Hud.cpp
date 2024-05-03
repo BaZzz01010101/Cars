@@ -188,7 +188,14 @@ namespace game
   {
     if (camera.direction * turret.forward() > 0)
     {
-      vec2 position = GetWorldToScreen(turret.target, camera);
+      vec3 barrelBack = turret.barrelBackPosition();
+      float distanceToTarget = barrelBack.distanceTo(turret.expectedTarget);
+      vec3 target;
+
+      if (!scene.traceRay(barrelBack, turret.forward(), distanceToTarget, scene.localPlayerIndex, &target, nullptr, nullptr, nullptr))
+        target = barrelBack + turret.forward() * distanceToTarget;
+
+      vec2 position = GetWorldToScreen(target, camera);
 
       // Fixes bug in RayLib with GetWorldToScreen returning NaN in some cases
       // Known case is when turret.currentTarget == camera.position

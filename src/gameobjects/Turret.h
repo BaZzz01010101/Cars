@@ -15,7 +15,6 @@ namespace game
 
     vec3 connectionPoint = vec3::zero;
     vec3 expectedTarget = vec3::zero;
-    vec3 target = vec3::zero;
     float yaw = 0;
     float pitch = 0;
 

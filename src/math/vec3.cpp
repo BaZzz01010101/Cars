@@ -243,6 +243,11 @@ namespace game
     *this = normalized();
   }
 
+  float vec3::distanceTo(vec3 position) const
+  {
+    return (position - *this).length();
+  }
+
   bool vec3::isNormalized() const
   {
     return fabsf(sqLength() - 1) < EPSILON;

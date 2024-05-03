@@ -78,12 +78,6 @@ namespace game
 
     rotation = parent.rotation * quat::fromXAngle(pitch).rotatedByYAngle(yaw);
     rotation.normalize();
-
-    // TODO: Move tracing to Hud::drawTurretCrossHair to avoid excess computations on server and for remote players
-    float distanceToTarget = barrelToExpectedTarget.length();
-
-    if (!scene.traceRay(barrelBackPosition(), forward(), distanceToTarget, scene.localPlayerIndex, &target, nullptr, nullptr, nullptr))
-      target = barrelBackPosition() + forward() * distanceToTarget;
   }
 
 }

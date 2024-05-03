@@ -12,10 +12,23 @@ namespace game
     return std::min(std::max(val, min), max);
   }
 
+  template <typename T>
+  inline T sign(T val)
+  {
+    return T((val > 0) - (val < 0));
+  }
+
   template<class T>
   T sqr(T val)
   {
     return val * val;
+  }
+
+  template<class T>
+  T sqrSigned(T val)
+  {
+    T result = val * val;
+    return sign(val) * result;
   }
 
   template<class T>
@@ -59,12 +72,6 @@ namespace game
   float moveAngleToRelative(float current, float target, float maxDeltaRelative);
 
   float moveAngleTo(float current, float target, float maxDelta);
-
-  template <typename T>
-  inline T sign(T val)
-  {
-    return T((val > 0) - (val < 0));
-  }
 
   int fastRand(void);
 

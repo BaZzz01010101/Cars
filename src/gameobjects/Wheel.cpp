@@ -34,7 +34,7 @@ namespace game
 
     wheelRotationSpeed += enginePower / momentOfInertia * dt;
     wheelRotationSpeed = moveTo(wheelRotationSpeed, 0, std::max(wheelRotationSpeed * wheelConfig.rollingFriction, 0.01f));
-    float maxRPS = float(!handBreaked) * (20 + 4 * velocity.length());
+    float maxRPS = float(!handBreaked) * (config.physics.car.maxForwardSpeed / wheelConfig.radius);
     wheelRotationSpeed = clamp(wheelRotationSpeed, -maxRPS, maxRPS);
 
     vec3 normal;
@@ -66,9 +66,9 @@ namespace game
         suspensionForce += dampingForce;
       }
 
-      float frictionSpeed = (velocity.projectedOnPlane(normal) - wheelRotationSpeed * wheelConfig.radius * frictionForward).length();
+      float frictionSpeed = frictionVelocity.length();
       float frictionKoef = wheelConfig.tireFriction + mapRangeClamped(frictionSpeed, 5, 30, 0.0f, -0.3f);
-      float maxFrictionForce = std::min(springForce * frictionKoef, sharedMass * 50);
+      float maxFrictionForce = springForce * frictionKoef;
       float gravity = config.physics.gravity;
 
       vec3 gravityVelocity = handBreaked ?
@@ -81,13 +81,13 @@ namespace game
       if (frictionForce.sqLength() > sqr(maxFrictionForce))
         frictionForce = frictionForce.normalized() * maxFrictionForce;
 
-      frictionForce = 0.5 * (frictionForce + lastFrictionForce);
-
+      frictionForce = 0.5f * (frictionForce + lastFrictionForce);
       suspensionForce += frictionForce;
 
       float targetWheelRotationSpeed = float(!handBreaked) * velocity * frictionForward / wheelConfig.radius;
-      float step = (frictionForce * frictionForward) * wheelConfig.radius / momentOfInertia * dt;
-      wheelRotationSpeed = moveTo(wheelRotationSpeed, targetWheelRotationSpeed, step);
+      float frictionMoment = 0.3f * (frictionForce * frictionForward) * wheelConfig.radius;
+      float handBreakingMoment = float(handBreaked) * sign(wheelRotationSpeed) * config.physics.car.handBrakePower;
+      wheelRotationSpeed = moveTo(wheelRotationSpeed, targetWheelRotationSpeed, (frictionMoment + handBreakingMoment) / momentOfInertia * dt);
 
       frictionVelocity = velocity.projectedOnPlane(normal) - wheelRotationSpeed * wheelConfig.radius * frictionForward;
     }

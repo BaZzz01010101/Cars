@@ -25,7 +25,7 @@ namespace game
     float radius = (size.x + size.y + size.z) / 6;
     momentOfInertia = 0.5f * mass * sqr(radius);
 
-    vec3 turnRadiusVector = carConfig.connectionPoints.wheels.frontLeft - 
+    vec3 turnRadiusVector = carConfig.connectionPoints.wheels.frontLeft -
       0.5f * (carConfig.connectionPoints.wheels.rearLeft + carConfig.connectionPoints.wheels.rearRight);
 
     steeringMaxCorrectionAngle = turnRadiusVector.getYAngle();
@@ -59,7 +59,7 @@ namespace game
     vec3 currentHitPosition = vec3::zero;
     vec3 currentHitNormal = vec3::zero;
     float currentHitDistance = FLT_MAX;
-    
+
     const Sphere(&carSpheres)[4] = config.collisionGeometries.carSpheres;
 
     for (const Sphere sphere : carSpheres)
@@ -140,7 +140,7 @@ namespace game
     typedef std::tuple<vec3, vec3, float> Hit;
     std::vector<Hit> hits;
 
-    const Sphere (&carSpheres)[4] = config.collisionGeometries.carSpheres;
+    const Sphere(&carSpheres)[4] = config.collisionGeometries.carSpheres;
     constexpr int MAX_SPHERES = (Scene::MAX_CARS - 1) * sizeof(carSpheres) / sizeof(carSpheres[0]);
     std::vector<Sphere> worldCarSpheres;
     worldCarSpheres.reserve(MAX_SPHERES);
@@ -309,16 +309,21 @@ namespace game
 
   void Car::updateEngine(float dt)
   {
-    float ep = (sign(enginePowerDirection) == sign(enginePower)) ? carConfig.enginePower : carConfig.brakePower;
-    float step = ep * dt;
-    float maxForwardEnginePower = mapRangeClamped(velocity * forward(), 0, carConfig.maxSpeed, ep, 0);
-    float maxBackwardEnginePower = mapRangeClamped(velocity * forward(), -carConfig.maxSpeed, 0, 0, ep);
-    enginePower = moveTo(enginePower, maxForwardEnginePower * float(enginePowerDirection > 0) - maxBackwardEnginePower * float(enginePowerDirection < 0), step);
+    float signedForwardSpeedSqr = sqrSigned(velocity * forward());
+    float maxForwardEnginePower = mapRangeClamped(signedForwardSpeedSqr, 0, sqr(carConfig.maxForwardSpeed), carConfig.enginePower, 0);
+    float maxBackwardEnginePower = mapRangeClamped(signedForwardSpeedSqr, -sqr(carConfig.maxBackwardSpeed), 0, 0, carConfig.enginePower);
+
+    float expectedPower = float(enginePowerDirection > 0) * maxForwardEnginePower - (enginePowerDirection < 0) * maxBackwardEnginePower;
+
+    if(sign(enginePowerDirection) == -sign(enginePower) || (enginePowerDirection == 0 && handBreaked))
+      enginePower = 0;
+    else
+      enginePower = moveTo(enginePower, expectedPower, (enginePowerDirection == 0 ? 1 : 0.5f) * carConfig.enginePower * dt);
   }
 
   void Car::updateSteering(float dt)
   {
-    float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0.25f * carConfig.maxSpeed, 0.75f * carConfig.maxSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
+    float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0.25f * carConfig.maxForwardSpeed, 0.75f * carConfig.maxForwardSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
     //float maxSteeringSpeed = mapRangeClamped(velocity.length(), 0, carConfig.maxSpeed, carConfig.maxSteeringSpeed, carConfig.maxSteeringSpeed * 0.5f);
     float steeringTarget;
 
@@ -336,20 +341,26 @@ namespace game
   void Car::updateWheels(float dt)
   {
     float correctionAngle = fabs(mapRangeClamped(steeringAngle, -PI / 2, PI / 2, -steeringMaxCorrectionAngle, steeringMaxCorrectionAngle));
-
-    // TODO: Move to config the power coefficients for front and rear wheels
-    float frontPower = 1.0f * enginePower;
-    float rearPower = 1.0f * enginePower;
-    float contactsCount = std::max(1.0f, float(frontLeftWheel.isGrounded + frontRightWheel.isGrounded + rearLeftWheel.isGrounded + rearRightWheel.isGrounded));
-    float sharedMass = mass / contactsCount;
     float frontLeftSteeringAngle = steeringAngle + correctionAngle;
     float frontRightSteeringAngle = steeringAngle - correctionAngle;
 
-    // TODO: Implement in config the mass sharing coefficient between front and rear wheels
-    frontLeftWheel.update(dt, *this, frontLeftSteeringAngle, sharedMass, frontPower, handBreaked);
-    frontRightWheel.update(dt, *this, frontRightSteeringAngle, sharedMass, frontPower, handBreaked);
-    rearLeftWheel.update(dt, *this, 0, sharedMass, rearPower, handBreaked);
-    rearRightWheel.update(dt, *this, 0, sharedMass, rearPower, handBreaked);
+    int frontContactsCount = int(frontLeftWheel.isGrounded + frontRightWheel.isGrounded);
+    int rearContactsCount = int(rearLeftWheel.isGrounded + rearRightWheel.isGrounded);
+
+    float frontMass = rearContactsCount ? mass * config.physics.car.frontRearWeightDistributionRatio : mass;
+    float frontSharedMass = frontContactsCount ? frontMass / frontContactsCount : 0;
+
+    float rearMass = frontContactsCount ? mass * (1 - config.physics.car.frontRearWeightDistributionRatio) : mass;
+    float rearSharedMass = rearContactsCount ? rearMass / rearContactsCount : 0;
+
+    float powerDistributionRatio = config.physics.car.frontRearPowerDistributionRatio;
+    float frontPower = (1.0f - powerDistributionRatio) * enginePower;
+    float rearPower = powerDistributionRatio * enginePower;
+
+    frontLeftWheel.update(dt, *this, frontLeftSteeringAngle, frontSharedMass, frontPower, handBreaked);
+    frontRightWheel.update(dt, *this, frontRightSteeringAngle, frontSharedMass, frontPower, handBreaked);
+    rearLeftWheel.update(dt, *this, 0, rearSharedMass, rearPower, handBreaked);
+    rearRightWheel.update(dt, *this, 0, rearSharedMass, rearPower, handBreaked);
   }
 
 }

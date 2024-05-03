@@ -48,7 +48,7 @@ namespace game
     static constexpr int HEIGHT_MAP_SIZE_4 = HEIGHT_MAP_SIZE / 4;
     static constexpr float TERRAIN_SIZE = 1000.0f;
     static constexpr float TERRAIN_SIZE_2 = TERRAIN_SIZE / 2;
-    static constexpr float TERRAIN_HEIGHT = TERRAIN_SIZE / 20.0f;
+    static constexpr float TERRAIN_HEIGHT = TERRAIN_SIZE / 15.0f;
     static constexpr int GRID_SIZE = HEIGHT_MAP_SIZE - 1;
     static constexpr float CELL_SIZE = TERRAIN_SIZE / GRID_SIZE;
     static constexpr int OBJECT_COUNT = int(TERRAIN_SIZE * TERRAIN_SIZE / 1000);

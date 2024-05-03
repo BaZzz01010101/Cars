@@ -16,7 +16,8 @@ namespace game
         float enginePower;
         float brakePower;
         float handBrakePower;
-        float maxSpeed;
+        float maxForwardSpeed;
+        float maxBackwardSpeed;
         float minSteeringAngle;
         float maxSteeringAngle;
         float maxSteeringSpeed;
@@ -24,6 +25,8 @@ namespace game
         float bodyFriction;
         float aerodynamicKoef;
         float speedSteeringDrop;
+        float frontRearPowerDistributionRatio;
+        float frontRearWeightDistributionRatio;
         int maxHealth;
 
         struct

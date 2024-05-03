@@ -26,7 +26,6 @@ namespace game
         float aerodynamicKoef;
         float speedSteeringDrop;
         float frontRearPowerDistributionRatio;
-        float frontRearWeightDistributionRatio;
         int maxHealth;
 
         struct

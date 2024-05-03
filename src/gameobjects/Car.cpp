@@ -347,13 +347,14 @@ namespace game
     int frontContactsCount = int(frontLeftWheel.isGrounded + frontRightWheel.isGrounded);
     int rearContactsCount = int(rearLeftWheel.isGrounded + rearRightWheel.isGrounded);
 
-    float frontWeigthDistribution = config.physics.car.frontRearWeightDistributionRatio;
-    float rearWeigthDistribution = 1 - frontWeigthDistribution;
+    const auto& wheelsConnectionPoints = config.physics.car.connectionPoints.wheels;
+    const float frontWeigthDistribution = clamp(fabsf(wheelsConnectionPoints.rearLeft.z) / (wheelsConnectionPoints.frontLeft.z - wheelsConnectionPoints.rearLeft.z), 0.0f, 1.0f);
+    const float rearWeigthDistribution = 1 - frontWeigthDistribution;
 
     float frontMass = rearContactsCount ? mass * frontWeigthDistribution : mass;
     float frontSharedMass = frontContactsCount ? frontMass / frontContactsCount : 0;
 
-    float rearMass = frontContactsCount ? mass * rearWeigthDistribution : mass;
+    float rearMass = frontContactsCount ? mass * rearWeigthDistribution : mass; 
     float rearSharedMass = rearContactsCount ? rearMass / rearContactsCount : 0;
 
     float powerDistributionRatio = config.physics.car.frontRearPowerDistributionRatio;

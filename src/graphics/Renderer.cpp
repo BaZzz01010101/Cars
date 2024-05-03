@@ -218,11 +218,11 @@ namespace game
     vec3 gunPosition = vec3::lerp(gun.lastPosition, gun.position, lerpFactor);
     quat gunRotation = quat::slerp(gun.lastRotation, gun.rotation, lerpFactor).normalized();
 
-    vec3 barrelPosition = gunPosition + vec3 { 0, config.physics.gun.barrelPosition.y, 0 }.rotatedBy(gunRotation);
-    vec3 gunForward = vec3::forward.rotatedBy(gunRotation);
-    DrawLine3D(barrelPosition, barrelPosition + gunForward * 100, BLUE);
+    vec3 barrelBackPosition = gun.barrelBackPosition();
+    vec3 gunForward = gun.forward();
+    DrawLine3D(barrelBackPosition, barrelBackPosition + gunForward * 100, BLUE);
 
-    if (scene.terrain.traceRay(barrelPosition, gunForward, 100, &hitPosition, &normal, &distance))
+    if (scene.terrain.traceRay(barrelBackPosition, gunForward, 100, &hitPosition, &normal, &distance))
     {
       DrawSphere(hitPosition, 0.1f, YELLOW);
       DrawLine3D(hitPosition, hitPosition + normal * 5, YELLOW);

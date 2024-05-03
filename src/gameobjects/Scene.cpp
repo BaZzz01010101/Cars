@@ -100,7 +100,7 @@ namespace game
         const Turret& gun = car.gun;
 
         float bulletOffsetfix = gunConfig.projectileSpeed * -car.timeToNextGunFire;
-        vec3 bulletPosition = gun.barrelPosition() + gun.forward() * bulletOffsetfix;
+        vec3 bulletPosition = gun.barrelFrontPosition() + gun.forward() * bulletOffsetfix;
         vec3 barrelOffset = 0.2f * gun.left();
         vec3 position1 = bulletPosition + barrelOffset;
         vec3 position2 = bulletPosition - barrelOffset;
@@ -142,7 +142,7 @@ namespace game
       {
         const Config::Physics::Turret& cannonConfig = config.physics.cannon;
         const Turret& cannon = car.cannon;
-        vec3 position = cannon.barrelPosition();
+        vec3 position = cannon.barrelFrontPosition();
         vec3 velocity = car.velocity + cannon.forward() * cannonConfig.projectileSpeed;
 
         projectiles.tryAdd(Projectile {

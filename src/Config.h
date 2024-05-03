@@ -71,8 +71,8 @@ namespace game
         float projectileSpeed;
         int baseDamage;
         float projectileLifeTime;
-        // TODO: Replace barrel position by barrelElevation and barrelLength
-        vec3 barrelPosition;
+        float barrelElevation;
+        float barrelLength;
       } gun, cannon;
 
       struct Explosion

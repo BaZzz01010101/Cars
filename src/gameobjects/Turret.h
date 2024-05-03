@@ -26,8 +26,8 @@ namespace game
     Turret& operator=(Turret&&) = delete;
 
     void reset();
-    vec3 barrelPosition() const;
-    vec3 barrelPosition(float lerpFactor) const;
+    vec3 barrelFrontPosition() const;
+    vec3 barrelBackPosition() const;
     void update(float dt, const Object& parent);
     TurretState getState() const;
     void syncState(TurretState turretState, float syncFactor, const Object& parent);

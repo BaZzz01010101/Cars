@@ -67,7 +67,8 @@ namespace game
         .projectileSpeed = 300,
         .baseDamage = 10,
         .projectileLifeTime = 2.0f,
-        .barrelPosition = { 0, 0.35f, 1.5f},
+        .barrelElevation = 0.35f,
+        .barrelLength = 1.5f,
       },
       .cannon = {
         .minPitch = -PI / 8 ,
@@ -80,7 +81,8 @@ namespace game
         .projectileSpeed = 100,
         .baseDamage = 100,
         .projectileLifeTime = 3.0f,
-        .barrelPosition = { 0, 0.75f, 3.0f},
+        .barrelElevation = 0.4f,
+        .barrelLength = 3.0f,
       },
       .cannonExplosion = {
         .radius = 3,

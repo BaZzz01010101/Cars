@@ -3,7 +3,6 @@
 
 namespace game
 {
-  // TODO: Move this and all descendants to objects folder
   vec3 game::Object::forward() const
   {
     return vec3::forward.rotatedBy(rotation);

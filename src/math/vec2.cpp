@@ -207,6 +207,11 @@ namespace game
     *this = normalized();
   }
 
+  float vec2::distanceTo(vec2 position) const
+  {
+    return (position - *this).length();
+  }
+
   bool vec2::isZero() const
   {
     return x == 0 && y == 0;

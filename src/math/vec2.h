@@ -43,6 +43,7 @@ namespace game
     float length() const;
     vec2 normalized() const;
     void normalize();
+    float distanceTo(vec2 position) const;
     bool isZero() const;
     bool isAlmostZero(float delta) const;
     vec2 reflected(vec2 normal) const;

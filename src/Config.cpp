@@ -23,7 +23,7 @@ namespace game
         .bodyFriction = 0.5f,
         .aerodynamicKoef = 8.7f,
         .frontRearPowerDistributionRatio = 0.6f,
-        .frontRearWeightDistributionRatio = 0.6f,
+        .frontRearWeightDistributionRatio = 0.45f,
         .maxHealth = 1000,
         .connectionPoints = {
           .wheels = {

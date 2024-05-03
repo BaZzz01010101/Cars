@@ -170,21 +170,19 @@ namespace game
   {
     int screenWidth = config.graphics.screen.width;
     int screenHeight = config.graphics.screen.height;
-    float srcSize = (float)crosshairsTexture.height;
-    float dstSize = float(std::min(screenWidth, screenHeight) / 16);
+    float size = float(std::min(screenWidth, screenHeight) / 12);
     Color color = { 255, 255, 255, 196 };
 
-    // camera cross hair
     vec2 center = { float(screenWidth / 2), float(screenHeight / 2) };
-    drawCrossHair(center, 0, srcSize, dstSize, color);
+    drawCrossHair(center, CrossHairIndex::Camera, size, color);
 
     const Car& player = scene.getLocalPlayer();
 
-    drawTurretCrossHair(camera, scene, player.cannon, 1, srcSize, dstSize, color, lerpFactor);
-    drawTurretCrossHair(camera, scene, player.gun, 2, srcSize, dstSize, color, lerpFactor);
+    drawTurretCrossHair(camera, scene, player.cannon, CrossHairIndex::Cannon, size, color, lerpFactor);
+    drawTurretCrossHair(camera, scene, player.gun, CrossHairIndex::Gun, size, color, lerpFactor);
   }
 
-  void Hud::drawTurretCrossHair(const CustomCamera& camera, const Scene& scene, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color, float lerpFactor) const
+  void Hud::drawTurretCrossHair(const CustomCamera& camera, const Scene& scene, const Turret& turret, CrossHairIndex crosshairIndex, float size, Color color, float lerpFactor) const
   {
     if (camera.direction * turret.forward() > 0)
     {
@@ -201,16 +199,18 @@ namespace game
       // Known case is when turret.currentTarget == camera.position
       if (position == position)
       {
-        crossHairPositions[textureIndex] = moveToRelative(crossHairPositions[textureIndex], position, CROSSHAIR_MOVEMENT_SHARPNESS);
-        position = crossHairPositions[textureIndex];
-        drawCrossHair(position, textureIndex, srcSize, dstSize, color);
+        crossHairPositions[crosshairIndex] = moveToRelative(crossHairPositions[crosshairIndex], position, CROSSHAIR_MOVEMENT_SHARPNESS);
+        position = crossHairPositions[crosshairIndex];
+        drawCrossHair(position, crosshairIndex, size, color);
       }
     }
   }
 
-  void Hud::drawCrossHair(vec2 position, int textureIndex, float srcSize, float dstSize, Color color) const
+  void Hud::drawCrossHair(vec2 position, CrossHairIndex crosshairIndex, float size, Color color) const
   {
-    DrawTexturePro(crosshairsTexture, { srcSize * textureIndex, srcSize * textureIndex, srcSize, srcSize }, { float(position.x - 0.5f * dstSize), float(position.y - 0.5f * dstSize), dstSize, dstSize }, { 0, 0 }, 0, color);
+    float textureSize = (float)crosshairsTexture.height;
+    float textureLeft = textureSize * (float)crosshairIndex;
+    DrawTexturePro(crosshairsTexture, { textureLeft, 0, textureSize, textureSize }, { float(position.x - 0.5f * size), float(position.y - 0.5f * size), size, size }, { 0, 0 }, 0, color);
   }
 
   void Hud::drawDebug(const Scene& scene) const

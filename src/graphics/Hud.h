@@ -8,6 +8,14 @@ namespace game
 
   struct Hud
   {
+    enum CrossHairIndex : int
+    {
+      Camera = 0,
+      Cannon, 
+      Gun,
+      CROSS_HAIR_COUNT
+    };
+
     static constexpr float CROSSHAIR_MOVEMENT_SHARPNESS = 0.3f;
     const Config& config {};
 
@@ -17,8 +25,7 @@ namespace game
     bool crosshairsTextureLoaded = false;
     bool paused = false;
 
-    // TODO: Make enum for cross hair indexes
-    mutable vec2 crossHairPositions[3] = {
+    mutable vec2 crossHairPositions[CROSS_HAIR_COUNT] = {
       vec2::zero,
       vec2::zero,
       vec2::zero
@@ -65,8 +72,8 @@ namespace game
     void update();
     void draw(const CustomCamera& camera, const Scene& scene, float lerpFactor) const;
     void drawCrossHairs(const CustomCamera& camera, const Scene& scene, float lerpFactor) const;
-    void drawTurretCrossHair(const CustomCamera& camera, const Scene& scene, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color, float lerpFactor) const;
-    void drawCrossHair(vec2 position, int textureIndex, float srcSize, float dstSize, Color color) const;
+    void drawTurretCrossHair(const CustomCamera& camera, const Scene& scene, const Turret& turret, CrossHairIndex crosshairIndex, float size, Color color, float lerpFactor) const;
+    void drawCrossHair(vec2 position, CrossHairIndex crosshairIndex, float size, Color color) const;
     void drawDebug(const Scene& scene) const;
   };
 

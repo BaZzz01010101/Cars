@@ -72,7 +72,6 @@ namespace game
 
     float expectedYaw, expectedPitch;
     vec3 barrelToExpectedTarget = expectedTarget - barrelBackPosition();
-    // TODO: Possible excess rotations, consider optimization
     barrelToExpectedTarget.rotatedBy(parent.rotation.inverted()).yawPitch(&expectedYaw, &expectedPitch);
 
     // TODO: This code does not support 360° rotations. Need additional checks

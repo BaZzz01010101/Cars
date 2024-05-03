@@ -157,16 +157,16 @@ namespace game
     debugGraphs.updateControl();
   }
 
-  void Hud::draw(const CustomCamera& camera, const Scene& scene) const
+  void Hud::draw(const CustomCamera& camera, const Scene& scene, float lerpFactor) const
   {
     if (scene.localPlayerIndex < 0)
       return;
 
-    drawCrossHairs(camera, scene);
+    drawCrossHairs(camera, scene, lerpFactor);
     drawDebug(scene);
   }
 
-  void Hud::drawCrossHairs(const CustomCamera& camera, const Scene& scene) const
+  void Hud::drawCrossHairs(const CustomCamera& camera, const Scene& scene, float lerpFactor) const
   {
     int screenWidth = config.graphics.screen.width;
     int screenHeight = config.graphics.screen.height;
@@ -180,19 +180,19 @@ namespace game
 
     const Car& player = scene.getLocalPlayer();
 
-    drawTurretCrossHair(camera, scene, player.cannon, 1, srcSize, dstSize, color);
-    drawTurretCrossHair(camera, scene, player.gun, 2, srcSize, dstSize, color);
+    drawTurretCrossHair(camera, scene, player.cannon, 1, srcSize, dstSize, color, lerpFactor);
+    drawTurretCrossHair(camera, scene, player.gun, 2, srcSize, dstSize, color, lerpFactor);
   }
 
-  void Hud::drawTurretCrossHair(const CustomCamera& camera, const Scene& scene, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color) const
+  void Hud::drawTurretCrossHair(const CustomCamera& camera, const Scene& scene, const Turret& turret, int textureIndex, float srcSize, float dstSize, Color color, float lerpFactor) const
   {
     if (camera.direction * turret.forward() > 0)
     {
-      vec3 barrelBack = turret.barrelBackPosition();
+      vec3 barrelBack = turret.barrelBackPosition(lerpFactor);
       float distanceToTarget = barrelBack.distanceTo(turret.expectedTarget);
       vec3 target;
 
-      if (!scene.traceRay(barrelBack, turret.forward(), distanceToTarget, scene.localPlayerIndex, &target, nullptr, nullptr, nullptr))
+      if (!scene.traceRay(barrelBack, turret.forward(), FLT_MAX, scene.localPlayerIndex, &target, nullptr, nullptr, nullptr))
         target = barrelBack + turret.forward() * distanceToTarget;
 
       vec2 position = GetWorldToScreen(target, camera);

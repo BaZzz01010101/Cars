@@ -9,7 +9,8 @@ namespace game
     config(config),
     scene(scene),
     connectionPoint(connectionPoint)
-  {}
+  {
+  }
 
   void Turret::reset()
   {
@@ -30,6 +31,16 @@ namespace game
   vec3 Turret::barrelBackPosition() const
   {
     return position + vec3(0, config.barrelElevation, 0).rotatedBy(rotation);
+  }
+
+  vec3 Turret::barrelFrontPosition(float lerpFactor) const
+  {
+    return vec3::lerp(lastPosition, position, lerpFactor) + vec3(0, config.barrelElevation, config.barrelLength).rotatedBy(rotation);
+  }
+
+  vec3 Turret::barrelBackPosition(float lerpFactor) const
+  {
+    return vec3::lerp(lastPosition, position, lerpFactor) + vec3(0, config.barrelElevation, 0).rotatedBy(rotation);
   }
 
   void Turret::syncState(TurretState turretState, float syncFactor, const Object& parent)

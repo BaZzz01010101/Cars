@@ -110,7 +110,7 @@ namespace game
         .steeringAxis = 0.0f,
         .accelerationAxis = 0.0f,
         .thrustAxis = 0.0f,
-        .target = player.gun.expectedTarget,
+        .target = player.gun.expectedTarget - player.position,
         .primaryFire = false,
         .secondaryFire = false,
         .handBrake = true,
@@ -127,7 +127,7 @@ namespace game
     if (scene.traceRay(camera.position, camera.direction, FLT_MAX, scene.localPlayerIndex, nullptr, nullptr, &targetDistance, nullptr))
       targetDistance += targetPenetration;
 
-    target = camera.position + camera.direction * targetDistance;
+    target = camera.position + camera.direction * targetDistance - player.position;
 
 
     return PlayerControl {

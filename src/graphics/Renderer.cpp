@@ -73,7 +73,7 @@ namespace game
 
     EndMode3D();
 
-    hud.draw(camera, scene);
+    hud.draw(camera, scene, lerpFactor);
 
     EndDrawing();
   }
@@ -218,7 +218,7 @@ namespace game
     vec3 gunPosition = vec3::lerp(gun.lastPosition, gun.position, lerpFactor);
     quat gunRotation = quat::slerp(gun.lastRotation, gun.rotation, lerpFactor).normalized();
 
-    vec3 barrelBackPosition = gun.barrelBackPosition();
+    vec3 barrelBackPosition = gun.barrelBackPosition(lerpFactor);
     vec3 gunForward = gun.forward();
     DrawLine3D(barrelBackPosition, barrelBackPosition + gunForward * 100, BLUE);
 

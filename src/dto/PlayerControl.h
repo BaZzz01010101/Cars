@@ -12,7 +12,7 @@ namespace dto
     float steeringAxis {};
     float accelerationAxis {};
     float thrustAxis {};
-    vec3 target {}; // replace with targetYaw and targetPitch
+    vec3 target {}; // target relative to player position (player-to-target vector) to avoid lag in aiming on high ping
     bool primaryFire {};
     bool secondaryFire {};
     bool handBrake {};

@@ -182,6 +182,22 @@ namespace network
         }
         break;
 
+        case ID_PLAYER_HIT:
+        {
+          PlayerHit playerHit;
+          playerHit.readFrom(stream);
+          messageHandler.onPlayerHit(playerHit);
+        }
+        break;
+
+        case ID_PLAYER_KILL:
+        {
+          PlayerKill playerKill;
+          playerKill.readFrom(stream);
+          messageHandler.onPlayerKill(playerKill);
+        }
+        break;
+
         default:
           printf("CLIENT: Unknown message: %i\n", packet->data[0]);
           break;

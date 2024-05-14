@@ -203,6 +203,18 @@ namespace game
     scene.serverPhysicalFrame = playerState.physicalFrame;
   }
 
+  void ClientApp::onPlayerHit(const PlayerHit& playerHit)
+  {
+    printf("CLIENT_APP: OnPlayerHit: %" PRIu64 " < %" PRIu64 "\n", playerHit.guid, playerHit.attakerGuid);
+    //scene.syncPlayerHit(playerHit);
+  }
+
+  void ClientApp::onPlayerKill(const PlayerKill& playerKill)
+  {
+    printf("CLIENT_APP: OnPlayerKill: %" PRIu64 " < %" PRIu64 "\n", playerKill.guid, playerKill.killerGuid);
+    //scene.cars
+  }
+
   void ClientApp::updateShortcuts()
   {
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_ALT) && IsKeyPressed(KEY_SPACE))

@@ -4,6 +4,8 @@
 #include "PlayerState.h"
 #include "PlayerJoin.h"
 #include "PlayerLeave.h"
+#include "PlayerHit.h"
+#include "PlayerKill.h"
 
 namespace network
 {
@@ -12,12 +14,14 @@ namespace network
   class IClientMessageHandler
   {
   public:
-    virtual inline void onConnected(uint64_t guid) = 0;
-    virtual inline void onDisconnected(uint64_t guid) = 0;
-    virtual inline void onPlayerJoin(const PlayerJoin& playerJoin) = 0;
-    virtual inline void onPlayerLeave(const PlayerLeave& playerLeave) = 0;
-    virtual inline void onPlayerControl(const PlayerControl& playerControl) = 0;
-    virtual inline void onPlayerState(const PlayerState& playerState) = 0;
+    virtual void onConnected(uint64_t guid) = 0;
+    virtual void onDisconnected(uint64_t guid) = 0;
+    virtual void onPlayerJoin(const PlayerJoin& playerJoin) = 0;
+    virtual void onPlayerLeave(const PlayerLeave& playerLeave) = 0;
+    virtual void onPlayerControl(const PlayerControl& playerControl) = 0;
+    virtual void onPlayerState(const PlayerState& playerState) = 0;
+    virtual void onPlayerHit(const PlayerHit& playerHit) = 0;
+    virtual void onPlayerKill(const PlayerKill& playerKill) = 0;
   };
 
 }

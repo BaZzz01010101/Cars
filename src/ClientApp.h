@@ -45,6 +45,8 @@ namespace game
     virtual void onPlayerLeave(const PlayerLeave& playerLeave) override;
     virtual void onPlayerControl(const PlayerControl& playerControl) override;
     virtual void onPlayerState(const PlayerState& playerState) override;
+    virtual void onPlayerHit(const PlayerHit& playerHit) override;
+    virtual void onPlayerKill(const PlayerKill& playerKill) override;
   };
 
 }

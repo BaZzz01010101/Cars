@@ -99,7 +99,9 @@
     <ClCompile Include="src\ClientApp.cpp" />
     <ClCompile Include="src\collisions\Sphere.cpp" />
     <ClCompile Include="src\dto\PlayerControl.cpp" />
+    <ClCompile Include="src\dto\PlayerHit.cpp" />
     <ClCompile Include="src\dto\PlayerJoin.cpp" />
+    <ClCompile Include="src\dto\PlayerKill.cpp" />
     <ClCompile Include="src\dto\PlayerLeave.cpp" />
     <ClCompile Include="src\dto\PlayerState.cpp" />
     <ClCompile Include="src\dto\TurretState.cpp" />
@@ -144,7 +146,9 @@
     <ClInclude Include="src\collisions\CollisionGeometry.hpp" />
     <ClInclude Include="src\collisions\Sphere.h" />
     <ClInclude Include="src\dto\PlayerControl.h" />
+    <ClInclude Include="src\dto\PlayerHit.h" />
     <ClInclude Include="src\dto\PlayerJoin.h" />
+    <ClInclude Include="src\dto\PlayerKill.h" />
     <ClInclude Include="src\dto\PlayerLeave.h" />
     <ClInclude Include="src\dto\PlayerState.h" />
     <ClInclude Include="src\dto\TurretState.h" />

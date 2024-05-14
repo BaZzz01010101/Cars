@@ -92,7 +92,7 @@ namespace game
   {
     std::optional<Material> overriddenMaterial = std::nullopt;
 
-    if(car.health <= 0) 
+    if (car.health <= 0)
       overriddenMaterial = destroyedCarMaterial;
 
     drawDynamicObject(car, carModel, lerpFactor, overriddenMaterial);
@@ -105,8 +105,11 @@ namespace game
     drawDynamicObject(car.gun, gunModel, lerpFactor, overriddenMaterial);
     drawDynamicObject(car.cannon, cannonModel, lerpFactor, overriddenMaterial);
 
-    if (!scene.isServer && car.guid != scene.localPlayerGuid)
-      drawHealthBar(car.position, car.health);
+    if (car.guid != scene.localPlayerGuid)
+    {
+      vec3 position = vec3::lerp(car.lastPosition, car.position, lerpFactor);
+      drawHealthBar(position, car.health);
+    }
   }
 
   void Renderer::drawHealthBar(vec3 position, int health)

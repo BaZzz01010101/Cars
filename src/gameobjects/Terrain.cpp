@@ -383,10 +383,11 @@ namespace game
     float max_h = -FLT_MAX;
 
     for (float h : heightMap)
-    {
-      min_h = std::min(h, min_h);
-      max_h = std::max(h, max_h);
-    }
+      if (h <= 1.0f)
+      {
+        min_h = std::min(h, min_h);
+        max_h = std::max(h, max_h);
+      }
 
     if (max_h > min_h)
       for (float& h : heightMap)
@@ -509,21 +510,25 @@ namespace game
   float Terrain::calcHeight(int x, int y, Mode mode) const
   {
     if (x == 0 || x == GRID_SIZE || y == 0 || y == GRID_SIZE)
-      return 1.0f;
+      return 2.0f;
 
     if (mode == Debug1)
+    {
       return
-      y == HEIGHT_MAP_SIZE - 2 ? 0.3f :
-      y == HEIGHT_MAP_SIZE - 3 ? 0.0f :
-      y == HEIGHT_MAP_SIZE - 4 ? 0.1f :
-      y == HEIGHT_MAP_SIZE - 5 ? 0.0f :
-      0.1f;
+        y == HEIGHT_MAP_SIZE - 2 ? 0.3f :
+        y == HEIGHT_MAP_SIZE - 3 ? 0.0f :
+        y == HEIGHT_MAP_SIZE - 4 ? 0.1f :
+        y == HEIGHT_MAP_SIZE - 5 ? 0.0f :
+        0.1f;
+    }
     else if (mode == Debug2)
+    {
       return abs(y - HEIGHT_MAP_SIZE_2) < HEIGHT_MAP_SIZE_4 ?
-      1 - float(abs(y - HEIGHT_MAP_SIZE_2)) / HEIGHT_MAP_SIZE_4 :
-      (y - HEIGHT_MAP_SIZE_2) > HEIGHT_MAP_SIZE_4 ?
-      float(y - HEIGHT_MAP_SIZE_2 - HEIGHT_MAP_SIZE_4) / HEIGHT_MAP_SIZE_4 :
-      0.0f;
+        1 - float(abs(y - HEIGHT_MAP_SIZE_2)) / HEIGHT_MAP_SIZE_4 :
+        (y - HEIGHT_MAP_SIZE_2) > HEIGHT_MAP_SIZE_4 ?
+        float(y - HEIGHT_MAP_SIZE_2 - HEIGHT_MAP_SIZE_4) / HEIGHT_MAP_SIZE_4 :
+        0.0f;
+    }
 
     float xf = float(x) / HEIGHT_MAP_SIZE;
     float yf = float(y + HEIGHT_MAP_SIZE_2) / HEIGHT_MAP_SIZE;
@@ -533,8 +538,8 @@ namespace game
     float k = 1.0f;
     float h = 0.0f;
     float add = 0.0f;
-    const int parts = 3;
-    const float kn = 0.5f / parts;
+    const int sinCount = 3;
+    const float kn = 0.5f / sinCount;
 
     while (sz)
     {
@@ -542,6 +547,7 @@ namespace game
         kn * k * sinf(2 * float(M_PI) * xf * yf * ka + add) +
         kn * k * sinf(2 * float(M_PI) * xf * ka + add) +
         kn * k * sinf(2 * float(M_PI) * yf * ka + add);
+
       sz /= 2;
       ka *= 2.0f;
       k /= 2.0f;
@@ -550,7 +556,7 @@ namespace game
 
     h += 0.5f;
 
-    return h;
+    return clamp(h, 0.0f, 1.0f);
   }
 
   bool Terrain::Triangle::traceRay(vec3 origin, vec3 directionNormalized, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const

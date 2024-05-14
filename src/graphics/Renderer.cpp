@@ -387,33 +387,37 @@ namespace game
           float min_c = 80;
           float max_c = 255;
 
-          return (unsigned char)(min_c + h * (max_c - min_c));
+          return (unsigned char)(min_c + clamp(h, 0.0f, 1.0f) * (max_c - min_c));
+        };
+
+        auto calc_transparency = [](float h) -> unsigned char {
+          return h > 1.0f ? 32 : 255;
         };
 
         mesh.colors[i * 24 + 0] = calc_color(h00);
         mesh.colors[i * 24 + 1] = calc_color(h00);
         mesh.colors[i * 24 + 2] = calc_color(h00);
-        mesh.colors[i * 24 + 3] = 255;
+        mesh.colors[i * 24 + 3] = calc_transparency(h00);
         mesh.colors[i * 24 + 4] = calc_color(h01);
         mesh.colors[i * 24 + 5] = calc_color(h01);
         mesh.colors[i * 24 + 6] = calc_color(h01);
-        mesh.colors[i * 24 + 7] = 255;
+        mesh.colors[i * 24 + 7] = calc_transparency(h01);
         mesh.colors[i * 24 + 8] = calc_color(h11);
         mesh.colors[i * 24 + 9] = calc_color(h11);
         mesh.colors[i * 24 + 10] = calc_color(h11);
-        mesh.colors[i * 24 + 11] = 255;
+        mesh.colors[i * 24 + 11] = calc_transparency(h11);
         mesh.colors[i * 24 + 12] = calc_color(h00);
         mesh.colors[i * 24 + 13] = calc_color(h00);
         mesh.colors[i * 24 + 14] = calc_color(h00);
-        mesh.colors[i * 24 + 15] = 255;
+        mesh.colors[i * 24 + 15] = calc_transparency(h00);
         mesh.colors[i * 24 + 16] = calc_color(h11);
         mesh.colors[i * 24 + 17] = calc_color(h11);
         mesh.colors[i * 24 + 18] = calc_color(h11);
-        mesh.colors[i * 24 + 19] = 255;
+        mesh.colors[i * 24 + 19] = calc_transparency(h11);
         mesh.colors[i * 24 + 20] = calc_color(h10);
         mesh.colors[i * 24 + 21] = calc_color(h10);
         mesh.colors[i * 24 + 22] = calc_color(h10);
-        mesh.colors[i * 24 + 23] = 255;
+        mesh.colors[i * 24 + 23] = calc_transparency(h10);
 
         i++;
       }

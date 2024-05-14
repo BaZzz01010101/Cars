@@ -283,6 +283,7 @@ namespace game
       .velocity = velocity,
       .angularVelocity = angularVelocity,
       .steeringAngle = steeringAngle,
+      .health = health,
       .frontLeftWheelState = frontLeftWheel.getState(),
       .frontRightWheelState = frontRightWheel.getState(),
       .rearLeftWheelState = rearLeftWheel.getState(),
@@ -299,6 +300,7 @@ namespace game
     rotation = quat::slerp(rotation, playerState.rotation, syncFactor);
     angularVelocity = vec3::lerp(angularVelocity, playerState.angularVelocity, syncFactor);
     steeringAngle = lerp(steeringAngle, playerState.steeringAngle, syncFactor);
+    health = playerState.health;
 
     float correctionAngle = fabs(mapRangeClamped(steeringAngle, -PI / 2, PI / 2, -steeringMaxCorrectionAngle, steeringMaxCorrectionAngle));
     float frontLeftSteeringAngle = steeringAngle + correctionAngle;
@@ -321,7 +323,7 @@ namespace game
 
     float expectedPower = float(enginePowerDirection > 0) * maxForwardEnginePower - (enginePowerDirection < 0) * maxBackwardEnginePower;
 
-    if(sign(enginePowerDirection) == -sign(enginePower) || (enginePowerDirection == 0 && handBreaked))
+    if (sign(enginePowerDirection) == -sign(enginePower) || (enginePowerDirection == 0 && handBreaked))
       enginePower = 0;
     else
       enginePower = moveTo(enginePower, expectedPower, (enginePowerDirection == 0 ? 1 : 0.5f) * carConfig.enginePower * dt);
@@ -360,7 +362,7 @@ namespace game
     float frontMass = rearContactsCount ? mass * frontWeigthDistribution : mass;
     float frontSharedMass = frontContactsCount ? frontMass / frontContactsCount : 0;
 
-    float rearMass = frontContactsCount ? mass * rearWeigthDistribution : mass; 
+    float rearMass = frontContactsCount ? mass * rearWeigthDistribution : mass;
     float rearSharedMass = rearContactsCount ? rearMass / rearContactsCount : 0;
 
     float powerDistributionRatio = config.physics.car.frontRearPowerDistributionRatio;

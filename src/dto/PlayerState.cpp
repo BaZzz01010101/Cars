@@ -14,6 +14,7 @@ namespace dto
     stream.Read(velocity);
     stream.Read(angularVelocity);
     stream.Read(steeringAngle);
+    stream.Read(health);
 
     frontLeftWheelState.readFrom(stream);
     frontRightWheelState.readFrom(stream);
@@ -35,6 +36,7 @@ namespace dto
     stream.Write(velocity);
     stream.Write(angularVelocity);
     stream.Write(steeringAngle);
+    stream.Write(health);
 
     frontLeftWheelState.writeTo(stream);
     frontRightWheelState.writeTo(stream);

@@ -16,6 +16,7 @@ namespace dto
     vec3 velocity {};
     vec3 angularVelocity {};
     float steeringAngle {};
+    int health {};
 
     WheelState frontLeftWheelState {};
     WheelState frontRightWheelState {};

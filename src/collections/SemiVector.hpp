@@ -56,6 +56,11 @@ namespace game
       return count;
     }
 
+    bool isEmpty() const
+    {
+      return count == 0;
+    }
+
   private:
     int count = 0;
     std::array<T, N> arr;

@@ -44,6 +44,7 @@ namespace game
     void draw(float lerpFactor);
     void drawDebug(float lerpFactor);
     void drawCar(const Car& car, float lerpFactor);
+    void drawHealthBar(vec3 position, int health);
     void drawDynamicObject(const DynamicObject& dynamicObject, const Model& model, float lerpFactor);
     void drawModel(const Model& model, const Matrix& transform);
     void drawProjectile(const Projectile& projectile, float lerpFactor);

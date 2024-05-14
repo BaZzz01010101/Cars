@@ -99,6 +99,44 @@ namespace game
 
     drawDynamicObject(car.gun, gunModel, lerpFactor);
     drawDynamicObject(car.cannon, cannonModel, lerpFactor);
+
+    drawHealthBar(car.position, car.health);
+  }
+
+  void Renderer::drawHealthBar(vec3 position, int health)
+  {
+    if ((position - camera.position) * camera.direction < 0)
+      return;
+
+    static constexpr float BAR_LENGTH = 6;
+    static constexpr float BAR_LENGTH_2 = BAR_LENGTH / 2;
+    static constexpr float BAR_ELEVATION = 5;
+    vec3 barPosition = position + vec3::up * BAR_ELEVATION;
+    vec3 cameraToBar = barPosition - camera.position;
+    vec3 healthBarDirection = cameraToBar.xz().normalized().right().intoXZWithY(0);
+    vec3 healthBarUp = (cameraToBar % vec3::up % cameraToBar).normalized();
+    vec3 left = barPosition - healthBarDirection * BAR_LENGTH_2;
+    vec3 mid = left + healthBarDirection * (float(health) / config.physics.car.maxHealth) * BAR_LENGTH;
+    vec3 right = barPosition + healthBarDirection * BAR_LENGTH_2;
+
+    vec3 redPoints[4] =
+    {
+      left + 0.1f * healthBarUp,
+      left - 0.1f * healthBarUp,
+      mid + 0.1f * healthBarUp,
+      mid - 0.1f * healthBarUp,
+    };
+
+    vec3 grayPoints[4] =
+    {
+      mid + 0.1f * healthBarUp,
+      mid - 0.1f * healthBarUp,
+      right + 0.1f * healthBarUp,
+      right - 0.1f * healthBarUp,
+    };
+
+    DrawTriangleStrip3D(redPoints, 4, { 255, 80, 80, 128 });
+    DrawTriangleStrip3D(grayPoints, 4, { 80, 80, 80, 128 });
   }
 
   void Renderer::drawDynamicObject(const DynamicObject& object, const Model& model, float lerpFactor)

@@ -21,6 +21,7 @@ namespace game
     float gravity = 0;
     float lifeTime = 0;
     float size = 0;
+    //TODO: Replace with ownerGuid to avoid incorrect damage calculation when index is reused by new connected player
     int ownerIndex = 0;
     int baseDamage = 0;
     Type type = Type::UNKNOWN;

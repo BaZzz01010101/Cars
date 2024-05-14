@@ -17,6 +17,11 @@ namespace game
     generate(Terrain::Mode::Normal);
   }
 
+  float Terrain::getHeight(vec2 position2D, vec3* normal) const
+  {
+    return getHeight(position2D.x, position2D.y, normal);
+  }
+
   float Terrain::getHeight(float worldX, float worldZ, vec3* normal) const
   {
     float x = clamp(worldX + TERRAIN_SIZE_2, 0.0f, TERRAIN_SIZE);

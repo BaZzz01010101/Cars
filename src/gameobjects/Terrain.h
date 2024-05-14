@@ -83,6 +83,7 @@ namespace game
     Terrain& operator=(Terrain&&) = delete;
 
     void init();
+    float getHeight(vec2 position2D, vec3* normal = nullptr) const;
     float getHeight(float worldX, float worldY, vec3* normal = nullptr) const;
     void generate(Mode mode);
     bool traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const;

@@ -190,9 +190,15 @@ namespace game
 
             if (geometry.collideWith(sphere, collisionPoint, collisionNormal, penetration))
             {
-              avgCollisionPosition += *collisionPoint;
-              avgCollisionNormal += *collisionNormal;
-              avgPenetration += *penetration;
+              if (collisionPoint)
+                avgCollisionPosition += *collisionPoint;
+
+              if (collisionNormal)
+                avgCollisionNormal += *collisionNormal;
+
+              if (penetration)
+                avgPenetration += *penetration;
+
               collisionCount++;
             }
           }

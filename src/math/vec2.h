@@ -12,7 +12,8 @@ namespace game
     static vec2 randomInCircle(float radius);
     static vec2 randomOnCircleSurface(float radius);
     static vec2 randomInRing(float innerRadius, float outerRadius);
-    static vec2 randomInSquare(float size);
+    static vec2 randomInSquare(float halfSize);
+    static vec2 randomInRect(float xHalfSize, float yHalfSize);
     static vec2 lerp(vec2 from, vec2 to, float factor);
 
     vec2() = default;
@@ -46,6 +47,7 @@ namespace game
     float distanceTo(vec2 position) const;
     bool isZero() const;
     bool isAlmostZero(float delta) const;
+    bool isInBounds(vec2 min, vec2 max) const;
     vec2 reflected(vec2 normal) const;
     void reflect(vec2 normal);
     vec2 projectedOnVector(vec2 v) const;

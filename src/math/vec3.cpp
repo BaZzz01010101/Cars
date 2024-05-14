@@ -58,35 +58,35 @@ namespace game
     return v + v.normalized() * innerRadius;
   }
 
-  vec3 vec3::randomInCube(float size)
+  vec3 vec3::randomInCube(float halfSize)
   {
-    if (size <= 0)
+    if (halfSize <= 0)
       return vec3::zero;
 
     return
     {
-      randf(-size, size),
-      randf(-size, size),
-      randf(-size, size),
+      randf(-halfSize, halfSize),
+      randf(-halfSize, halfSize),
+      randf(-halfSize, halfSize),
     };
   }
 
-  vec3 vec3::randomInBox(float xSize, float ySize, float zSize)
+  vec3 vec3::randomInBox(float xHalfSize, float yHalfSize, float zHalfSize)
   {
-    if (xSize <= 0)
+    if (xHalfSize <= 0)
       return vec3::zero;
 
-    if (ySize <= 0)
+    if (yHalfSize <= 0)
       return vec3::zero;
 
-    if (zSize <= 0)
+    if (zHalfSize <= 0)
       return vec3::zero;
 
     return
     {
-      randf(-xSize, xSize),
-      randf(-ySize, ySize),
-      randf(-zSize, zSize),
+      randf(-xHalfSize, xHalfSize),
+      randf(-yHalfSize, yHalfSize),
+      randf(-zHalfSize, zHalfSize),
     };
   }
 
@@ -264,6 +264,14 @@ namespace game
       fabsf(x) < delta &&
       fabsf(y) < delta &&
       fabsf(z) < delta;
+  }
+
+  bool vec3::isInBounds(vec3 min, vec3 max) const
+  {
+    return
+      x >= min.x && x <= max.x &&
+      y >= min.y && y <= max.y &&
+      z >= min.z && z <= max.z;
   }
 
   vec3 vec3::reflected(vec3 normal) const

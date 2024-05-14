@@ -56,12 +56,30 @@ namespace game
     return v + innerRadius;
   }
 
-  vec2 vec2::randomInSquare(float size)
+  vec2 vec2::randomInSquare(float halfSize)
   {
+    if (halfSize <= 0)
+      return vec2::zero;
+
     return
     {
-      randf(-size, size),
-      randf(-size, size),
+      randf(-halfSize, halfSize),
+      randf(-halfSize, halfSize),
+    };
+  }
+
+  vec2 vec2::randomInRect(float xHalfSize, float yHalfSize)
+  {
+    if (xHalfSize <= 0)
+      return vec2::zero;
+
+    if (yHalfSize <= 0)
+      return vec2::zero;
+
+    return
+    {
+      randf(-xHalfSize, xHalfSize),
+      randf(-yHalfSize, yHalfSize),
     };
   }
 
@@ -71,10 +89,12 @@ namespace game
   }
 
   vec2::vec2(Vector2 v) : Vector2 { v }
-  {}
+  {
+  }
 
   vec2::vec2(float x, float y) : Vector2 { x, y }
-  {}
+  {
+  }
 
   vec2 vec2::operator+(vec2 v) const
   {
@@ -222,6 +242,13 @@ namespace game
     return
       fabsf(x) <= delta &&
       fabsf(y) <= delta;
+  }
+
+  bool vec2::isInBounds(vec2 min, vec2 max) const
+  {
+    return
+      x >= min.x && x <= max.x &&
+      y >= min.y && y <= max.y;
   }
 
   vec2 vec2::reflected(vec2 normal) const

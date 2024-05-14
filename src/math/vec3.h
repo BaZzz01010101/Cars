@@ -17,8 +17,8 @@ namespace game
     static vec3 randomInSphere(float radius);
     static vec3 randomOnSphereSurface(float radius);
     static vec3 randomInHollowSphere(float innerRadius, float outerRadius);
-    static vec3 randomInCube(float size);
-    static vec3 randomInBox(float xSize, float ySize, float zSize);
+    static vec3 randomInCube(float halfSize);
+    static vec3 randomInBox(float xHalfSize, float yHalfSize, float zHalfSize);
     static vec3 lerp(vec3 from, vec3 to, float factor);
 
     vec3() = default;
@@ -54,6 +54,7 @@ namespace game
     bool isNormalized() const;
     bool isZero() const;
     bool isAlmostZero(float delta) const;
+    bool isInBounds(vec3 min, vec3 max) const;
     vec3 reflected(vec3 normal) const;
     void reflect(vec3 normal);
     vec3 projectedOnVector(vec3 v) const;
@@ -79,5 +80,4 @@ namespace game
   };
 
   vec3 operator*(float f, const vec3& v);
-
 }

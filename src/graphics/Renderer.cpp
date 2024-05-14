@@ -90,17 +90,23 @@ namespace game
 
   void Renderer::drawCar(const Car& car, float lerpFactor)
   {
-    drawDynamicObject(car, carModel, lerpFactor);
+    std::optional<Material> overriddenMaterial = std::nullopt;
 
-    drawDynamicObject(car.frontLeftWheel, wheelModel, lerpFactor);
-    drawDynamicObject(car.frontRightWheel, wheelModel, lerpFactor);
-    drawDynamicObject(car.rearLeftWheel, wheelModel, lerpFactor);
-    drawDynamicObject(car.rearRightWheel, wheelModel, lerpFactor);
+    if(car.health <= 0) 
+      overriddenMaterial = destroyedCarMaterial;
 
-    drawDynamicObject(car.gun, gunModel, lerpFactor);
-    drawDynamicObject(car.cannon, cannonModel, lerpFactor);
+    drawDynamicObject(car, carModel, lerpFactor, overriddenMaterial);
 
-    drawHealthBar(car.position, car.health);
+    drawDynamicObject(car.frontLeftWheel, wheelModel, lerpFactor, overriddenMaterial);
+    drawDynamicObject(car.frontRightWheel, wheelModel, lerpFactor, overriddenMaterial);
+    drawDynamicObject(car.rearLeftWheel, wheelModel, lerpFactor, overriddenMaterial);
+    drawDynamicObject(car.rearRightWheel, wheelModel, lerpFactor, overriddenMaterial);
+
+    drawDynamicObject(car.gun, gunModel, lerpFactor, overriddenMaterial);
+    drawDynamicObject(car.cannon, cannonModel, lerpFactor, overriddenMaterial);
+
+    if (!scene.isServer && car.guid != scene.localPlayerGuid)
+      drawHealthBar(car.position, car.health);
   }
 
   void Renderer::drawHealthBar(vec3 position, int health)
@@ -139,21 +145,24 @@ namespace game
     DrawTriangleStrip3D(grayPoints, 4, { 80, 80, 80, 128 });
   }
 
-  void Renderer::drawDynamicObject(const DynamicObject& object, const Model& model, float lerpFactor)
+  void Renderer::drawDynamicObject(const DynamicObject& object, const Model& model, float lerpFactor, std::optional<Material> overriddenMaterial)
   {
     vec3 position = vec3::lerp(object.lastPosition, object.position, lerpFactor);
     quat rotation = quat::slerp(object.lastRotation, object.rotation, lerpFactor);
     Matrix transform = MatrixMultiply(QuaternionToMatrix(rotation), MatrixTranslate(position.x, position.y, position.z));
 
-    drawModel(model, transform);
+    drawModel(model, transform, overriddenMaterial);
   }
 
-  void Renderer::drawModel(const Model& model, const Matrix& transform)
+  void Renderer::drawModel(const Model& model, const Matrix& transform, std::optional<Material> overriddenMaterial)
   {
     for (int i = 0; i < model.meshCount; i++)
     {
+      Material& meshMaterial = model.materials[model.meshMaterial[i]];
+      Material&& material = overriddenMaterial.value_or(meshMaterial);
+
       if (!drawWires)
-        DrawMesh(model.meshes[i], model.materials[model.meshMaterial[i]], transform);
+        DrawMesh(model.meshes[i], material, transform);
 
       rlEnableWireMode();
       DrawMesh(model.meshes[i], wiresMaterial, transform);
@@ -293,6 +302,9 @@ namespace game
     wiresMaterial = LoadMaterialDefault();
     wiresMaterial.maps->color = Color { 255, 255, 255, 64 };
 
+    destroyedCarMaterial = LoadMaterialDefault();
+    destroyedCarMaterial.maps[0].color = { 40, 40, 40, 255 };
+
     carModel = LoadModel(config.graphics.resources.carModelPath);
     wheelModel = LoadModel(config.graphics.resources.wheelModelPath);
     gunModel = LoadModel(config.graphics.resources.gunModelPath);
@@ -309,12 +321,12 @@ namespace game
     tree2Texture = LoadTexture(config.graphics.resources.tree2TexturePath);
     rockTexture = LoadTexture(config.graphics.resources.rockTexturePath);
 
-    for(int i=0; i< tree1Model.materialCount; i++)
+    for (int i = 0; i < tree1Model.materialCount; i++)
       tree1Model.materials[i].maps[MATERIAL_MAP_DIFFUSE].texture = tree1Texture;
 
     for (int i = 0; i < tree2Model.materialCount; i++)
       tree2Model.materials[i].maps[MATERIAL_MAP_DIFFUSE].texture = tree2Texture;
-    
+
     for (int i = 0; i < rockModel.materialCount; i++)
       rockModel.materials[i].maps[MATERIAL_MAP_DIFFUSE].texture = rockTexture;
   }
@@ -322,6 +334,7 @@ namespace game
   void Renderer::unloadResources()
   {
     UnloadMaterial(wiresMaterial);
+    UnloadMaterial(destroyedCarMaterial);
 
     UnloadModel(terrainModel);
     UnloadModel(carModel);

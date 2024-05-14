@@ -14,6 +14,7 @@ namespace game
     const Hud& hud;
 
     Material wiresMaterial {};
+    Material destroyedCarMaterial {};
 
     Model terrainModel {};
     Model carModel {};
@@ -45,8 +46,8 @@ namespace game
     void drawDebug(float lerpFactor);
     void drawCar(const Car& car, float lerpFactor);
     void drawHealthBar(vec3 position, int health);
-    void drawDynamicObject(const DynamicObject& dynamicObject, const Model& model, float lerpFactor);
-    void drawModel(const Model& model, const Matrix& transform);
+    void drawDynamicObject(const DynamicObject& dynamicObject, const Model& model, float lerpFactor, std::optional<Material> overriddenMaterial = std::nullopt);
+    void drawModel(const Model& model, const Matrix& transform, std::optional<Material> overriddenMaterial = std::nullopt);
     void drawProjectile(const Projectile& projectile, float lerpFactor);
     void drawExplosionParticle(const ExplosionParticle& explosionParticle, float lerpFactor);
     void drawTerrain();

@@ -15,6 +15,14 @@ namespace game
 
   struct Car : public PhysicalObject
   {
+    struct SteeringAngles
+    {
+      float frontLeft;
+      float frontRight;
+      float rearLeft;
+      float rearRight;
+    };
+
     friend struct Hud;
 
     const Config& config {};
@@ -42,7 +50,6 @@ namespace game
     float steeringDirection {};
     float enginePowerDirection {};
     float verticalTrust {};
-    float steeringMaxCorrectionAngle = 0;
     float steeringAngle = 0;
     int health = 0;
 
@@ -63,6 +70,7 @@ namespace game
     void updateCollisions(float dt);
     vec3 getAutoAlignmentMoment(float dt);
     void updateEngine(float dt);
+    SteeringAngles calcSteeringAngles() const;
   };
 
 }

@@ -24,11 +24,6 @@ namespace game
     vec3 size = { 2.04f, 2.32f, 4.56f };
     float radius = (size.x + size.y + size.z) / 6;
     momentOfInertia = 0.5f * mass * sqr(radius);
-
-    vec3 turnRadiusVector = carConfig.connectionPoints.wheels.frontLeft -
-      0.5f * (carConfig.connectionPoints.wheels.rearLeft + carConfig.connectionPoints.wheels.rearRight);
-
-    steeringMaxCorrectionAngle = turnRadiusVector.getYAngle();
   }
 
   void Car::resetToPosition(vec3 position, quat rotation)
@@ -302,14 +297,11 @@ namespace game
     steeringAngle = lerp(steeringAngle, playerState.steeringAngle, syncFactor);
     health = playerState.health;
 
-    float correctionAngle = fabs(mapRangeClamped(steeringAngle, -PI / 2, PI / 2, -steeringMaxCorrectionAngle, steeringMaxCorrectionAngle));
-    float frontLeftSteeringAngle = steeringAngle + correctionAngle;
-    float frontRightSteeringAngle = steeringAngle - correctionAngle;
-
-    frontLeftWheel.syncState(playerState.frontLeftWheelState, syncFactor, frontLeftSteeringAngle, *this);
-    frontRightWheel.syncState(playerState.frontRightWheelState, syncFactor, frontRightSteeringAngle, *this);
-    rearLeftWheel.syncState(playerState.rearLeftWheelState, syncFactor, 0, *this);
-    rearRightWheel.syncState(playerState.rearRightWheelState, syncFactor, 0, *this);
+    const SteeringAngles steeringAngles = calcSteeringAngles();
+    frontLeftWheel.syncState(playerState.frontLeftWheelState, syncFactor, steeringAngles.frontLeft, *this);
+    frontRightWheel.syncState(playerState.frontRightWheelState, syncFactor, steeringAngles.frontRight, *this);
+    rearLeftWheel.syncState(playerState.rearLeftWheelState, syncFactor, steeringAngles.rearLeft, *this);
+    rearRightWheel.syncState(playerState.rearRightWheelState, syncFactor, steeringAngles.rearRight, *this);
 
     gun.syncState(playerState.gunState, syncFactor, *this);
     cannon.syncState(playerState.cannonState, syncFactor, *this);
@@ -348,10 +340,6 @@ namespace game
 
   void Car::updateWheels(float dt)
   {
-    float correctionAngle = fabs(mapRangeClamped(steeringAngle, -PI / 2, PI / 2, -steeringMaxCorrectionAngle, steeringMaxCorrectionAngle));
-    float frontLeftSteeringAngle = steeringAngle + correctionAngle;
-    float frontRightSteeringAngle = steeringAngle - correctionAngle;
-
     int frontContactsCount = int(frontLeftWheel.isGrounded + frontRightWheel.isGrounded);
     int rearContactsCount = int(rearLeftWheel.isGrounded + rearRightWheel.isGrounded);
 
@@ -369,10 +357,28 @@ namespace game
     float frontPower = (1.0f - powerDistributionRatio) * enginePower;
     float rearPower = powerDistributionRatio * enginePower;
 
-    frontLeftWheel.update(dt, *this, frontLeftSteeringAngle, frontSharedMass, frontPower, handBreaked);
-    frontRightWheel.update(dt, *this, frontRightSteeringAngle, frontSharedMass, frontPower, handBreaked);
-    rearLeftWheel.update(dt, *this, 0, rearSharedMass, rearPower, handBreaked);
-    rearRightWheel.update(dt, *this, 0, rearSharedMass, rearPower, handBreaked);
+    const SteeringAngles steeringAngles = calcSteeringAngles();
+    frontLeftWheel.update(dt, *this, steeringAngles.frontLeft, frontSharedMass, frontPower, handBreaked);
+    frontRightWheel.update(dt, *this, steeringAngles.frontRight, frontSharedMass, frontPower, handBreaked);
+    rearLeftWheel.update(dt, *this, steeringAngles.rearLeft, rearSharedMass, rearPower, handBreaked);
+    rearRightWheel.update(dt, *this, steeringAngles.rearRight, rearSharedMass, rearPower, handBreaked);
+  }
+
+  Car::SteeringAngles Car::calcSteeringAngles() const
+  {
+    static const vec3 turnRadiusVector = carConfig.connectionPoints.wheels.frontLeft -
+      0.5f * (carConfig.connectionPoints.wheels.rearLeft + carConfig.connectionPoints.wheels.rearRight);
+
+    static const float steeringMaxCorrectionAngle = turnRadiusVector.getYAngle();
+
+    float correctionAngle = fabs(mapRangeClamped(steeringAngle, -PI / 2, PI / 2, -steeringMaxCorrectionAngle, steeringMaxCorrectionAngle));
+
+    return {
+      .frontLeft = steeringAngle + correctionAngle,
+      .frontRight = steeringAngle - correctionAngle,
+      .rearLeft = 0,
+      .rearRight = 0
+    };
   }
 
 }

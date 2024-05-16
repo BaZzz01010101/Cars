@@ -15,6 +15,7 @@ namespace game
 
     Material wiresMaterial {};
     Material destroyedCarMaterial {};
+    Material destroyedCarMaterialTransparent {};
 
     Model terrainModel {};
     Model carModel {};

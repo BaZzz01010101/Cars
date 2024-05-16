@@ -12,7 +12,7 @@ namespace game
     exit(false),
     config(config),
     camera(config),
-    scene(config),
+    scene(config, false),
     hud(config),
     renderer(config, camera, scene, hud),
     network(serverConfig, *this)
@@ -101,20 +101,6 @@ namespace game
   PlayerControl ClientApp::getLocalPlayerControl()
   {
     const Car& player = scene.getLocalPlayer();
-
-    // TODO: Move the logic of disabled control for dead player to server side
-    if (player.health == 0)
-      return PlayerControl {
-        .physicalFrame = scene.localPhysicalFrame,
-        .guid = player.guid,
-        .steeringAxis = 0.0f,
-        .accelerationAxis = 0.0f,
-        .thrustAxis = 0.0f,
-        .target = player.gun.expectedTarget - player.position,
-        .primaryFire = false,
-        .secondaryFire = false,
-        .handBrake = true,
-    };
 
     vec3 target = vec3::zero;
     float targetDistance = 100;
@@ -212,7 +198,13 @@ namespace game
   void ClientApp::onPlayerKill(const PlayerKill& playerKill)
   {
     printf("CLIENT_APP: OnPlayerKill: %" PRIu64 " < %" PRIu64 "\n", playerKill.guid, playerKill.killerGuid);
-    //scene.cars
+
+    if (Car* killedPlayer = scene.tryGetPlayer(playerKill.guid))
+    {
+      scene.createExplosion(config.graphics.carExplosionParticles, killedPlayer->position);
+      killedPlayer->health = 0;
+      killedPlayer->resetDeathTimeouts();
+    }
   }
 
   void ClientApp::updateShortcuts()

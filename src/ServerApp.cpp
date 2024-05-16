@@ -3,6 +3,8 @@
 #include "Helpers.h"
 #include "PlayerJoin.h"
 #include "PlayerLeave.h"
+#include "PlayerHit.h"
+#include "PlayerKill.h"
 
 namespace game
 {
@@ -10,7 +12,7 @@ namespace game
     exit(false),
     config(config),
     network(serverConfig, *this),
-    scene(config),
+    scene(config, true),
     maxPlayers(serverConfig.maxPlayers)
   {
   }
@@ -48,6 +50,8 @@ namespace game
 
       scene.update(config.physics.fixedDt);
       sendPlayerStates();
+      sendPlayerHits();
+      sendPlayerKills();
       network.update();
     }
 
@@ -68,8 +72,36 @@ namespace game
       {
         BitStream stream;
         scene.getPlayerState(i).writeTo(stream);
-        network.broadcast(stream, false);
+        const Car& car = scene.cars[i];
+
+        if(car.isRespawning())
+          network.send(stream, car.guid, false);
+        else
+          network.broadcast(stream, false);
       }
+  }
+
+
+  void ServerApp::sendPlayerHits()
+  {
+    for (int i = 0; i < scene.cars.capacity(); i++)
+      if (scene.cars.isAlive(i))
+        for (const PlayerHit& playerHit : scene.getPlayerHits(i))
+        {
+          BitStream stream;
+          playerHit.writeTo(stream);
+          network.broadcast(stream, false);
+        }
+  }
+
+  void ServerApp::sendPlayerKills()
+  {
+    for (const PlayerKill& playerKill : scene.getPlayerKills())
+    {
+      BitStream stream;
+      playerKill.writeTo(stream);
+      network.broadcast(stream, true);
+    }
   }
 
   void ServerApp::onClientConnected(uint64_t guid)
@@ -82,9 +114,9 @@ namespace game
       return;
     }
 
-    int playerIndex = scene.cars.tryAdd(guid, config, scene);
+    int newPlayerIndex = scene.cars.tryAdd(guid, config, scene);
 
-    if (playerIndex < 0)
+    if (newPlayerIndex < 0)
     {
       printf("SERVER_APP: OnClientConnected: %" PRIu64 ". Disconnecting! Players pool overflow.\n", guid);
       network.disconnectClient(guid, true);
@@ -93,20 +125,14 @@ namespace game
     }
 
     printf("SERVER_APP: OnClientConnected: %" PRIu64 ". Players: %i\n", guid, scene.cars.count());
-    scene.localPlayerIndex = playerIndex;
-    Car& player = scene.getLocalPlayer();
-    float x = randf(-10, 10);
-    float z = randf(-10, 10);
-    vec3 normal;
-    float y = scene.terrain.getHeight(x, z, &normal);
-    player.position = { x, y + 3, z };
-    player.rotation = quat::fromAxisAngle(normal, randf(2.0f * PI));
+    Car& newPlayer = scene.cars[newPlayerIndex];
+    scene.respawnCar(newPlayer);
 
     PlayerJoin playerJoin = {
       .physicalFrame = scene.localPhysicalFrame,
       .guid = guid,
-      .position = player.position,
-      .rotation = player.rotation,
+      .position = newPlayer.position,
+      .rotation = newPlayer.rotation,
     };
 
     BitStream stream;

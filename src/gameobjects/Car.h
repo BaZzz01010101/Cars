@@ -25,6 +25,9 @@ namespace game
 
     friend struct Hud;
 
+    static constexpr float DEATH_TIMEOUT = 10.0f;
+    static constexpr float RESPAWN_TIMEOUT = 5.0f;
+
     const Config& config {};
     const Config::Physics::Car& carConfig {};
     const float& gravity {};
@@ -54,6 +57,8 @@ namespace game
     float verticalTrust {};
     float steeringAngle = 0;
     int health = 0;
+    float deathTimeout = 0;
+    float respawnTimeout = 0;
 
     Car(uint64_t guid, const Config& config, const Scene& scene);
     Car(Car&) = delete;
@@ -73,6 +78,9 @@ namespace game
     vec3 getAutoAlignmentMoment(float dt);
     void updateEngine(float dt);
     SteeringAngles calcSteeringAngles() const;
+    void updateTimeouts(float dt);
+    void resetDeathTimeouts();
+    bool isRespawning() const;
   };
 
 }

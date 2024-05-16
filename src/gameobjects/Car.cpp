@@ -43,10 +43,12 @@ namespace game
     enginePower = 0;
     handBreaked = false;
     steeringAngle = 0.0f;
-    frontLeftWheel.reset();
-    frontRightWheel.reset();
-    rearLeftWheel.reset();
-    rearRightWheel.reset();
+    frontLeftWheel.reset(*this);
+    frontRightWheel.reset(*this);
+    rearLeftWheel.reset(*this);
+    rearRightWheel.reset(*this);
+    gun.reset(*this);
+    cannon.reset(*this);
   }
 
   bool Car::traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const
@@ -95,6 +97,8 @@ namespace game
 
   void Car::update(float dt)
   {
+    updateTimeouts(dt);
+
     resetForces();
     applyGlobalForceAtCenterOfMass({ 0, -gravity * mass, 0 });
 
@@ -103,8 +107,11 @@ namespace game
 
     applyGlobalForceAtCenterOfMass({ 0, verticalTrust, 0 });
 
-    vec3 alignmentMoment = getAutoAlignmentMoment(dt);
-    applyMoment(alignmentMoment);
+    if (health > 0)
+    {
+      vec3 alignmentMoment = getAutoAlignmentMoment(dt);
+      applyMoment(alignmentMoment);
+    }
 
     vec3 airFrictionMoment = -angularVelocity / dt * momentOfInertia * 0.001f;
     applyMoment(airFrictionMoment);
@@ -155,17 +162,18 @@ namespace game
     std::vector<Sphere> worldCarSpheres;
     worldCarSpheres.reserve(MAX_SPHERES);
 
-    for (int i = 0; i < scene.cars.capacity(); i++)
-      if (scene.cars.isAlive(i) && &scene.cars[i] != this)
-      {
-        const Car& car = scene.cars[i];
+    if (!isRespawning())
+      for (int i = 0; i < scene.cars.capacity(); i++)
+        if (scene.cars.isAlive(i) && &scene.cars[i] != this && !scene.cars[i].isRespawning())
+        {
+          const Car& car = scene.cars[i];
 
-        for (const Sphere& s : carSpheres)
-          worldCarSpheres.push_back({
-            .center = car.position + s.center.rotatedBy(car.rotation),
-            .radius = s.radius
-          });
-      }
+          for (const Sphere& s : carSpheres)
+            worldCarSpheres.push_back({
+              .center = car.position + s.center.rotatedBy(car.rotation),
+              .radius = s.radius
+            });
+        }
 
     for (Sphere sphere : collisionSpheres)
     {
@@ -222,12 +230,12 @@ namespace game
 
       div += 1.0f;
       float nForceScalar = 20 * mass / dt * penetration * penetration;
-      nForceScalar = std::min(nForceScalar, 500000.0f);
+      nForceScalar = std::min(nForceScalar, 50000.0f);
       vec3 nForce = normal * nForceScalar;
 
       vec3 frictionForce = -ptVelocityGlobal.projectedOnPlane(normal) / dt / (ptLocal.sqLength() / momentOfInertia + 1 / mass);
       float frictionForceScalar = frictionForce.length();
-      float maxFrictionForce = std::min(nForceScalar, 2000000.0f) * carConfig.bodyFriction;
+      float maxFrictionForce = std::min(nForceScalar, 200000.0f) * carConfig.bodyFriction;
       velocity -= velocity.projectedOnVector(normal) * clamp(penetration * penetration * dt * 400, 0.0f, 1.0f);
 
       if (frictionForceScalar > 0 && frictionForceScalar > maxFrictionForce)
@@ -269,6 +277,20 @@ namespace game
 
   void Car::updateControl(const PlayerControl& playerControl)
   {
+    if (health <= 0 || deathTimeout > 0 || respawnTimeout > 0)
+    {
+      verticalTrust = 0;
+      handBreaked = true;
+      gunFiring = false;
+      cannonFiring = false;
+      enginePowerDirection = 0;
+      steeringDirection = 0;
+      gun.expectedTarget = gun.position + 100 * gun.forward();
+      cannon.expectedTarget = cannon.position + 100 * cannon.forward();
+
+      return;
+    };
+
     verticalTrust = mass * 20 * playerControl.thrustAxis;
     handBreaked = playerControl.handBrake;
     gunFiring = playerControl.primaryFire;
@@ -299,7 +321,17 @@ namespace game
 
   void Car::syncState(const PlayerState& playerState, float syncFactor)
   {
-    position = moveToRelative(position, playerState.position, 0.1f * syncFactor);
+    bool isRespawn = health <= 0 && playerState.health > 0;
+
+    if (isRespawn)
+    {
+      resetToPosition(playerState.position, playerState.rotation);
+    }
+
+    float relativeSyncFactor = isRespawn ? 1.0f : 0.1f * syncFactor;
+    syncFactor = isRespawn ? 1.0f : syncFactor;
+
+    position = moveToRelative(position, playerState.position, relativeSyncFactor);
     velocity = vec3::lerp(velocity, playerState.velocity, syncFactor);
     rotation = quat::slerp(rotation, playerState.rotation, syncFactor);
     angularVelocity = vec3::lerp(angularVelocity, playerState.angularVelocity, syncFactor);
@@ -327,7 +359,21 @@ namespace game
     if (sign(enginePowerDirection) == -sign(enginePower) || (enginePowerDirection == 0 && handBreaked))
       enginePower = 0;
     else
-      enginePower = moveTo(enginePower, expectedPower, (enginePowerDirection == 0 ? 1 : 0.5f) * carConfig.enginePower * dt);
+      enginePower = moveTo(enginePower, expectedPower, (enginePowerDirection == 0 ? 3 : 1) * carConfig.enginePower * dt);
+  }
+
+  void Car::updateTimeouts(float dt)
+  {
+    if (deathTimeout > 0)
+      deathTimeout = std::max(0.0f, deathTimeout - dt);
+    else if (respawnTimeout > 0)
+      respawnTimeout = std::max(0.0f, respawnTimeout - dt);
+  }
+
+  void Car::resetDeathTimeouts()
+  {
+    deathTimeout = DEATH_TIMEOUT;
+    respawnTimeout = RESPAWN_TIMEOUT;
   }
 
   void Car::updateSteering(float dt)
@@ -388,6 +434,11 @@ namespace game
       .rearLeft = 0,
       .rearRight = 0
     };
+  }
+
+  bool Car::isRespawning() const
+  {
+    return deathTimeout <= 0 && respawnTimeout > 0;
   }
 
 }

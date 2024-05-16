@@ -33,6 +33,8 @@ namespace game
     void shutdown();
 
     void sendPlayerStates();
+    void sendPlayerHits();
+    void sendPlayerKills();
 
     virtual void onClientConnected(uint64_t guid) override;
     virtual void onClientDisconnected(uint64_t guid) override;

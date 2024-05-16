@@ -92,8 +92,17 @@ namespace game
   {
     std::optional<Material> overriddenMaterial = std::nullopt;
 
-    if (car.health <= 0)
+    if (car.deathTimeout > 0.25f * Car::DEATH_TIMEOUT)
       overriddenMaterial = destroyedCarMaterial;
+    else if (car.deathTimeout > 0)
+    {
+      constexpr float BLINKS_PER_SECOND = 5;
+      float blinkFactor = car.deathTimeout * BLINKS_PER_SECOND - int(car.deathTimeout * BLINKS_PER_SECOND);
+      overriddenMaterial = blinkFactor > 0.5f ? destroyedCarMaterial : destroyedCarMaterialTransparent;
+    }
+    else if (car.respawnTimeout > 0 && car.guid != scene.localPlayerGuid)
+      overriddenMaterial = destroyedCarMaterialTransparent;
+
 
     drawDynamicObject(car, carModel, lerpFactor, overriddenMaterial);
 
@@ -308,6 +317,9 @@ namespace game
     destroyedCarMaterial = LoadMaterialDefault();
     destroyedCarMaterial.maps[0].color = { 40, 40, 40, 255 };
 
+    destroyedCarMaterialTransparent = LoadMaterialDefault();
+    destroyedCarMaterialTransparent.maps[0].color = { 40, 40, 40, 32 };
+
     carModel = LoadModel(config.graphics.resources.carModelPath);
     wheelModel = LoadModel(config.graphics.resources.wheelModelPath);
     gunModel = LoadModel(config.graphics.resources.gunModelPath);
@@ -338,6 +350,7 @@ namespace game
   {
     UnloadMaterial(wiresMaterial);
     UnloadMaterial(destroyedCarMaterial);
+    UnloadMaterial(destroyedCarMaterialTransparent);
 
     UnloadModel(terrainModel);
     UnloadModel(carModel);

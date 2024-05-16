@@ -4,7 +4,8 @@
 
 namespace game
 {
-  Scene::Scene(const Config& config) :
+  Scene::Scene(const Config& config, bool isServer) :
+    isServer(isServer),
     terrain(config),
     config(config)
   {
@@ -25,11 +26,20 @@ namespace game
     slowMoCounter = (slowMoCounter + 1) % slowMoCounterMax;
 
     if (!paused && (!slowMotion || slowMoCounter == 0))
+    {
       updateGameObjects(dt);
+
+      if (isServer)
+        updateRespawn();
+    }
   }
 
   void Scene::updateGameObjects(float dt)
   {
+    clearHits();
+    clearKills();
+
+    // TODO: Separate onto updateProjectiles, updateCars and updateParticles
     for (int i = 0; i < projectiles.capacity(); i++)
       if (projectiles.isAlive(i))
       {
@@ -40,35 +50,39 @@ namespace game
         direction /= distance;
         vec3 hitPosition, normal;
         int hitCarIndex = -1;
+        float hitDistance = 0;
 
         if (projectile.lifeTime < 0)
           projectiles.remove(i);
-        else if (traceRay(projectile.lastPosition, direction, distance, projectile.ownerIndex, &hitPosition, &normal, nullptr, &hitCarIndex))
+        else if (traceRay(projectile.lastPosition, direction, distance, projectile.ownerIndex, &hitPosition, &normal, &hitDistance, &hitCarIndex))
         {
           projectiles.remove(i);
 
-          Config::Graphics::ExplosionParticles explosionConfig = projectile.type == Projectile::Bullet ?
-            config.graphics.bulletExplosionParticles :
-            config.graphics.shellExplosionParticles;
+          if (!isServer)
+          {
+            Config::Graphics::ExplosionParticles explosionConfig = projectile.type == Projectile::Bullet ?
+              config.graphics.bulletExplosionParticles :
+              config.graphics.shellExplosionParticles;
 
-          createExplosion(explosionConfig, hitPosition);
+            createExplosion(explosionConfig, hitPosition);
+          }
 
-          if (hitCarIndex >= 0)
+          if (isServer && hitCarIndex >= 0)
           {
             Car& hitCar = cars[hitCarIndex];
-            // TODO: Move impact factor into Config
             hitCar.hitForce += direction * hitCar.mass * float(projectile.baseDamage) * 0.1f;
             hitCar.hitMoment += ((hitPosition - hitCar.position) % hitCar.hitForce).rotatedBy(hitCar.rotation.inverted());
-
-            int newHealth = std::max(hitCar.health - projectile.baseDamage, 0);
-
-            if (hitCar.health > 0 && newHealth == 0)
-              createExplosion(config.graphics.carExplosionParticles, hitCar.position);
-
-            hitCar.health = newHealth;
+            uint64_t hitTick = localPhysicalFrame * 100 + int(100 * hitDistance / distance);
+            addHit(hitCarIndex, { hitTick, projectile.ownerIndex, projectile.baseDamage });
           }
         }
       }
+
+    if (isServer)
+    {
+      applyHits();
+      applyKills();
+    }
 
     for (int i = 0; i < cars.capacity(); i++)
       if (cars.isAlive(i))
@@ -78,15 +92,16 @@ namespace game
         updateFiring(i, dt);
       }
 
-    for (int i = 0; i < explosionParticles.capacity(); i++)
-      if (explosionParticles.isAlive(i))
-      {
-        ExplosionParticle& particle = explosionParticles[i];
-        particle.update(dt);
+    if (!isServer)
+      for (int i = 0; i < explosionParticles.capacity(); i++)
+        if (explosionParticles.isAlive(i))
+        {
+          ExplosionParticle& particle = explosionParticles[i];
+          particle.update(dt);
 
-        if (particle.lifeTime < 0)
-          explosionParticles.remove(i);
-      }
+          if (particle.lifeTime < 0)
+            explosionParticles.remove(i);
+        }
   }
 
   void Scene::updateFiring(int carIndex, float dt)
@@ -175,6 +190,21 @@ namespace game
       car.timeToNextCannonFire = 0;
   }
 
+  void Scene::updateRespawn()
+  {
+    for (int i = 0; i < cars.capacity(); i++)
+      if (cars.isAlive(i))
+      {
+        Car& car = cars[i];
+
+        if (car.health <= 0 && car.deathTimeout <= 0)
+        {
+          car.health = config.physics.car.maxHealth;
+          respawnCar(car);
+        }
+      }
+  }
+
   void Scene::createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position)
   {
     for (int i = 0; i < config.count; i++)
@@ -214,7 +244,7 @@ namespace game
       {
         const Car& car = cars[i];
 
-        if (car.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestsHitDistance)
+        if (!car.isRespawning() && car.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestsHitDistance)
         {
           closestsHitPosition = currentHitPosition;
           closestsHitNormal = currentHitNormal;
@@ -242,6 +272,139 @@ namespace game
     return false;
   }
 
+  void Scene::clearKills()
+  {
+    kills.clear();
+  }
+
+  void Scene::clearHits()
+  {
+    for (int i = 0; i < MAX_CARS; i++)
+      hits[i].clear();
+  }
+
+  void Scene::addHit(int carIndex, Hit hit)
+  {
+    SemiVector<Hit, MAX_CARS>& carHits = hits[carIndex];
+
+    if (carHits.isEmpty())
+    {
+      carHits.add(hit);
+
+      return;
+    }
+
+    int lastIndex = carHits.size() - 1;
+
+    if (hit.tick >= carHits[lastIndex].tick)
+    {
+      carHits.add(hit);
+
+      return;
+    }
+
+    for (int i = 0; i < carHits.size(); i++)
+      if (hit.tick < carHits[i].tick)
+      {
+        carHits.add(carHits[lastIndex]);
+
+        for (int j = lastIndex; j > i; j--)
+          carHits[j] = carHits[j - 1];
+
+        carHits[i] = hit;
+
+        break;
+      }
+  }
+
+  void Scene::applyHits()
+  {
+    for (int i = 0; i < MAX_CARS; i++)
+      if (cars.isAlive(i))
+      {
+        Car& player = cars[i];
+
+        if (IsKeyPressed(KEY_F7))
+          player.velocity = vec2::randomInRing(10, 10).intoXZWithY(randf(5, 10));
+
+        if (player.health <= 0)
+          continue;
+
+        SemiVector<Hit, MAX_CARS>& carHits = hits[i];
+
+        for (int j = 0; j < carHits.size(); j++)
+        {
+          Hit& hit = carHits[j];
+          player.health -= hit.damage;
+
+          if (player.health <= 0)
+          {
+            Car& attacker = cars[hit.attackerIndex];
+            kills.add({ player.guid, attacker.guid });
+
+            break;
+          }
+        }
+      }
+  }
+
+  void Scene::applyKills()
+  {
+    for (int i = 0; i < kills.size(); i++)
+    {
+      Kill& kill = kills[i];
+
+      if (Car* player = tryGetPlayer(kill.playerGuid))
+      {
+        player->resetDeathTimeouts();
+        player->velocity = vec2::randomInRing(5, 5).intoXZWithY(randf(5, 10));
+      }
+    }
+  }
+
+  void Scene::respawnCar(Car& car) const
+  {
+    static constexpr int ATTEMPT_COUNT = 10;
+
+    for (int i = 0; i < ATTEMPT_COUNT; i++)
+    {
+      static const Sphere carBoundingSphere = ([&]() {
+        Sphere boundingSphere {};
+        vec3 min = vec3::zero;
+        vec3 max = vec3::zero;
+
+        for (Sphere s : config.collisionGeometries.carSpheres)
+        {
+          min.x = std::min(min.x, s.center.x - s.radius);
+          min.y = std::min(min.y, s.center.y - s.radius);
+          min.z = std::min(min.z, s.center.z - s.radius);
+
+          max.x = std::max(max.x, s.center.x + s.radius);
+          max.y = std::max(max.y, s.center.y + s.radius);
+          max.z = std::max(max.z, s.center.z + s.radius);
+        }
+
+        return Sphere {
+          .center = 0.5f * (min + max),
+          .radius = std::max({max.x - min.x, max.y - min.y, max.z - min.z}),
+        };
+      })();
+
+      vec2 pos2d = vec2::randomInSquare(Terrain::TERRAIN_SIZE_2 - 2 * carBoundingSphere.radius);
+      float bottomOffsetY = -config.physics.car.connectionPoints.wheels.frontLeft.y + config.physics.frontWheels.radius;
+      vec3 normal;
+      car.position = pos2d.intoXZWithY(terrain.getHeight(pos2d, &normal) + bottomOffsetY);
+      car.rotation = quat::fromAxisAngle(normal, randf(2.0f * PI));
+      Sphere carBoundingSphereWorld = carBoundingSphere;
+      carBoundingSphereWorld.center = carBoundingSphere.center.rotatedBy(car.rotation) + car.position;
+
+      if (!terrain.collideSphereWithObjects(carBoundingSphereWorld, nullptr, nullptr, nullptr))
+        break;
+    }
+
+    car.resetToPosition(car.position, car.rotation);
+  }
+
   void Scene::regenerateTerrain(Terrain::Mode mode)
   {
     terrain.generate(mode);
@@ -255,6 +418,24 @@ namespace game
     playerPosition.y = terrainY + 2;
     Car& player = cars[localPlayerIndex];
     player.resetToPosition(playerPosition, playerRotation);
+  }
+
+  const Car* Scene::tryGetPlayer(uint64_t guid) const
+  {
+    for (int i = 0; i < MAX_CARS; i++)
+      if (cars.isAlive(i) && cars[i].guid == guid)
+        return &cars[i];
+
+    return nullptr;
+  }
+
+  Car* Scene::tryGetPlayer(uint64_t guid)
+  {
+    for (int i = 0; i < MAX_CARS; i++)
+      if (cars.isAlive(i) && cars[i].guid == guid)
+        return &cars[i];
+
+    return nullptr;
   }
 
   void Scene::updatePlayerControl(const PlayerControl& playerControl)
@@ -286,6 +467,60 @@ namespace game
     state.guid = player.guid;
 
     return state;
+  }
+
+  std::vector<PlayerHit> Scene::getPlayerHits(int index) const
+  {
+    std::vector<PlayerHit> result;
+    const Car& player = cars[index];
+    const SemiVector<Hit, MAX_CARS>& playerHits = hits[index];
+
+    for (int i = 0; i < playerHits.size(); i++)
+    {
+      const Hit& hit = playerHits[i];
+
+      // TODO: Consider replacing with guid to avoid issues when index is reused by new connected player
+      const Car& attacker = cars[hit.attackerIndex];
+
+      bool isNewHit = true;
+
+      for (int j = 0; j < result.size(); j++)
+        if (attacker.guid == result[j].attakerGuid)
+        {
+          result[j].damage += hit.damage;
+          isNewHit = false;
+
+          break;
+        }
+
+      if (isNewHit)
+        result.push_back(PlayerHit {
+          .physicalFrame = localPhysicalFrame,
+          .guid = player.guid,
+          .attakerGuid = attacker.guid,
+          .damage = hit.damage
+        });
+    }
+
+    return result;
+  }
+
+  std::vector<PlayerKill> Scene::getPlayerKills() const
+  {
+    std::vector<PlayerKill> result;
+
+    for (int i = 0; i < kills.size(); i++)
+    {
+      const Scene::Kill& kill = kills[i];
+
+      result.push_back(PlayerKill {
+        .physicalFrame = localPhysicalFrame,
+        .guid = kill.playerGuid,
+        .killerGuid = kill.killerGuid
+      });
+    }
+
+    return result;
   }
 
 }

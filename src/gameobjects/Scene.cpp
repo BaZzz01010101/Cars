@@ -358,6 +358,7 @@ namespace game
       {
         player->resetDeathTimeouts();
         player->velocity = vec2::randomInRing(5, 5).intoXZWithY(randf(5, 10));
+        player->angularVelocity = vec3::randomInCube(5.0f);
       }
     }
   }

@@ -25,38 +25,30 @@ namespace game
     pitch = moveAngleToRelative(pitch, expectedPitch, cameraConfig.rotationSharpness * dt);
 
     quat rotation = quat::fromXAngle(pitch).rotatedByYAngle(yaw);
+    const float ZOOM_SPEED = 1000;
+
+    vec3 focusToCameraDir = vec3::forward.rotatedBy(rotation);
+    vec3 expectedFocusPosition = playerPosition + vec3 { 0, cameraConfig.focusElevation, 0 };
+    focusPosition = moveToRelative(focusPosition, expectedFocusPosition, cameraConfig.pursuitSharpness * dt);
+
+    float hitDistance;
+    constexpr float CAMERA_HIT_OFFSET = 1.0f;
+
+    if (terrain.traceRay(focusPosition, focusToCameraDir, cameraConfig.maxDistanceFromFocus + CAMERA_HIT_OFFSET, nullptr, nullptr, &hitDistance))
+    {
+      hitDistance = std::max(hitDistance, CAMERA_HIT_OFFSET + 0.01f);
+      distanceFromFocus = moveTo(distanceFromFocus, hitDistance - CAMERA_HIT_OFFSET, cameraConfig.collisionSharpness * dt);
+    }
+    else
+      distanceFromFocus = moveTo(distanceFromFocus, cameraConfig.maxDistanceFromFocus, cameraConfig.pursuitSharpness * dt);
 
     if(mode == Mode::Normal)
-    {
-      vec3 expectedFocusPosition = playerPosition + vec3 { 0, cameraConfig.focusElevation, 0 };
-      focusPosition = moveToRelative(focusPosition, expectedFocusPosition, cameraConfig.pursuitSharpness * dt);
-      vec3 focusToCameraDir = vec3::forward.rotatedBy(rotation);
-      float hitDistance;
-
-      if (terrain.traceRay(focusPosition, focusToCameraDir, cameraConfig.maxDistanceFromFocus, nullptr, nullptr, &hitDistance))
-        distanceFromFocus = moveTo(distanceFromFocus, hitDistance, cameraConfig.collisionSharpness * dt);
-      else
-        distanceFromFocus = moveTo(distanceFromFocus, cameraConfig.maxDistanceFromFocus, cameraConfig.pursuitSharpness * dt);
-
-      position = focusPosition + focusToCameraDir * distanceFromFocus;
-      direction = -focusToCameraDir;
-
-      if (terrain.traceRay(position + vec3::up, -vec3::up, 2.0f, nullptr, nullptr, &hitDistance))
-      {
-        position.y += 2.0f - hitDistance;
-        direction = (focusPosition - position).normalized();
-      }
-      camera.fovy = 90;
-    }
+      camera.fovy = moveTo(camera.fovy, 90, ZOOM_SPEED * dt);
     else if (mode == Mode::Zoom)
-    {
-      focusPosition = playerPosition + vec3 { 0, cameraConfig.focusElevation, 0 };
-      vec3 focusToCameraDir = vec3::forward.rotatedBy(rotation);
-      distanceFromFocus = 0.01f;
-      position = focusPosition + focusToCameraDir * distanceFromFocus;
-      direction = -focusToCameraDir;
-      camera.fovy = 90 / config.graphics.camera.zoomFactor;
-    }
+      camera.fovy = moveTo(camera.fovy, 90 / config.graphics.camera.zoomFactor, ZOOM_SPEED * dt);
+
+    position = focusPosition + focusToCameraDir * distanceFromFocus;
+    direction = -focusToCameraDir;
 
     camera.position = position;
     camera.target = focusPosition;

@@ -12,8 +12,8 @@ namespace game
   {
     const Config::Physics::Turret& config {};
     const Scene& scene;
+    const vec3 connectionPoint = vec3::zero;
 
-    vec3 connectionPoint = vec3::zero;
     vec3 expectedTarget = vec3::zero;
     float yaw = 0;
     float pitch = 0;
@@ -24,7 +24,7 @@ namespace game
     Turret& operator=(Turret&) = delete;
     Turret& operator=(Turret&&) = delete;
 
-    void reset();
+    void reset(const Object& parent);
     vec3 barrelFrontPosition() const;
     vec3 barrelBackPosition() const;
     vec3 barrelFrontPosition(float lerpFactor) const;
@@ -32,6 +32,7 @@ namespace game
     void update(float dt, const Object& parent);
     TurretState getState() const;
     void syncState(TurretState turretState, float syncFactor, const Object& parent);
+    void updatePositionAndRotation(const Object& parent);
   };
 
 }

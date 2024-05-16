@@ -12,15 +12,14 @@ namespace game
   {
   }
 
-  void Turret::reset()
+  void Turret::reset(const Object& parent)
   {
-    lastPosition = vec3::zero;
-    lastRotation = quat::identity;
-
-    position = vec3::zero;
-    rotation = quat::identity;
     yaw = 0;
     pitch = 0;
+    updatePositionAndRotation(parent);
+    lastPosition = position;
+    lastRotation = rotation;
+    expectedTarget = position + 100 * forward();
   }
 
   vec3 Turret::barrelFrontPosition() const
@@ -47,10 +46,7 @@ namespace game
   {
     yaw = moveToRelative(yaw, turretState.yaw, 0.1f * syncFactor);
     pitch = moveToRelative(pitch, turretState.pitch, 0.1f * syncFactor);
-    vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
-    position = parent.position + globalConnectionPoint;
-    rotation = parent.rotation * quat::fromXAngle(pitch).rotatedByYAngle(yaw);
-    rotation.normalize();
+    updatePositionAndRotation(parent);
   }
 
   TurretState Turret::getState() const
@@ -65,10 +61,6 @@ namespace game
   {
     lastPosition = position;
     lastRotation = rotation;
-
-    vec3 connectionPointRotated = connectionPoint.rotatedBy(parent.rotation);
-    position = parent.position + connectionPointRotated;
-    rotation = parent.rotation * quat::fromXAngle(pitch).rotatedByYAngle(yaw);
 
     float expectedYaw, expectedPitch;
     vec3 barrelToExpectedTarget = expectedTarget - barrelBackPosition();
@@ -85,7 +77,13 @@ namespace game
 
     yaw = clamp(yaw, config.minYaw, config.maxYaw);
     pitch = clamp(pitch, config.minPitch, config.maxPitch);
+    updatePositionAndRotation(parent);
+  }
 
+  void Turret::updatePositionAndRotation(const Object& parent)
+  {
+    vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
+    position = parent.position + globalConnectionPoint;
     rotation = parent.rotation * quat::fromXAngle(pitch).rotatedByYAngle(yaw);
     rotation.normalize();
   }

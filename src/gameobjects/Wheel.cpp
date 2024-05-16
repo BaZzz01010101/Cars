@@ -22,7 +22,7 @@ namespace game
     vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
     position = parent.position + globalConnectionPoint;
     rotation = parent.rotation * quat::fromYAngle(steeringAngle);
-    velocity = parent.velocity + parent.angularVelocity.rotatedBy(rotation) % globalConnectionPoint;
+    vec3 velocity = parent.velocity + parent.angularVelocity.rotatedBy(rotation) % globalConnectionPoint;
     suspensionForce = vec3::zero;
 
     float springForce = sqr(suspensionOffset) * wheelConfig.suspensionStiffness;
@@ -99,13 +99,11 @@ namespace game
     rotation = rotation * wheelRotation;
   }
 
-  void Wheel::reset()
+  void Wheel::reset(const Object& parent)
   {
-    lastPosition = vec3::zero;
-    lastRotation = quat::identity;
-    position = vec3::zero;
-    rotation = quat::identity;
-    velocity = vec3::zero;
+    updatePositionAndRotation(parent, 0);
+    lastPosition = position;
+    lastRotation = rotation;
     wheelRotation = quat::identity;
     wheelRotationSpeed = 0;
     suspensionOffset = 0;
@@ -129,13 +127,17 @@ namespace game
     suspensionOffset = lerp(suspensionOffset, wheelState.suspensionOffset, syncFactor);
     suspensionSpeed = lerp(suspensionSpeed, wheelState.suspensionSpeed, syncFactor);
     wheelRotationSpeed = lerp(wheelRotationSpeed, wheelState.rotationSpeed, syncFactor);
-    
+
+    updatePositionAndRotation(parent, steeringAngle);
+    position.y += suspensionOffset;
+    rotation = rotation * wheelRotation;
+  }
+
+  void Wheel::updatePositionAndRotation(const Object& parent, float steeringAngle)
+  {
     vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
     position = parent.position + globalConnectionPoint;
     rotation = parent.rotation * quat::fromYAngle(steeringAngle);
-    velocity = parent.velocity + parent.angularVelocity.rotatedBy(rotation) % globalConnectionPoint;
-    position.y += suspensionOffset;
-    rotation = rotation * wheelRotation;
   }
 
 }

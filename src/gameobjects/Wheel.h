@@ -15,8 +15,8 @@ namespace game
     const Config& config {};
     const Config::Physics::Wheels& wheelConfig {};
     const Terrain& terrain;
+    const vec3 connectionPoint = vec3::zero;
 
-    vec3 connectionPoint = vec3::zero;
     vec3 suspensionForce = vec3::zero;
     vec3 nForce = vec3::zero;
     vec3 frictionForce = vec3::zero;
@@ -37,9 +37,10 @@ namespace game
     Wheel& operator=(Wheel&&) = delete;
 
     void update(float dt, const DynamicObject& parent, float steeringAngle, float sharedMass, float enginePower, bool handBreaked);
-    void reset();
+    void reset(const Object& parent);
     WheelState getState() const;
     void syncState(const WheelState& wheelState, float syncFactor, float steeringAngle, const DynamicObject& parent);
+    void updatePositionAndRotation(const Object& parent, float steeringAngle);
   };
 
 }

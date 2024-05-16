@@ -36,6 +36,10 @@ namespace game
     angularVelocity = vec3::zero;
     force = vec3::zero;
     moment = vec3::zero;
+    gunRecoilForce = vec3::zero;
+    cannonRecoilForce = vec3::zero;
+    hitForce = vec3::zero;
+    hitMoment = vec3::zero;
     enginePower = 0;
     handBreaked = false;
     steeringAngle = 0.0f;
@@ -116,8 +120,13 @@ namespace game
     applyGlobalForceAtLocalPoint(gunRecoilForce, gun.connectionPoint + vec3(0, gun.config.barrelElevation, 0));
     applyGlobalForceAtLocalPoint(cannonRecoilForce, cannon.connectionPoint + vec3(0, cannon.config.barrelElevation, 0));
 
+    applyGlobalForceAtCenterOfMass(hitForce);
+    applyMoment(hitMoment);
+
     gunRecoilForce = moveToRelative(gunRecoilForce, vec3::zero, 20 * dt);
     cannonRecoilForce = moveToRelative(cannonRecoilForce, vec3::zero, 20 * dt);
+    hitForce = moveToRelative(hitForce, vec3::zero, 10 * dt);
+    hitMoment = moveToRelative(hitMoment, vec3::zero, 10 * dt);
 
     updateCollisions(dt);
 

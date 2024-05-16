@@ -47,6 +47,8 @@ namespace game
     float timeToNextCannonFire = 0;
     vec3 gunRecoilForce = vec3::zero;
     vec3 cannonRecoilForce = vec3::zero;
+    vec3 hitForce = vec3::zero;
+    vec3 hitMoment = vec3::zero;
     float steeringDirection {};
     float enginePowerDirection {};
     float verticalTrust {};

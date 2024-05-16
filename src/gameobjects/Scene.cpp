@@ -57,7 +57,8 @@ namespace game
           {
             Car& hitCar = cars[hitCarIndex];
             // TODO: Move impact factor into Config
-            hitCar.velocity += (hitCar.position - hitPosition).normalized() * (float)projectile.baseDamage * 0.01f;
+            hitCar.hitForce += direction * hitCar.mass * float(projectile.baseDamage) * 0.1f;
+            hitCar.hitMoment += ((hitPosition - hitCar.position) % hitCar.hitForce).rotatedBy(hitCar.rotation.inverted());
 
             int newHealth = std::max(hitCar.health - projectile.baseDamage, 0);
 
@@ -167,10 +168,10 @@ namespace game
     car.timeToNextCannonFire -= dt;
     car.timeToNextGunFire -= dt;
 
-    if(!car.gunFiring && car.timeToNextGunFire < 0)
+    if (!car.gunFiring && car.timeToNextGunFire < 0)
       car.timeToNextGunFire = 0;
 
-    if(!car.cannonFiring && car.timeToNextCannonFire < 0)
+    if (!car.cannonFiring && car.timeToNextCannonFire < 0)
       car.timeToNextCannonFire = 0;
   }
 
@@ -201,19 +202,19 @@ namespace game
     vec3 currentHitNormal = vec3::zero;
     float currentHitDistance = FLT_MAX;
 
-    if(terrain.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestsHitDistance)
+    if (terrain.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestsHitDistance)
     {
       closestsHitPosition = currentHitPosition;
       closestsHitNormal = currentHitNormal;
       closestsHitDistance = currentHitDistance;
     }
 
-    for(int i = 0; i < cars.capacity(); i++)
-      if(cars.isAlive(i) && i != excludePlayerIndex)
+    for (int i = 0; i < cars.capacity(); i++)
+      if (cars.isAlive(i) && i != excludePlayerIndex)
       {
         const Car& car = cars[i];
 
-        if(car.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestsHitDistance)
+        if (car.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestsHitDistance)
         {
           closestsHitPosition = currentHitPosition;
           closestsHitNormal = currentHitNormal;
@@ -226,13 +227,13 @@ namespace game
 
     if (closestsHitDistance != FLT_MAX)
     {
-      if(hitPosition)
+      if (hitPosition)
         *hitPosition = closestsHitPosition;
 
-      if(hitNormal)
+      if (hitNormal)
         *hitNormal = closestsHitNormal;
 
-      if(hitDistance)
+      if (hitDistance)
         *hitDistance = closestsHitDistance;
 
       return true;

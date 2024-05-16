@@ -102,6 +102,7 @@ namespace game
         float rotationSharpness;
         float pursuitSharpness;
         float collisionSharpness;
+        float zoomFactor;
       } camera;
 
       struct Hud

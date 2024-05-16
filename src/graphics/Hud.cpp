@@ -170,7 +170,8 @@ namespace game
   {
     int screenWidth = config.graphics.screen.width;
     int screenHeight = config.graphics.screen.height;
-    float size = float(std::min(screenWidth, screenHeight) / 12);
+    float minScreenSize = float(std::min(screenWidth, screenHeight));
+    float size = (camera.mode == CustomCamera::Zoom) ? (minScreenSize / 6) : (minScreenSize / 12);
     Color color = { 255, 255, 255, 196 };
 
     vec2 center = { float(screenWidth / 2), float(screenHeight / 2) };

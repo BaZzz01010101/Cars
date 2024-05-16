@@ -105,6 +105,7 @@ namespace game
         .rotationSharpness = 20.0f,
         .pursuitSharpness = 8.0f,
         .collisionSharpness = 30.0f,
+        .zoomFactor = 10,
       },
       .hud = {
         .fontSize = 20,

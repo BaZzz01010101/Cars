@@ -217,6 +217,21 @@ namespace game
       network.connect();
     }
 
+    if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON))
+      switch (camera.mode)
+      {
+        case CustomCamera::Normal:
+          camera.mode = CustomCamera::Zoom;
+          break;
+
+          case CustomCamera::Zoom:
+            camera.mode = CustomCamera::Normal;
+            break;
+
+          default:
+            break;
+      }
+
     if (IsKeyPressed(KEY_P))
       togglePaused();
 

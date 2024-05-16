@@ -7,6 +7,12 @@ namespace game
 
   struct CustomCamera
   {
+    enum Mode
+    {
+      Normal,
+      Zoom
+    };
+
     const Config& config {};
     Camera camera {};
 
@@ -19,6 +25,7 @@ namespace game
     vec3 position = vec3::zero;
     vec3 direction = vec3::forward;
     bool invertY = false;
+    Mode mode = Mode::Normal;
 
     CustomCamera(const Config& config);
     CustomCamera(CustomCamera&) = delete;

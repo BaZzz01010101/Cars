@@ -285,8 +285,8 @@ namespace game
       cannonFiring = false;
       enginePowerDirection = 0;
       steeringDirection = 0;
-      gun.expectedTarget = gun.position + 100 * gun.forward();
-      cannon.expectedTarget = cannon.position + 100 * cannon.forward();
+      gun.expectedTarget = gun.position + 100000 * gun.forward();
+      cannon.expectedTarget = cannon.position + 100000 * cannon.forward();
 
       return;
     };

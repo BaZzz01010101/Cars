@@ -8,6 +8,7 @@ namespace dto
   {
     stream.Read(physicalFrame);
     stream.Read(guid);
+    stream.Read(name);
     stream.Read(position);
     stream.Read(rotation);
   }
@@ -17,6 +18,7 @@ namespace dto
     stream.Write(ID_PLAYER_JOIN);
     stream.Write(physicalFrame);
     stream.Write(guid);
+    stream.Write(name);
     stream.Write(position);
     stream.Write(rotation);
   }

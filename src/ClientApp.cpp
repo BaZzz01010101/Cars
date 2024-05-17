@@ -13,7 +13,7 @@ namespace game
     config(config),
     camera(config),
     scene(config, false),
-    hud(config),
+    hud(config, matchStats),
     renderer(config, camera, scene, hud),
     network(serverConfig, *this)
   {
@@ -155,6 +155,7 @@ namespace game
     }
 
     Car& car = scene.cars[index];
+    car.name = playerJoin.name;
     car.position = playerJoin.position;
     car.rotation = playerJoin.rotation;
 
@@ -163,6 +164,8 @@ namespace game
       scene.localPhysicalFrame = playerJoin.physicalFrame;
       scene.localPlayerIndex = index;
     }
+
+    matchStats.addPlayer(playerJoin.guid, playerJoin.name);
   }
 
   void ClientApp::onPlayerLeave(const PlayerLeave& playerLeave)
@@ -175,6 +178,8 @@ namespace game
         scene.cars.remove(i);
         break;
       }
+
+    matchStats.removePlayer(playerLeave.guid);
   }
 
   void ClientApp::onPlayerControl(const PlayerControl& playerControl)
@@ -187,6 +192,7 @@ namespace game
   {
     scene.syncPlayerState(playerState, SYNC_FACTOR);
     scene.serverPhysicalFrame = playerState.physicalFrame;
+    matchStats.setPing(playerState.guid, playerState.ping);
   }
 
   void ClientApp::onPlayerHit(const PlayerHit& playerHit)
@@ -204,6 +210,8 @@ namespace game
       scene.createExplosion(config.graphics.carExplosionParticles, killedPlayer->position);
       killedPlayer->health = 0;
       killedPlayer->resetDeathTimeouts();
+      matchStats.addKill(playerKill.killerGuid);
+      matchStats.addDeath(playerKill.guid);
     }
   }
 

@@ -9,6 +9,7 @@ namespace dto
     stream.Read(physicalFrame);
     stream.Read(guid);
 
+    stream.Read(ping);
     stream.Read(position);
     stream.Read(rotation);
     stream.Read(velocity);
@@ -31,6 +32,7 @@ namespace dto
     stream.Write(physicalFrame);
     stream.Write(guid);
 
+    stream.Write(ping);
     stream.Write(position);
     stream.Write(rotation);
     stream.Write(velocity);

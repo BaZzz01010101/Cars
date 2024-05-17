@@ -9,6 +9,7 @@ namespace dto
     int64_t physicalFrame {};
     uint64_t guid {};
 
+    PlayerName name = DEFAULT_PLAYER_NAME;
     vec3 position = vec3::zero;
     quat rotation = quat::identity;
 

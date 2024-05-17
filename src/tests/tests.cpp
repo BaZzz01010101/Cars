@@ -764,6 +764,7 @@ namespace game_tests
       PlayerState msg {
         .physicalFrame = -1234567890123456789,
         .guid = 9876543210987654321,
+        .ping = 1234,
         .position = { 0.1f, 0.2f, 0.3f },
         .rotation = { 0.4f, 0.5f, 0.6f, 0.7f },
         .velocity = { 0.8f, 0.9f, 1.0f },
@@ -785,6 +786,7 @@ namespace game_tests
       PlayerJoin msg {
         .guid = 1234567890,
 
+        .name = "Clint Eastwood",
         .position = {0.1f, 0.2f, 0.3f},
         .rotation = { 0.4f, 0.5f, 0.6f, 0.7f },
       };

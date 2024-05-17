@@ -46,3 +46,12 @@
 
 using namespace std::chrono;
 using namespace RakNet;
+
+namespace game
+{
+  static constexpr int MAX_PLAYER_NAME_LENGTH = 31;
+  static constexpr int PLAYER_NAME_BUF_SIZE = MAX_PLAYER_NAME_LENGTH + 1;
+
+  typedef std::array<char, PLAYER_NAME_BUF_SIZE> PlayerName;
+  static constexpr PlayerName DEFAULT_PLAYER_NAME = { "UNKNOWN" };
+}

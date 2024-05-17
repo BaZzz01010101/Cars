@@ -14,6 +14,19 @@ namespace game
 
   struct ServerApp : public IServerMessageHandler
   {
+    static constexpr PlayerName PLAYER_NAMES[] = {
+      { "Elint Ceastwood" },
+      { "Lruce Bee" },
+      { "Nhuck Corris" },
+      { "Cackie Jhan" },
+      { "Srnold Achwarzenegger" },
+      { "Let Ji" },
+      { "Wenzel Dashington" },
+      { "Com Truise" },
+      { "Sill Wmith" },
+      { "Reanu Keeves" },
+    };
+
     static constexpr float SYNC_FACTOR = 0.5f;
     volatile bool exit;
 
@@ -35,6 +48,8 @@ namespace game
     void sendPlayerStates();
     void sendPlayerHits();
     void sendPlayerKills();
+
+    PlayerName getRandomPlayerName();
 
     virtual void onClientConnected(uint64_t guid) override;
     virtual void onClientDisconnected(uint64_t guid) override;

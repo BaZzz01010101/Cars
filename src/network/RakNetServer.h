@@ -21,6 +21,7 @@ namespace network
     void send(const BitStream& data, uint64_t guid, bool isReliable);
     void broadcast(const BitStream& data, bool isReliable);
     void broadcastExcept(const BitStream& data, uint64_t guid, bool isReliable);
+    int getPlayerPing(uint64_t guid) const;
     void update();
 
   private:

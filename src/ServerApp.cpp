@@ -71,7 +71,9 @@ namespace game
       if (scene.cars.isAlive(i))
       {
         BitStream stream;
-        scene.getPlayerState(i).writeTo(stream);
+        PlayerState playerState = scene.getPlayerState(i);
+        playerState.ping = network.getPlayerPing(scene.cars[i].guid);
+        playerState.writeTo(stream);
         const Car& car = scene.cars[i];
 
         if(car.isRespawning())
@@ -104,6 +106,34 @@ namespace game
     }
   }
 
+  PlayerName ServerApp::getRandomPlayerName()
+  {
+    static constexpr int PLAYER_NAMES_COUNT = sizeof(PLAYER_NAMES) / sizeof(PLAYER_NAMES[0]);
+    int freeNamesCount = PLAYER_NAMES_COUNT - scene.cars.count();
+    int skipCount = randi(freeNamesCount - 1);
+
+    PlayerName name {};
+
+    for (int i = 0; i < PLAYER_NAMES_COUNT; i++)
+    {
+      name = PLAYER_NAMES[i];
+
+      for (int j = 0; j < scene.cars.capacity(); j++)
+        if (scene.cars.isAlive(j) && scene.cars[j].name == name)
+          goto name_exists;
+
+      if(skipCount-- == 0)
+        break;
+
+    name_exists:;
+    }
+
+    if (name[0] == '\0')
+      snprintf(name.data(), PLAYER_NAME_BUF_SIZE, "Player: %i", scene.cars.count());
+
+    return name;
+  }
+
   void ServerApp::onClientConnected(uint64_t guid)
   {
     if (scene.cars.count() >= maxPlayers)
@@ -126,11 +156,13 @@ namespace game
 
     printf("SERVER_APP: OnClientConnected: %" PRIu64 ". Players: %i\n", guid, scene.cars.count());
     Car& newPlayer = scene.cars[newPlayerIndex];
+    newPlayer.name = getRandomPlayerName();
     scene.respawnCar(newPlayer);
 
     PlayerJoin playerJoin = {
       .physicalFrame = scene.localPhysicalFrame,
       .guid = guid,
+      .name = newPlayer.name,
       .position = newPlayer.position,
       .rotation = newPlayer.rotation,
     };
@@ -147,6 +179,7 @@ namespace game
         PlayerJoin playerJoin = {
           .physicalFrame = scene.localPhysicalFrame,
           .guid = player.guid,
+          .name = player.name,
           .position = player.position,
           .rotation = player.rotation,
         };

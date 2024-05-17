@@ -68,6 +68,11 @@ namespace network
     peer->Send(&data, PacketPriority::MEDIUM_PRIORITY, reliability, 0, exceptAddress, true);
   }
 
+  int RakNetServer::getPlayerPing(uint64_t guid) const
+  {
+    return peer->GetAveragePing(RakNet::RakNetGUID(guid));
+  }
+
   void RakNetServer::update()
   {
     time_point<steady_clock> now = steady_clock::now();

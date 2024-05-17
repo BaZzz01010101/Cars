@@ -1,6 +1,7 @@
 #pragma once
 #include "DebugGraphs.h"
 #include "Config.h"
+#include "MatchStats.h"
 #include "Scene.h"
 
 namespace game
@@ -18,6 +19,7 @@ namespace game
 
     static constexpr float CROSSHAIR_MOVEMENT_SHARPNESS = 0.3f;
     const Config& config {};
+    const MatchStats& matchStats {};
 
     Font font {};
     Texture crosshairsTexture {};
@@ -36,7 +38,7 @@ namespace game
     mutable int lastPosY = 0;
     mutable int lastFontSize = 10;
 
-    Hud(const Config& config);
+    Hud(const Config& config, const MatchStats& matchStats);
     ~Hud();
     Hud(Hud&) = delete;
     Hud(Hud&&) = delete;
@@ -76,6 +78,7 @@ namespace game
     void drawCrossHair(vec2 position, CrossHairIndex crosshairIndex, float size, Color color) const;
     void drawCountdown(const Scene& scene) const;
     void drawLocalPlayerHealth(const Scene& scene) const;
+    void drawMatchStats(const Scene& scene) const;
     void drawDebug(const Scene& scene) const;
   };
 

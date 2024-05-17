@@ -42,6 +42,7 @@ namespace game
     Wheel rearRightWheel;
 
     uint64_t guid {};
+    PlayerName name = DEFAULT_PLAYER_NAME;
     float enginePower {};
     bool handBreaked {};
     bool gunFiring = false;

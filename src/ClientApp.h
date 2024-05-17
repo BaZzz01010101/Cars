@@ -6,6 +6,7 @@
 #include "Renderer.h"
 #include "IClientMessageHandler.h"
 #include "RakNetClient.h"
+#include "MatchStats.h"
 
 namespace game
 {
@@ -23,6 +24,7 @@ namespace game
     Hud hud;
     Renderer renderer;
     RakNetClient network;
+    MatchStats matchStats {};
 
     float dtAccumulator = 0;
     bool paused = false;

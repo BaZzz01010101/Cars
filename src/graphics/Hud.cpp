@@ -3,8 +3,9 @@
 
 namespace game
 {
-  Hud::Hud(const Config& config) :
-    config(config)
+  Hud::Hud(const Config& config, const MatchStats& matchStats) :
+    config(config),
+    matchStats(matchStats)
   {
   }
 
@@ -165,6 +166,7 @@ namespace game
     drawCrossHairs(camera, scene, lerpFactor);
     drawCountdown(scene);
     drawLocalPlayerHealth(scene);
+    drawMatchStats(scene);
     drawDebug(scene);
   }
 
@@ -224,7 +226,7 @@ namespace game
     {
       static const Config::Graphics::Screen& screen = config.graphics.screen;
       static const int fontSize = 200;
-      static const int charWidth = fontSize * font.recs->width / font.recs->height;
+      static const int charWidth = int(fontSize * font.recs->width / font.recs->height);
 
       const char* text = TextFormat("%i", int(ceilf(car.respawnTimeout)));
       print(text, WHITE, (screen.width - charWidth) / 2, (screen.height - fontSize) / 4, fontSize);
@@ -261,6 +263,19 @@ namespace game
 
       DrawRectangle(left, top, hpWidth, height, RED);
       DrawRectangle(left + hpWidth, top, width - hpWidth, height, DARKGRAY);
+    }
+  }
+
+  void Hud::drawMatchStats(const Scene& scene) const
+  {
+    const char* title = TextFormat("%-20s %-10s %-10s %-10s", "Name", "Kills", "Deaths", "Ping");
+    print(title, LIGHTGRAY, config.graphics.screen.width - 500, 20, 20);
+
+    for (PlayerStats ps : matchStats.playerStats)
+    {
+      Color color = (ps.guid == scene.localPlayerGuid) ? YELLOW : WHITE;
+      const char* line = TextFormat("%-20s %-10i %-10i %-10i", ps.name, ps.kills, ps.deaths, ps.ping);
+      print(line, color);
     }
   }
 

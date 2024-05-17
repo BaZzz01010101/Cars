@@ -1,4 +1,4 @@
-#include "core.h"
+﻿#include "core.h"
 #include "Hud.h"
 
 namespace game
@@ -164,6 +164,7 @@ namespace game
 
     drawCrossHairs(camera, scene, lerpFactor);
     drawCountdown(scene);
+    drawLocalPlayerHealth(scene);
     drawDebug(scene);
   }
 
@@ -221,10 +222,45 @@ namespace game
 
     if (car.deathTimeout <= 0 && car.respawnTimeout > 0)
     {
+      static const Config::Graphics::Screen& screen = config.graphics.screen;
       static const int fontSize = 200;
       static const int charWidth = fontSize * font.recs->width / font.recs->height;
+
       const char* text = TextFormat("%i", int(ceilf(car.respawnTimeout)));
-      print(text, WHITE, (config.graphics.screen.width - charWidth) / 2, (config.graphics.screen.height - fontSize) / 3, fontSize);
+      print(text, WHITE, (screen.width - charWidth) / 2, (screen.height - fontSize) / 4, fontSize);
+    }
+  }
+
+  void Hud::drawLocalPlayerHealth(const Scene& scene) const
+  {
+    static constexpr bool isVertical = true;
+    static const Config::Graphics::Screen& screen = config.graphics.screen;
+
+    const Car& car = scene.getLocalPlayer();
+
+    if (isVertical)
+    {
+      static const int width = std::min(screen.width, screen.height) / 30;
+      static const int height = screen.height / 3;
+      static const int left = 20;
+      static const int top = screen.height - height - 20;
+
+      int hpHeight = height * car.health / config.physics.car.maxHealth;
+
+      DrawRectangle(left, top, width, height - hpHeight, DARKGRAY);
+      DrawRectangle(left, top + height - hpHeight, width, hpHeight, RED);
+    }
+    else
+    {
+      static const int width = screen.width / 4;
+      static const int height = std::min(screen.width, screen.height) / 30;
+      static const int left = 20;
+      static const int top = screen.height - height - 20;
+
+      int hpWidth = width * car.health / config.physics.car.maxHealth;
+
+      DrawRectangle(left, top, hpWidth, height, RED);
+      DrawRectangle(left + hpWidth, top, width - hpWidth, height, DARKGRAY);
     }
   }
 

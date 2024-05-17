@@ -97,11 +97,13 @@
     </ClCompile>
     <ClCompile Include="src\Args.cpp" />
     <ClCompile Include="src\ServerConfig.cpp" />
-    <ClCompile Include="src\dto\TurretState.cpp" />
     <ClCompile Include="src\dto\PlayerHit.cpp">
       <Filter>dto</Filter>
     </ClCompile>
     <ClCompile Include="src\dto\PlayerKill.cpp">
+      <Filter>dto</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dto\TurretState.cpp">
       <Filter>dto</Filter>
     </ClCompile>
   </ItemGroup>
@@ -229,11 +231,13 @@
     </ClInclude>
     <ClInclude Include="src\Args.h" />
     <ClInclude Include="src\ServerConfig.h" />
-    <ClInclude Include="src\dto\TurretState.h" />
     <ClInclude Include="src\dto\PlayerHit.h">
       <Filter>dto</Filter>
     </ClInclude>
     <ClInclude Include="src\dto\PlayerKill.h">
+      <Filter>dto</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dto\TurretState.h">
       <Filter>dto</Filter>
     </ClInclude>
   </ItemGroup>

@@ -163,6 +163,7 @@ namespace game
       return;
 
     drawCrossHairs(camera, scene, lerpFactor);
+    drawCountdown(scene);
     drawDebug(scene);
   }
 
@@ -214,8 +215,23 @@ namespace game
     DrawTexturePro(crosshairsTexture, { textureLeft, 0, textureSize, textureSize }, { float(position.x - 0.5f * size), float(position.y - 0.5f * size), size, size }, { 0, 0 }, 0, color);
   }
 
+  void Hud::drawCountdown(const Scene& scene) const
+  {
+    const Car& car = scene.getLocalPlayer();
+
+    if (car.deathTimeout <= 0 && car.respawnTimeout > 0)
+    {
+      static const int fontSize = 200;
+      static const int charWidth = fontSize * font.recs->width / font.recs->height;
+      const char* text = TextFormat("%i", int(ceilf(car.respawnTimeout)));
+      print(text, WHITE, (config.graphics.screen.width - charWidth) / 2, (config.graphics.screen.height - fontSize) / 3, fontSize);
+    }
+  }
+
   void Hud::drawDebug(const Scene& scene) const
   {
+    lastFontSize = 20;
+
     if (paused)
       print("Paused", YELLOW, 10, 10);
     else

@@ -74,6 +74,7 @@ namespace game
     void drawCrossHairs(const CustomCamera& camera, const Scene& scene, float lerpFactor) const;
     void drawTurretCrossHair(const CustomCamera& camera, const Scene& scene, const Turret& turret, CrossHairIndex crosshairIndex, float size, Color color, float lerpFactor) const;
     void drawCrossHair(vec2 position, CrossHairIndex crosshairIndex, float size, Color color) const;
+    void drawCountdown(const Scene& scene) const;
     void drawDebug(const Scene& scene) const;
   };
 

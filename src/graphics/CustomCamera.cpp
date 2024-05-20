@@ -12,8 +12,17 @@ namespace game
 
   void CustomCamera::update(float dt, const Terrain& terrain, vec3 playerPosition)
   {
-    Vector2 mouseDelta = GetMouseDelta();
     static const Config::Graphics::Camera& cameraConfig = config.graphics.camera;
+    Vector2 mouseDelta {};
+
+    if(IsWindowFocused())
+    {
+      mouseDelta = GetMouseDelta();
+      HideCursor();
+      SetMousePosition(config.graphics.screen.width / 2, config.graphics.screen.height / 2);
+    }
+    else
+      ShowCursor();
 
     float sensitivityModifier = mode == Mode::Zoom ? 0.0001f : 0.001f;
 
@@ -53,9 +62,6 @@ namespace game
     camera.position = position;
     camera.target = focusPosition;
     camera.up = vec3::up;
-
-    HideCursor();
-    SetMousePosition(config.graphics.screen.width / 2, config.graphics.screen.height / 2);
   }
 
   void CustomCamera::reset(vec3 playerPosition)

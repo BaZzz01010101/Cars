@@ -24,7 +24,10 @@ namespace game
     else
       ShowCursor();
 
-    float sensitivityModifier = mode == Mode::Zoom ? 0.0001f : 0.001f;
+    float sensitivityModifier = 0.001f;
+    
+    if (mode == Mode::Zoom)
+      sensitivityModifier /= config.graphics.camera.zoomFactor;
 
     expectedYaw = normalizeAngle(expectedYaw - mouseDelta.x * cameraConfig.horzSensitivity * sensitivityModifier);
     expectedPitch = normalizeAngle(expectedPitch - mouseDelta.y * cameraConfig.vertSensitivity * sensitivityModifier * (1 - 2 * invertY));

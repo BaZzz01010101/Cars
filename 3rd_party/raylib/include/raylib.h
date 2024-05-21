@@ -65,7 +65,7 @@
 *   Permission is granted to anyone to use this software for any purpose, including commercial
 *   applications, and to alter it and redistribute it freely, subject to the following restrictions:
 *
-*     1. The begin of this software must not be misrepresented; you must not claim that you
+*     1. The origin of this software must not be misrepresented; you must not claim that you
 *     wrote the original software. If you use this software in a product, an acknowledgment
 *     in the product documentation would be appreciated but is not required.
 *
@@ -314,7 +314,7 @@ typedef struct Font {
 // Camera, defines position/orientation in 3d space
 typedef struct Camera3D {
     Vector3 position;       // Camera position
-    Vector3 target;         // Camera expectedTarget it looks-at
+    Vector3 target;         // Camera target it looks-at
     Vector3 up;             // Camera up vector (rotation over its axis)
     float fovy;             // Camera field-of-view aperture in Y (degrees) in perspective, used as near plane width in orthographic
     int projection;         // Camera projection: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
@@ -324,8 +324,8 @@ typedef Camera3D Camera;    // Camera type fallback, defaults to Camera3D
 
 // Camera2D, defines position/orientation in 2d space
 typedef struct Camera2D {
-    Vector2 offset;         // Camera offset (displacement from expectedTarget)
-    Vector2 target;         // Camera expectedTarget (rotation and zoom begin)
+    Vector2 offset;         // Camera offset (displacement from target)
+    Vector2 target;         // Camera target (rotation and zoom origin)
     float rotation;         // Camera rotation in degrees
     float zoom;             // Camera zoom (scaling), should be 1.0f by default
 } Camera2D;
@@ -413,10 +413,10 @@ typedef struct ModelAnimation {
     char name[32];          // Animation name
 } ModelAnimation;
 
-// Line, ray for raycasting
+// Ray, ray for raycasting
 typedef struct Ray {
-    Vector3 position;       // Line position (begin)
-    Vector3 direction;      // Line end
+    Vector3 position;       // Ray position (origin)
+    Vector3 direction;      // Ray direction
 } Ray;
 
 // RayCollision, ray hit information
@@ -1054,7 +1054,7 @@ RLAPI Vector2 GetWorldToScreenEx(Vector3 position, Camera camera, int width, int
 RLAPI Vector2 GetWorldToScreen2D(Vector2 position, Camera2D camera); // Get the screen space position for a 2d camera world space position
 
 // Timing-related functions
-RLAPI void SetTargetFPS(int fps);                                 // Set expectedTarget FPS (maximum)
+RLAPI void SetTargetFPS(int fps);                                 // Set target FPS (maximum)
 RLAPI float GetFrameTime(void);                                   // Get time in seconds for last frame drawn (delta time)
 RLAPI double GetTime(void);                                       // Get elapsed time in seconds since InitWindow()
 RLAPI int GetFPS(void);                                           // Get current FPS
@@ -1307,7 +1307,7 @@ RLAPI bool ExportImageAsCode(Image image, const char *fileName);                
 
 // Image generation functions
 RLAPI Image GenImageColor(int width, int height, Color color);                                           // Generate image: plain color
-RLAPI Image GenImageGradientLinear(int width, int height, int direction, Color start, Color end);        // Generate image: linear gradient, end in degrees [0..360], 0=Vertical gradient
+RLAPI Image GenImageGradientLinear(int width, int height, int direction, Color start, Color end);        // Generate image: linear gradient, direction in degrees [0..360], 0=Vertical gradient
 RLAPI Image GenImageGradientRadial(int width, int height, float density, Color inner, Color outer);      // Generate image: radial gradient
 RLAPI Image GenImageGradientSquare(int width, int height, float density, Color inner, Color outer);      // Generate image: square gradient
 RLAPI Image GenImageChecked(int width, int height, int checksX, int checksY, Color col1, Color col2);    // Generate image: checked

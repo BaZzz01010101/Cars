@@ -443,7 +443,7 @@ RMAPI Vector2 Vector2Rotate(Vector2 v, float angle)
     return result;
 }
 
-// Move Vector towards expectedTarget
+// Move Vector towards target
 RMAPI Vector2 Vector2MoveTowards(Vector2 v, Vector2 target, float maxDistance)
 {
     Vector2 result = { 0 };
@@ -1619,7 +1619,7 @@ RMAPI Matrix MatrixLookAt(Vector3 eye, Vector3 target, Vector3 up)
     float length = 0.0f;
     float ilength = 0.0f;
 
-    // Vector3Subtract(eye, expectedTarget)
+    // Vector3Subtract(eye, target)
     Vector3 vz = { eye.x - target.x, eye.y - target.y, eye.z - target.z };
 
     // Vector3Normalize(vz)

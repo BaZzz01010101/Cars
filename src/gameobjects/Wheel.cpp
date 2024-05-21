@@ -19,10 +19,9 @@ namespace game
     lastPosition = position;
     lastRotation = rotation;
 
-    vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
-    position = parent.position + globalConnectionPoint;
-    rotation = parent.rotation * quat::fromYAngle(steeringAngle);
-    vec3 velocity = parent.velocity + parent.angularVelocity.rotatedBy(rotation) % globalConnectionPoint;
+    updatePositionAndRotation(parent, steeringAngle);
+    vec3 rotatedConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
+    vec3 velocity = parent.velocity + parent.angularVelocity.rotatedBy(rotation) % rotatedConnectionPoint;
     suspensionForce = vec3::zero;
 
     float springForce = sqr(suspensionOffset) * wheelConfig.suspensionStiffness;
@@ -135,8 +134,8 @@ namespace game
 
   void Wheel::updatePositionAndRotation(const Object& parent, float steeringAngle)
   {
-    vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
-    position = parent.position + globalConnectionPoint;
+    vec3 rotatedConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
+    position = parent.position + rotatedConnectionPoint;
     rotation = parent.rotation * quat::fromYAngle(steeringAngle);
   }
 

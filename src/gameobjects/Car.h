@@ -88,6 +88,7 @@ namespace game
     SteeringAngles calcSteeringAngles() const;
     void updateTimeouts(float dt);
     void resetDeathTimeouts();
+    bool isDeadOrRespawning() const;
     bool isRespawning() const;
   };
 

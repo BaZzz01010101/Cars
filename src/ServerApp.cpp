@@ -76,7 +76,7 @@ namespace game
         playerState.writeTo(stream);
         const Car& car = scene.cars[i];
 
-        if(car.isRespawning())
+        if (car.isRespawning())
           network.send(stream, car.guid, false);
         else
           network.broadcast(stream, false);
@@ -122,7 +122,7 @@ namespace game
         if (scene.cars.isAlive(j) && scene.cars[j].name == name)
           goto name_exists;
 
-      if(skipCount-- == 0)
+      if (skipCount-- == 0)
         break;
 
     name_exists:;
@@ -214,11 +214,39 @@ namespace game
 
   void ServerApp::onPlayerControl(const PlayerControl& playerControl)
   {
-    scene.updatePlayerControl(playerControl);
+    if (const Car* player = scene.tryGetPlayer(playerControl.guid))
+    {
+      if (player->isDeadOrRespawning())
+      {
+        PlayerControl blockedControl =
+        {
+          .physicalFrame = playerControl.physicalFrame,
+          .guid = playerControl.guid,
 
-    BitStream stream;
-    playerControl.writeTo(stream);
-    network.broadcast(stream, false);
+          .steeringAxis = 0,
+          .accelerationAxis = 0,
+          .thrustAxis = 0,
+          .target = vec3::zero,
+          .primaryFire = false,
+          .secondaryFire = false,
+          .handBrake = true,
+        };
+
+        scene.updatePlayerControl(blockedControl);
+
+        BitStream stream;
+        blockedControl.writeTo(stream);
+        network.broadcast(stream, false);
+      }
+      else
+      {
+        scene.updatePlayerControl(playerControl);
+
+        BitStream stream;
+        playerControl.writeTo(stream);
+        network.broadcast(stream, false);
+      }
+    }
   }
 
 }

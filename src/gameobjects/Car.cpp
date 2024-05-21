@@ -117,7 +117,9 @@ namespace game
     applyMoment(airFrictionMoment);
 
     updateEngine(dt);
-    updateSteering(dt);
+
+    if (!isDeadOrRespawning())
+      updateSteering(dt);
 
     applyGlobalForceAtLocalPoint(frontLeftWheel.suspensionForce, frontLeftWheel.connectionPoint);
     applyGlobalForceAtLocalPoint(frontRightWheel.suspensionForce, frontRightWheel.connectionPoint);
@@ -141,9 +143,16 @@ namespace game
 
     updateWheels(dt);
 
-    // TODO: call only updatePositionAndRotation if player is dead/respawning
-    gun.update(dt, *this);
-    cannon.update(dt, *this);
+    if (isDeadOrRespawning())
+    {
+      gun.updateLocked(dt, *this);
+      cannon.updateLocked(dt, *this);
+    }
+    else
+    {
+      gun.update(dt, *this);
+      cannon.update(dt, *this);
+    }
   }
 
   void Car::updateCollisions(float dt)
@@ -279,20 +288,6 @@ namespace game
 
   void Car::updateControl(const PlayerControl& playerControl)
   {
-    if (health <= 0 || deathTimeout > 0 || respawnTimeout > 0)
-    {
-      verticalTrust = 0;
-      handBreaked = true;
-      gunFiring = false;
-      cannonFiring = false;
-      enginePowerDirection = 0;
-      steeringDirection = 0;
-      gun.expectedTarget = gun.position + 100000 * gun.forward();
-      cannon.expectedTarget = cannon.position + 100000 * cannon.forward();
-
-      return;
-    };
-
     verticalTrust = mass * 20 * playerControl.thrustAxis;
     handBreaked = playerControl.handBrake;
     gunFiring = playerControl.primaryFire;
@@ -436,6 +431,11 @@ namespace game
       .rearLeft = 0,
       .rearRight = 0
     };
+  }
+
+  bool Car::isDeadOrRespawning() const
+  {
+    return deathTimeout > 0 || respawnTimeout > 0;
   }
 
   bool Car::isRespawning() const

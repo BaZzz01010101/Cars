@@ -30,6 +30,7 @@ namespace game
     vec3 barrelFrontPosition(float lerpFactor) const;
     vec3 barrelBackPosition(float lerpFactor) const;
     void update(float dt, const Object& parent);
+    void updateLocked(float dt, const Object& parent);
     TurretState getState() const;
     void syncState(TurretState turretState, float syncFactor, const Object& parent);
     void updatePositionAndRotation(const Object& parent);

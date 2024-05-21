@@ -77,13 +77,22 @@ namespace game
 
     yaw = clamp(yaw, config.minYaw, config.maxYaw);
     pitch = clamp(pitch, config.minPitch, config.maxPitch);
+
+    updatePositionAndRotation(parent);
+  }
+
+  void Turret::updateLocked(float dt, const Object& parent)
+  {
+    lastPosition = position;
+    lastRotation = rotation;
+
     updatePositionAndRotation(parent);
   }
 
   void Turret::updatePositionAndRotation(const Object& parent)
   {
-    vec3 globalConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
-    position = parent.position + globalConnectionPoint;
+    vec3 rotatedConnectionPoint = connectionPoint.rotatedBy(parent.rotation);
+    position = parent.position + rotatedConnectionPoint;
     rotation = parent.rotation * quat::fromXAngle(pitch).rotatedByYAngle(yaw);
     rotation.normalize();
   }

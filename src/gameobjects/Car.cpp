@@ -140,6 +140,8 @@ namespace game
     PhysicalObject::update(dt);
 
     updateWheels(dt);
+
+    // TODO: call only updatePositionAndRotation if player is dead/respawning
     gun.update(dt, *this);
     cannon.update(dt, *this);
   }

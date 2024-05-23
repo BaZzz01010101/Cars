@@ -19,7 +19,7 @@ namespace game
     updatePositionAndRotation(parent);
     lastPosition = position;
     lastRotation = rotation;
-    expectedTarget = position + 100 * forward();
+    expectedTarget = vec3::zero;
   }
 
   vec3 Turret::barrelFrontPosition() const
@@ -62,21 +62,24 @@ namespace game
     lastPosition = position;
     lastRotation = rotation;
 
-    float expectedYaw, expectedPitch;
-    vec3 barrelToExpectedTarget = expectedTarget - barrelBackPosition();
-    barrelToExpectedTarget.rotatedBy(parent.rotation.inverted()).yawPitch(&expectedYaw, &expectedPitch);
+    if (!expectedTarget.isZero())
+    {
+      float expectedYaw, expectedPitch;
+      vec3 barrelToExpectedTarget = parent.position + expectedTarget - barrelBackPosition();
+      barrelToExpectedTarget.rotatedBy(parent.rotation.inverted()).yawPitch(&expectedYaw, &expectedPitch);
 
-    // TODO: This code does not support 360° rotations. Need additional checks
-    // for this case to rotate turret in the right direction by shortest path
-    static constexpr float DECELERATION_ANGLE = 5 * DEG2RAD;
-    static constexpr float MIN_DECELERATION_FACTOR = 0.01f;
-    float yawDecelerationFactor = clamp(fabsf(yaw - expectedYaw) / DECELERATION_ANGLE, MIN_DECELERATION_FACTOR, 1.0f);
-    float pitchDecelerationFactor = clamp(fabsf(pitch - expectedPitch) / DECELERATION_ANGLE, MIN_DECELERATION_FACTOR, 1.0f);
-    yaw = moveTo(yaw, expectedYaw, config.rotationSpeed * dt * yawDecelerationFactor);
-    pitch = moveTo(pitch, expectedPitch, config.rotationSpeed * dt * pitchDecelerationFactor);
+      // TODO: This code does not support 360° rotations. Need additional checks
+      // for this case to rotate turret in the right direction by shortest path
+      static constexpr float DECELERATION_ANGLE = 5 * DEG2RAD;
+      static constexpr float MIN_DECELERATION_FACTOR = 0.01f;
+      float yawDecelerationFactor = clamp(fabsf(yaw - expectedYaw) / DECELERATION_ANGLE, MIN_DECELERATION_FACTOR, 1.0f);
+      float pitchDecelerationFactor = clamp(fabsf(pitch - expectedPitch) / DECELERATION_ANGLE, MIN_DECELERATION_FACTOR, 1.0f);
+      yaw = moveTo(yaw, expectedYaw, config.rotationSpeed * dt * yawDecelerationFactor);
+      pitch = moveTo(pitch, expectedPitch, config.rotationSpeed * dt * pitchDecelerationFactor);
 
-    yaw = clamp(yaw, config.minYaw, config.maxYaw);
-    pitch = clamp(pitch, config.minPitch, config.maxPitch);
+      yaw = clamp(yaw, config.minYaw, config.maxYaw);
+      pitch = clamp(pitch, config.minPitch, config.maxPitch);
+    }
 
     updatePositionAndRotation(parent);
   }

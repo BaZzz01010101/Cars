@@ -294,8 +294,8 @@ namespace game
     cannonFiring = playerControl.secondaryFire;
     enginePowerDirection = playerControl.accelerationAxis;
     steeringDirection = playerControl.steeringAxis;
-    gun.expectedTarget = position + playerControl.target;
-    cannon.expectedTarget = position + playerControl.target;
+    gun.expectedTarget = playerControl.target;
+    cannon.expectedTarget = playerControl.target;
   }
 
   PlayerState Car::getState() const

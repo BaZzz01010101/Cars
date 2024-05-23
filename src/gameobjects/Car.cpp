@@ -117,9 +117,7 @@ namespace game
     applyMoment(airFrictionMoment);
 
     updateEngine(dt);
-
-    if (!isDeadOrRespawning())
-      updateSteering(dt);
+    updateSteering(dt);
 
     applyGlobalForceAtLocalPoint(frontLeftWheel.suspensionForce, frontLeftWheel.connectionPoint);
     applyGlobalForceAtLocalPoint(frontRightWheel.suspensionForce, frontRightWheel.connectionPoint);
@@ -298,6 +296,18 @@ namespace game
     cannon.expectedTarget = playerControl.target;
   }
 
+  void Car::blockControl()
+  {
+    verticalTrust = 0;
+    handBreaked = true;
+    gunFiring = false;
+    cannonFiring = false;
+    enginePowerDirection = 0;
+    steeringDirection = FLT_MAX;
+    gun.expectedTarget = vec3::zero;
+    cannon.expectedTarget = vec3::zero;
+  }
+
   PlayerState Car::getState() const
   {
     return {
@@ -375,19 +385,20 @@ namespace game
 
   void Car::updateSteering(float dt)
   {
+    if (steeringDirection == FLT_MAX)
+      return;
+
     float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0.25f * carConfig.maxForwardSpeed, 0.75f * carConfig.maxForwardSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
     //float maxSteeringSpeed = mapRangeClamped(velocity.length(), 0, carConfig.maxSpeed, carConfig.maxSteeringSpeed, carConfig.maxSteeringSpeed * 0.5f);
-    float steeringTarget;
-
+    
     if (steeringDirection == 0.0f)
-    {
-      steeringDirection = -sign(steeringAngle);
-      steeringTarget = 0.0f;
-    }
+      steeringAngle = moveTo(steeringAngle, 0, carConfig.maxSteeringSpeed * dt);
     else
-      steeringTarget = maxSteeringAngle * steeringDirection;
-
-    steeringAngle = moveTo(steeringAngle, steeringTarget, carConfig.maxSteeringSpeed * steeringDirection * dt);
+    {
+      float steeringTarget = maxSteeringAngle * sign(steeringDirection);
+      float steeringSpeed = carConfig.maxSteeringSpeed * steeringDirection;
+      steeringAngle = moveTo(steeringAngle, steeringTarget, steeringSpeed * dt);
+    }
   }
 
   void Car::updateWheels(float dt)

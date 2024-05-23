@@ -76,6 +76,7 @@ namespace game
 
     void update(float dt);
     void updateControl(const PlayerControl& playerControl);
+    void blockControl();
     PlayerState getState() const;
     void syncState(const PlayerState& playerState, float syncFactor);
     void resetToPosition(vec3 position, quat rotation);

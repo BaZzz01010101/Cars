@@ -214,39 +214,11 @@ namespace game
 
   void ServerApp::onPlayerControl(const PlayerControl& playerControl)
   {
-    if (const Car* player = scene.tryGetPlayer(playerControl.guid))
-    {
-      if (player->isDeadOrRespawning())
-      {
-        PlayerControl blockedControl =
-        {
-          .physicalFrame = playerControl.physicalFrame,
-          .guid = playerControl.guid,
+    scene.updatePlayerControl(playerControl);
 
-          .steeringAxis = 0,
-          .accelerationAxis = 0,
-          .thrustAxis = 0,
-          .target = vec3::zero,
-          .primaryFire = false,
-          .secondaryFire = false,
-          .handBrake = true,
-        };
-
-        scene.updatePlayerControl(blockedControl);
-
-        BitStream stream;
-        blockedControl.writeTo(stream);
-        network.broadcast(stream, false);
-      }
-      else
-      {
-        scene.updatePlayerControl(playerControl);
-
-        BitStream stream;
-        playerControl.writeTo(stream);
-        network.broadcast(stream, false);
-      }
-    }
+    BitStream stream;
+    playerControl.writeTo(stream);
+    network.broadcast(stream, false);
   }
 
 }

@@ -444,7 +444,13 @@ namespace game
     for (int i = 0; i < cars.capacity(); i++)
       if (cars.isAlive(i) && cars[i].guid == playerControl.guid)
       {
-        cars[i].updateControl(playerControl);
+        Car& car = cars[i];
+
+        if (car.isDeadOrRespawning())
+          car.blockControl();
+        else
+          car.updateControl(playerControl);
+
         return;
       }
   }

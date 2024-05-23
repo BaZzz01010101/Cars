@@ -8,9 +8,10 @@ namespace game
   // Saving the reference to Config in every instance can lead to serious multithreading issues
   // if config will be changed from different thread
 
-  ClientApp::ClientApp(const Config& config, const ServerConfig& serverConfig) :
+  ClientApp::ClientApp(const Config& config, const WindowConfig& windowConfig, const ServerConfig& serverConfig) :
     exit(false),
     config(config),
+    windowConfig(windowConfig),
     camera(config),
     scene(config, false),
     hud(config, matchStats),
@@ -21,7 +22,7 @@ namespace game
 
   void ClientApp::initialize()
   {
-    renderer.init();
+    renderer.init(windowConfig);
     scene.init();
     hud.init();
     renderer.updateTerrainModel();

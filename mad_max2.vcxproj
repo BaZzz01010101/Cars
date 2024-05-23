@@ -134,6 +134,7 @@
     <ClCompile Include="src\network\RakNetServer.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\WindowConfig.cpp" />
     <ClCompile Include="src\ServerApp.cpp" />
     <ClCompile Include="src\ServerConfig.cpp" />
   </ItemGroup>
@@ -186,6 +187,7 @@
     <ClInclude Include="src\network\RakNetServer.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\core.h" />
+    <ClInclude Include="src\WindowConfig.h" />
     <ClInclude Include="src\ServerApp.h" />
     <ClInclude Include="src\ServerConfig.h" />
   </ItemGroup>

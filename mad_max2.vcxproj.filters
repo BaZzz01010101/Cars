@@ -112,6 +112,7 @@
     <ClCompile Include="src\gameplay\PlayerStats.cpp">
       <Filter>gameplay</Filter>
     </ClCompile>
+    <ClCompile Include="src\WindowConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ClientApp.h" />
@@ -252,6 +253,7 @@
     <ClInclude Include="src\gameplay\PlayerStats.h">
       <Filter>gameplay</Filter>
     </ClInclude>
+    <ClInclude Include="src\WindowConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

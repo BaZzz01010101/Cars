@@ -2,6 +2,7 @@
 
 #include "Scene.h"
 #include "Hud.h"
+#include "WindowConfig.h"
 
 namespace game
 {
@@ -40,7 +41,7 @@ namespace game
     Renderer& operator=(Renderer&) = delete;
     Renderer& operator=(Renderer&&) = delete;
 
-    void init();
+    void init(const WindowConfig& windowConfig);
     void shutdown();
     void inject(std::function<void()> callback);
     void draw(float lerpFactor);

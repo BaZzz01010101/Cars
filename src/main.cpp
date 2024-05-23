@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
   if (args.mode == Args::Test)
   {
     ServerApp* server = new ServerApp(config, args.serverConfig);
-    ClientApp* client = new ClientApp(config, args.serverConfig);
+    ClientApp* client = new ClientApp(config, args.windowConfig, args.serverConfig);
     bool renderServerPlayers = true;
     high_resolution_clock clock {};
     const uint64_t fixedDt = uint64_t(nanoseconds::period::den * config.physics.fixedDt);
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
   }
   if (args.mode == Args::Client)
   {
-    ClientApp* app = new ClientApp(config, args.serverConfig);
+    ClientApp* app = new ClientApp(config, args.windowConfig, args.serverConfig);
 
     app->initialize();
     while (app->pulse());

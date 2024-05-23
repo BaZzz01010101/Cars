@@ -93,7 +93,7 @@ namespace game
       .screen = {
         .title = "Mad Max",
         .width = 1280,
-        .height = 720,
+        .height = 500,
       },
       .camera = {
         .focusElevation = 4,

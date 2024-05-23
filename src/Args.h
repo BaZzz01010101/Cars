@@ -1,5 +1,6 @@
 #pragma once
 #include "ServerConfig.h"
+#include "WindowConfig.h"
 
 namespace game
 {
@@ -19,6 +20,7 @@ namespace game
     };
 
     Mode mode = Mode::Client;
+    WindowConfig windowConfig = WindowConfig::DEFAULT;
     ServerConfig serverConfig = ServerConfig::DEFAULT;
 
     Args(int argc, char** argv);

@@ -14,6 +14,10 @@ namespace game
         mode = Mode::Server;
       else if (!strcmp(argv[i], "-test"))
         mode = Mode::Test;
+      else if (!strcmp(argv[i], "-wx"))
+        windowConfig.left = atoi(argv[++i]);
+      else if (!strcmp(argv[i], "-wy"))
+        windowConfig.top = atoi(argv[++i]);
       else if (!strcmp(argv[i], "-host"))
         serverConfig.host = argv[++i];
       else if (!strcmp(argv[i], "-port"))

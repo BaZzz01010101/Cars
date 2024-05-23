@@ -14,12 +14,16 @@ namespace game
   {
   }
 
-  void Renderer::init()
+  void Renderer::init(const WindowConfig& windowConfig)
   {
     SetConfigFlags(FLAG_VSYNC_HINT);
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     //SetConfigFlags(FLAG_FULLSCREEN_MODE);
     InitWindow(config.graphics.screen.width, config.graphics.screen.height, config.graphics.screen.title);
+    vec2 currentPosition = GetWindowPosition();
+    int left = windowConfig.left == WindowConfig::DEFAULT.left ? (int)currentPosition.x : windowConfig.left;
+    int top = windowConfig.top == WindowConfig::DEFAULT.top ? (int)currentPosition.y : windowConfig.top;
+    SetWindowPosition(left, top);
     //SetTargetFPS(60);
     loadResources();
   }

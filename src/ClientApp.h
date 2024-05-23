@@ -18,7 +18,8 @@ namespace game
     static constexpr float SYNC_FACTOR = 0.5f;
     volatile bool exit;
 
-    Config config {};
+    const Config& config;
+    const WindowConfig& windowConfig;
     CustomCamera camera;
     Scene scene;
     Hud hud;
@@ -29,7 +30,7 @@ namespace game
     float dtAccumulator = 0;
     bool paused = false;
 
-    ClientApp(const Config& config, const ServerConfig& serverConfig);
+    ClientApp(const Config& config, const WindowConfig& windowConfig, const ServerConfig& serverConfig);
 
     void initialize();
     bool pulse();

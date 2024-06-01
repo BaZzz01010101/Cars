@@ -3,12 +3,23 @@
 
 namespace game
 {
-  void MatchStats::addPlayer(uint64_t playerGuid, PlayerName name)
+
+  void MatchStats::addPlayer(uint64_t guid, int kills, int deaths)
   {
-    playerStats.push_back({
-      .guid = playerGuid,
-      .name = name,
-    });
+    PlayerStatsIterator it = getIterator(guid);
+
+    if (it != playerStats.end())
+    {
+      it->kills = kills;
+      it->deaths = deaths;
+    }
+    else
+      playerStats.push_back({
+        .guid = guid,
+        .kills = kills,
+        .deaths = deaths,
+        .ping = 0
+      });
   }
 
   void MatchStats::removePlayer(uint64_t playerGuid)
@@ -56,6 +67,13 @@ namespace game
     });
   }
 
+  PlayerStats* MatchStats::tryGetStats(uint64_t playerGuid)
+  {
+    PlayerStatsIterator it = getIterator(playerGuid);
+
+    return it != playerStats.end() ? &*it : nullptr;
+  }
+
   void MatchStats::updateOrder(PlayerStatsIterator playerStatsIt)
   {
     for (PlayerStatsIterator it = playerStats.begin(); it != playerStatsIt; it++)
@@ -66,6 +84,20 @@ namespace game
         playerStats.insert(it, ps);
         break;
       }
+  }
+
+  void MatchStats::clear()
+  {
+    playerStats.clear();
+  }
+
+  void MatchStats::reset()
+  {
+    for (PlayerStats& ps : playerStats)
+    {
+      ps.kills = 0;
+      ps.deaths = 0;
+    }
   }
 
 }

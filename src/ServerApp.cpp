@@ -5,6 +5,7 @@
 #include "PlayerLeave.h"
 #include "PlayerHit.h"
 #include "PlayerKill.h"
+#include "MatchState.h"
 
 namespace game
 {
@@ -48,10 +49,15 @@ namespace game
     {
       elapsed -= fixedDt;
 
-      scene.update(config.physics.fixedDt);
-      sendPlayerStates();
-      sendPlayerHits();
-      sendPlayerKills();
+      if (scene.cars.count() > 0)
+      {
+        scene.update(config.physics.fixedDt);
+        sendPlayerStates();
+        sendPlayerHits();
+        sendPlayerKills();
+        updateMatchRestart();
+      }
+
       network.update();
     }
 
@@ -76,13 +82,13 @@ namespace game
         playerState.writeTo(stream);
         const Car& car = scene.cars[i];
 
-        if (car.isRespawning())
+        // When player is still respawning we send state only to him to avoid potential abuse the new position of the player by cheat software
+        if (car.aliveState == Car::AliveState::Countdown)
           network.send(stream, car.guid, false);
         else
           network.broadcast(stream, false);
       }
   }
-
 
   void ServerApp::sendPlayerHits()
   {
@@ -100,10 +106,56 @@ namespace game
   {
     for (const PlayerKill& playerKill : scene.getPlayerKills())
     {
+      matchStats.addDeath(playerKill.guid);
+      matchStats.addKill(playerKill.killerGuid);
+
       BitStream stream;
       playerKill.writeTo(stream);
       network.broadcast(stream, true);
     }
+  }
+
+  void ServerApp::updateMatchRestart()
+  {
+    if (scene.matchState == Scene::Scoreboard && scene.getMatchStateTimeout() <= 0)
+    {
+      matchStats.reset();
+      scene.reset();
+
+      if (scene.cars.count() == 1)
+        scene.switchToMatchState(Scene::Running);
+      else
+      {
+        scene.switchToMatchState(Scene::Countdown);
+        scene.respawnAllPlayers();
+      }
+
+      broadcastMatchState(true);
+    }
+  }
+
+  void ServerApp::sendMatchState(uint64_t guid, bool resetMatchStats)
+  {
+    BitStream stream;
+
+    MatchState {
+      .matchTimeout = scene.matchTimeout,
+      .shouldResetMatchStats = resetMatchStats,
+    }.writeTo(stream);
+
+    network.send(stream, guid, true);
+  }
+
+  void ServerApp::broadcastMatchState(bool resetMatchStats)
+  {
+    BitStream stream;
+
+    MatchState {
+      .matchTimeout = scene.matchTimeout,
+      .shouldResetMatchStats = resetMatchStats,
+    }.writeTo(stream);
+
+    network.broadcast(stream, true);
   }
 
   PlayerName ServerApp::getRandomPlayerName()
@@ -157,14 +209,18 @@ namespace game
     printf("SERVER_APP: OnClientConnected: %" PRIu64 ". Players: %i\n", guid, scene.cars.count());
     Car& newPlayer = scene.cars[newPlayerIndex];
     newPlayer.name = getRandomPlayerName();
-    scene.respawnCar(newPlayer);
 
+    // TODO: The position and the aliveStateTimeout are not correct because respawn call is moved below
+    // As result the car is displayed underground at {0,0,0} position
+    // Need to find a way to hide the car on client who is currently joining with countdown
     PlayerJoin playerJoin = {
       .physicalFrame = scene.localPhysicalFrame,
       .guid = guid,
       .name = newPlayer.name,
       .position = newPlayer.position,
       .rotation = newPlayer.rotation,
+      .kills = 0,
+      .deaths = 0,
     };
 
     BitStream stream;
@@ -175,6 +231,9 @@ namespace game
       if (scene.cars.isAlive(i))
       {
         Car& player = scene.cars[i];
+        PlayerStats* playerStats = matchStats.tryGetStats(player.guid);
+        int playerKills = playerStats ? playerStats->kills : 0;
+        int playerDeaths = playerStats ? playerStats->deaths : 0;
 
         PlayerJoin playerJoin = {
           .physicalFrame = scene.localPhysicalFrame,
@@ -182,12 +241,46 @@ namespace game
           .name = player.name,
           .position = player.position,
           .rotation = player.rotation,
+          .kills = playerKills,
+          .deaths = playerDeaths,
         };
 
         BitStream stream;
         playerJoin.writeTo(stream);
         network.send(stream, guid, true);
       }
+
+    int playersCount = scene.cars.count();
+
+    if (playersCount == 1)
+    {
+      scene.reset();
+      scene.respawnPlayer(newPlayer, false);
+      scene.switchToMatchState(Scene::Running);
+      sendMatchState(guid, true);
+    }
+    else if (playersCount == 2)
+    {
+      if (scene.matchState == Scene::Scoreboard)
+      {
+        scene.respawnPlayer(newPlayer, false);
+        sendMatchState(guid, false);
+      }
+      else
+      {
+        scene.reset();
+        scene.respawnAllPlayers();
+        scene.switchToMatchState(Scene::Countdown);
+        broadcastMatchState(true);
+      }
+    }
+    else
+    {
+      scene.respawnPlayer(newPlayer, true);
+      sendMatchState(guid, false);
+    }
+
+    matchStats.addPlayer(newPlayer.guid, 0, 0);
   }
 
   void ServerApp::onClientDisconnected(uint64_t guid)
@@ -210,6 +303,25 @@ namespace game
     BitStream stream;
     playerLeave.writeTo(stream);
     network.broadcast(stream, true);
+
+    int playersCount = scene.cars.count();
+
+    if (playersCount == 0)
+      scene.reset();
+    else if (playersCount == 1)
+    {
+      if (scene.matchState == Scene::Running)
+      {
+        scene.switchToMatchState(Scene::Scoreboard);
+        broadcastMatchState(false);
+      }
+      else if(scene.matchState == Scene::Countdown)
+      {
+        scene.reset();
+        scene.switchToMatchState(Scene::Running);
+        broadcastMatchState(true);
+      }
+    }
   }
 
   void ServerApp::onPlayerControl(const PlayerControl& playerControl)

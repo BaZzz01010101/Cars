@@ -15,6 +15,16 @@ namespace game
 
   struct Car : public PhysicalObject
   {
+    friend struct Hud;
+
+    enum AliveState
+    {
+      Unknown = 0,
+      Alive,
+      Dead,
+      Countdown,
+    };
+
     struct SteeringAngles
     {
       float frontLeft;
@@ -23,10 +33,17 @@ namespace game
       float rearRight;
     };
 
-    friend struct Hud;
+    typedef std::pair<AliveState, float> AliveStateRecord;
 
-    static constexpr float DEATH_TIMEOUT = 10.0f;
-    static constexpr float RESPAWN_TIMEOUT = 5.0f;
+    static constexpr float PLAYER_DEATH_DURATION = 10.0f;
+    static constexpr float DUMMY_ALIVE_DURATION = 10.0f;
+    static constexpr float PLAYER_RESPAWN_COUNTDOWN_DURATION = 5.0f;
+
+    static constexpr std::array<AliveStateRecord, 3> aliveStatesOrdered = {
+      AliveStateRecord { AliveState::Dead, PLAYER_DEATH_DURATION },
+      AliveStateRecord { AliveState::Alive, DUMMY_ALIVE_DURATION },
+      AliveStateRecord { AliveState::Countdown, PLAYER_RESPAWN_COUNTDOWN_DURATION },
+    };
 
     const Config& config {};
     const Config::Physics::Car& carConfig {};
@@ -65,8 +82,8 @@ namespace game
 
     float steeringAngle = 0;
     int health = 0;
-    float deathTimeout = 0;
-    float respawnTimeout = 0;
+    AliveState aliveState {};
+    float aliveStateTimeout = 0;
 
     Car(uint64_t guid, const Config& config, const Scene& scene);
     Car(Car&) = delete;
@@ -87,10 +104,11 @@ namespace game
     vec3 getAutoAlignmentMoment(float dt);
     void updateEngine(float dt);
     SteeringAngles calcSteeringAngles() const;
-    void updateTimeouts(float dt);
-    void resetDeathTimeouts();
-    bool isDeadOrRespawning() const;
-    bool isRespawning() const;
+    void updateAliveStateTimeout(float dt);
+    void updateAliveState();
+    float getAliveStateTimeout() const;
+    float getAliveStateTimeoutProgress() const;
+    void switchToAliveState(AliveState newState);
   };
 
 }

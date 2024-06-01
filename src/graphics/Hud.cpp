@@ -46,6 +46,7 @@ namespace game
     print(text, color, posX, posY, lastFontSize);
   }
 
+  // TODO: change type of x, y, and fontSize to float
   void Hud::print(const char* text, Color color, int posX, int posY, int fontSize) const
   {
     DrawTextEx(font, text, { (float)posX - 1, (float)posY - 1 }, (float)fontSize, 0, BLACK);
@@ -53,6 +54,7 @@ namespace game
     DrawTextEx(font, text, { (float)posX - 1, (float)posY + 1 }, (float)fontSize, 0, BLACK);
     DrawTextEx(font, text, { (float)posX + 1, (float)posY + 1 }, (float)fontSize, 0, BLACK);
     DrawTextEx(font, text, { (float)posX, (float)posY }, (float)fontSize, 0, color);
+
     lastColor = color;
     lastPosX = posX;
     lastPosY = posY;
@@ -167,7 +169,10 @@ namespace game
     drawCountdown(scene);
     drawLocalPlayerHealth(scene);
     drawMatchStats(scene);
-    drawDebug(scene);
+    drawMatchTimer(scene);
+
+    if(drawDebugInfo)
+      drawDebug(scene);
   }
 
   void Hud::drawCrossHairs(const CustomCamera& camera, const Scene& scene, float lerpFactor) const
@@ -220,33 +225,38 @@ namespace game
 
   void Hud::drawCountdown(const Scene& scene) const
   {
+    static const Config::Graphics::Screen& screen = config.graphics.screen;
+    static const int fontSize = 200;
+    static const vec2 charSize = MeasureTextEx(font, "0", fontSize, 0);
+    static const int x = (screen.width - (int)charSize.x) / 2;
+    static const int y = (screen.height - (int)charSize.y) / 4;
+
     const Car& car = scene.getLocalPlayer();
 
-    if (car.deathTimeout <= 0 && car.respawnTimeout > 0)
+    if (car.aliveState == Car::Countdown && scene.matchState == Scene::Running)
     {
-      static const Config::Graphics::Screen& screen = config.graphics.screen;
-      static const int fontSize = 200;
-      static const int charWidth = int(fontSize * font.recs->width / font.recs->height);
-
-      const char* text = TextFormat("%i", int(ceilf(car.respawnTimeout)));
-      print(text, WHITE, (screen.width - charWidth) / 2, (screen.height - fontSize) / 4, fontSize);
+      const char* text = TextFormat("%i", int(1 + car.getAliveStateTimeout()));
+      print(text, WHITE, x, y, fontSize);
+    }
+    else if (scene.matchState == Scene::Countdown)
+    {
+      const char* text = TextFormat("%i", int(1 + scene.getMatchStateTimeout()));
+      print(text, WHITE, x, y, fontSize);
     }
   }
 
   void Hud::drawLocalPlayerHealth(const Scene& scene) const
   {
-    static constexpr bool isVertical = true;
     static const Config::Graphics::Screen& screen = config.graphics.screen;
-
     const Car& car = scene.getLocalPlayer();
 
-    if (isVertical)
+    if (IS_VERTICAL_HEALTH_BAR)
     {
       static const int width = std::min(screen.width, screen.height) / 30;
       static const int height = screen.height / 3;
+      // TODO: use hud margins from config
       static const int left = 20;
       static const int top = screen.height - height - 20;
-
       int hpHeight = height * car.health / config.physics.car.maxHealth;
 
       DrawRectangle(left, top, width, height - hpHeight, DARKGRAY);
@@ -256,9 +266,9 @@ namespace game
     {
       static const int width = screen.width / 4;
       static const int height = std::min(screen.width, screen.height) / 30;
+      // TODO: use hud margins from config
       static const int left = 20;
       static const int top = screen.height - height - 20;
-
       int hpWidth = width * car.health / config.physics.car.maxHealth;
 
       DrawRectangle(left, top, hpWidth, height, RED);
@@ -268,14 +278,78 @@ namespace game
 
   void Hud::drawMatchStats(const Scene& scene) const
   {
-    const char* title = TextFormat("%-20s %-10s %-10s %-10s", "Name", "Kills", "Deaths", "Ping");
-    print(title, LIGHTGRAY, config.graphics.screen.width - 500, 20, 20);
+    static const Config::Graphics::Screen& screen = config.graphics.screen;
+    static constexpr int BUF_SIZE = 256;
+    static char title[BUF_SIZE];
+    static int dummy = snprintf(title, BUF_SIZE, "%-24s %-6s %-7s %-4s", "Name", "Kills", "Deaths", "Ping");
+    int x, y, fontSize;
 
-    for (PlayerStats ps : matchStats.playerStats)
+    if (scene.matchState == Scene::Scoreboard)
+    {
+      fontSize = 40;
+      static const int textWidth = (int)MeasureTextEx(font, title, (float)fontSize, 0).x;
+      // TODO: use hud margins from config
+      x = std::max(20, (screen.width - textWidth) / 2);
+      y = screen.height / 4;
+    }
+    else
+    {
+      fontSize = 20;
+      static const int textWidth = (int)MeasureTextEx(font, title, (float)fontSize, 0).x;
+      // TODO: use hud margins from config
+      x = screen.width - textWidth - 20;
+      y = 20;
+    }
+
+    print(title, LIGHTGRAY, x, y, fontSize);
+
+    for (const PlayerStats& ps : matchStats.playerStats)
     {
       Color color = (ps.guid == scene.localPlayerGuid) ? YELLOW : WHITE;
-      const char* line = TextFormat("%-20s %-10i %-10i %-10i", ps.name, ps.kills, ps.deaths, ps.ping);
-      print(line, color);
+
+      if (const Car* player = scene.tryGetPlayer(ps.guid))
+      {
+        const char* line = TextFormat("%-24s %-6i %-7i %-4i", player->name, ps.kills, ps.deaths, ps.ping);
+        print(line, color);
+      }
+    }
+  }
+
+  void Hud::drawMatchTimer(const Scene& scene) const
+  {
+    static const Config::Graphics::Screen& screen = config.graphics.screen;
+    // TODO: use hud margins from config
+    static const int y = 20;
+
+    if (scene.matchState == Scene::Scoreboard)
+    {
+      float matchStateTimeout = scene.getMatchStateTimeout();
+      int mins = int(matchStateTimeout / 60);
+      int secs = int(matchStateTimeout - mins * 60);
+      const char* text = TextFormat("Time To next match: %02i:%02i", mins, secs);
+      static const int fontSize = 30;
+      static const int textWidth = (int)MeasureTextEx(font, text, fontSize, 0).x;
+      static const int x = (screen.width - textWidth) / 2;
+      print(text, WHITE, x, y, fontSize);
+    }
+    else if (scene.isWaitingForPlayers())
+    {
+      static const char* text = "Waiting for players";
+      static const int fontSize = 30;
+      static const int textWidth = (int)MeasureTextEx(font, text, fontSize, 0).x;
+      static const int x = (screen.width - textWidth) / 2;
+      print(text, WHITE, x, y, fontSize);
+    }
+    else if(scene.matchState == Scene::Running)
+    {
+      float matchStateTimeout = scene.getMatchStateTimeout();
+      int mins = int(matchStateTimeout / 60);
+      int secs = int(matchStateTimeout - mins * 60);
+      const char* text = TextFormat("%02i:%02i", mins, secs);
+      static const int fontSize = 60;
+      static const int textWidth = (int)MeasureTextEx(font, text, fontSize, 0).x;
+      static const int x = (screen.width - textWidth) / 2;
+      print(text, WHITE, x, y, fontSize);
     }
   }
 
@@ -284,11 +358,13 @@ namespace game
     lastFontSize = 20;
 
     if (paused)
+      // TODO: use hud margins from config
       print("Paused", YELLOW, 10, 10);
     else
       DrawFPS(10, 10);
 
     const Car& player = scene.getLocalPlayer();
+    // TODO: use hud margins from config
     print("Position", player.position, LIGHTGRAY, 10, 30);
     vec3 rotation;
     player.rotation.toEuler(&rotation.y, &rotation.z, &rotation.x);

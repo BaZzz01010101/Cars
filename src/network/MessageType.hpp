@@ -12,6 +12,7 @@ namespace game
     ID_PLAYER_KILL,
     ID_PLAYER_JOIN,
     ID_PLAYER_LEAVE,
+    ID_MATCH_STATE,
   };
 
 }

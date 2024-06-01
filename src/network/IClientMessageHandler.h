@@ -6,6 +6,7 @@
 #include "PlayerLeave.h"
 #include "PlayerHit.h"
 #include "PlayerKill.h"
+#include "MatchState.h"
 
 namespace network
 {
@@ -22,6 +23,7 @@ namespace network
     virtual void onPlayerState(const PlayerState& playerState) = 0;
     virtual void onPlayerHit(const PlayerHit& playerHit) = 0;
     virtual void onPlayerKill(const PlayerKill& playerKill) = 0;
+    virtual void onMatchState(const MatchState& matchState) = 0;
   };
 
 }

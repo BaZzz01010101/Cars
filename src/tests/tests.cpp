@@ -770,6 +770,8 @@ namespace game_tests
         .velocity = { 0.8f, 0.9f, 1.0f },
         .angularVelocity = { 1.1f, 1.2f, 1.3f },
         .steeringAngle = 1.4f,
+        .health = 1234,
+        .aliveStateTimeout = 1.5f,
         .frontLeftWheelState = { 1.5f, 1.6f, 1.7f },
         .frontRightWheelState = { 1.8f, 1.9f, 2.0f },
         .rearLeftWheelState = { 2.1f, 2.2f, 2.3f },
@@ -789,6 +791,8 @@ namespace game_tests
         .name = "Clint Eastwood",
         .position = {0.1f, 0.2f, 0.3f},
         .rotation = { 0.4f, 0.5f, 0.6f, 0.7f },
+        .kills = 8,
+        .deaths = 9,
       };
 
       testMessage(msg, ID_PLAYER_JOIN);

@@ -95,6 +95,7 @@ namespace network
           messageHandler.onClientConnected(senderGuid);
           break;
         }
+
         case ID_DISCONNECTION_NOTIFICATION:
           printf("SERVER: Disconnected client: %s\n", packet->guid.ToString());
           messageHandler.onClientDisconnected(senderGuid);

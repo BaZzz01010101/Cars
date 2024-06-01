@@ -27,18 +27,34 @@ namespace game
 
     if (!paused && (!slowMotion || slowMoCounter == 0))
     {
-      updateGameObjects(dt);
-
       if (isServer)
+      {
+        clearHits();
+        clearKills();
+      }
+
+      if (matchState != Scoreboard)
+      {
+        //// Kills 1st player for debug purposes
+        // if (isServer && IsKeyDown(KEY_K))
+        //   hits->add({ .tick = 0, .attackerIndex = 0, .damage = 100 });
+
+        updateGameObjects(dt);
+      }
+
+      if (isServer && matchState == Running)
+      {
+        applyHits();
+        applyKills();
         updateRespawn();
+      }
+
+      updateMatchTimeout(dt);
     }
   }
 
   void Scene::updateGameObjects(float dt)
   {
-    clearHits();
-    clearKills();
-
     // TODO: Separate onto updateProjectiles, updateCars and updateParticles
     for (int i = 0; i < projectiles.capacity(); i++)
       if (projectiles.isAlive(i))
@@ -67,7 +83,7 @@ namespace game
             createExplosion(explosionConfig, hitPosition);
           }
 
-          if (isServer && hitCarIndex >= 0)
+          if (isServer && hitCarIndex >= 0 && matchState == Running)
           {
             Car& hitCar = cars[hitCarIndex];
             hitCar.hitForce += direction * hitCar.mass * float(projectile.baseDamage) * 0.1f;
@@ -77,12 +93,6 @@ namespace game
           }
         }
       }
-
-    if (isServer)
-    {
-      applyHits();
-      applyKills();
-    }
 
     for (int i = 0; i < cars.capacity(); i++)
       if (cars.isAlive(i))
@@ -122,6 +132,7 @@ namespace game
         vec3 position2 = bulletPosition - barrelOffset;
         vec3 velocity = car.velocity + gun.forward() * gunConfig.projectileSpeed;
 
+        // TODO: Replace carIndex with guid to avoid issues when index is reused by new connected player
         projectiles.tryAdd(Projectile {
           .lastPosition = position1,
           .lastVelocity = velocity,
@@ -197,11 +208,8 @@ namespace game
       {
         Car& car = cars[i];
 
-        if (car.health <= 0 && car.deathTimeout <= 0)
-        {
-          car.health = config.physics.car.maxHealth;
-          respawnCar(car);
-        }
+        if (car.aliveState == Car::Dead && car.getAliveStateTimeout() <= 0)
+          respawnPlayer(car, true);
       }
   }
 
@@ -244,7 +252,7 @@ namespace game
       {
         const Car& car = cars[i];
 
-        if (!car.isRespawning() && car.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestsHitDistance)
+        if (car.aliveState != Car::Countdown && car.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestsHitDistance)
         {
           closestsHitPosition = currentHitPosition;
           closestsHitNormal = currentHitNormal;
@@ -356,16 +364,16 @@ namespace game
 
       if (Car* player = tryGetPlayer(kill.playerGuid))
       {
-        player->resetDeathTimeouts();
+        player->switchToAliveState(Car::Dead);
         player->velocity = vec2::randomInRing(5, 5).intoXZWithY(randf(5, 10));
         player->angularVelocity = vec3::randomInCube(5.0f);
       }
     }
   }
 
-  void Scene::respawnCar(Car& car) const
+  void Scene::respawnPlayer(Car& car, bool withCountdown) const
   {
-    static constexpr int ATTEMPT_COUNT = 10;
+    static constexpr int ATTEMPT_COUNT = 100;
 
     for (int i = 0; i < ATTEMPT_COUNT; i++)
     {
@@ -392,17 +400,33 @@ namespace game
       })();
 
       vec2 pos2d = vec2::randomInSquare(Terrain::TERRAIN_SIZE_2 - 2 * carBoundingSphere.radius);
-      float bottomOffsetY = -config.physics.car.connectionPoints.wheels.frontLeft.y + config.physics.frontWheels.radius;
-      vec3 normal;
-      car.position = pos2d.intoXZWithY(terrain.getHeight(pos2d, &normal) + bottomOffsetY);
-      car.rotation = quat::fromAxisAngle(normal, randf(2.0f * PI));
+      static constexpr float DROP_HEIGHT = 0.25f;
+      float bottomOffsetY = -config.physics.car.connectionPoints.wheels.frontLeft.y + config.physics.frontWheels.radius + DROP_HEIGHT;
+      car.position = pos2d.intoXZWithY(terrain.getHeight(pos2d) + bottomOffsetY);
+      car.rotation = quat::fromYAngle(randf(2.0f * PI));
       Sphere carBoundingSphereWorld = carBoundingSphere;
       carBoundingSphereWorld.center = carBoundingSphere.center.rotatedBy(car.rotation) + car.position;
 
-      if (!terrain.collideSphereWithObjects(carBoundingSphereWorld, nullptr, nullptr, nullptr))
-        break;
+      if (terrain.collideSphereWithObjects(carBoundingSphereWorld, nullptr, nullptr, nullptr))
+        goto next_attempt;
+
+      for (int i = 0; i < cars.capacity(); i++)
+        if (cars.isAlive(i))
+        {
+          const Car& otherCar = cars[i];
+
+          if(&car != &otherCar && car.position.distanceTo(otherCar.position) < 4 * carBoundingSphere.radius)
+            goto next_attempt;
+        }
+
+      break;
+
+    next_attempt:
+      continue;
     }
 
+    car.health = config.physics.car.maxHealth;
+    car.switchToAliveState(withCountdown ? Car::Countdown : Car::Alive);
     car.resetToPosition(car.position, car.rotation);
   }
 
@@ -410,10 +434,28 @@ namespace game
   {
     terrain.generate(mode);
     Car& player = cars[localPlayerIndex];
-    reset(player.position, player.rotation);
+    resetPlayer(player.position, player.rotation);
   }
 
-  void Scene::reset(vec3 playerPosition, quat playerRotation)
+  void Scene::reset()
+  {
+    for (int i = 0; i < MAX_CARS; i++)
+      if (cars.isAlive(i))
+      {
+        Car& car = cars[i];
+        car.health = config.physics.car.maxHealth;
+        car.switchToAliveState(Car::Alive);
+      }
+
+
+    projectiles.clear();
+    explosionParticles.clear();
+
+    clearHits();
+    clearKills();
+  }
+
+  void Scene::resetPlayer(vec3 playerPosition, quat playerRotation)
   {
     float terrainY = terrain.getHeight(playerPosition.x, playerPosition.z);
     playerPosition.y = terrainY + 2;
@@ -446,10 +488,10 @@ namespace game
       {
         Car& car = cars[i];
 
-        if (car.isDeadOrRespawning())
-          car.blockControl();
-        else
+        if (matchState == Scene::Running && car.aliveState == Car::Alive)
           car.updateControl(playerControl);
+        else
+          car.blockControl();
 
         return;
       }
@@ -479,12 +521,19 @@ namespace game
   std::vector<PlayerHit> Scene::getPlayerHits(int index) const
   {
     std::vector<PlayerHit> result;
+
+    if (!cars.isAlive(index))
+      return result;
+
     const Car& player = cars[index];
     const SemiVector<Hit, MAX_CARS>& playerHits = hits[index];
 
     for (int i = 0; i < playerHits.size(); i++)
     {
       const Hit& hit = playerHits[i];
+
+      if (!cars.isAlive(hit.attackerIndex))
+        continue;
 
       // TODO: Consider replacing with guid to avoid issues when index is reused by new connected player
       const Car& attacker = cars[hit.attackerIndex];
@@ -528,6 +577,81 @@ namespace game
     }
 
     return result;
+  }
+
+  void Scene::updateMatchTimeout(float dt)
+  {
+    if (isWaitingForPlayers() && matchState == Scene::Running)
+      return;
+
+    matchTimeout = std::max(0.0f, matchTimeout - dt);
+    updateMatchState();
+  }
+
+  void Scene::updateMatchState()
+  {
+    float threshold = 0;
+
+    for (auto [state, duration] : matchStagesOrdered)
+    {
+      if (matchTimeout <= threshold + duration)
+      {
+        matchState = state;
+        return;
+      }
+
+      threshold += duration;
+    }
+
+    matchState = MatchState::Unknown;
+  }
+
+  void Scene::respawnAllPlayers()
+  {
+    for (int i = 0; i < cars.capacity(); i++)
+      if (cars.isAlive(i))
+      {
+        Car& car = cars[i];
+        respawnPlayer(car, false);
+      }
+  }
+
+  void Scene::switchToMatchState(MatchState newState)
+  {
+    float timeout = 0;
+
+    for (auto [state, duration] : matchStagesOrdered)
+    {
+      timeout += duration;
+
+      if (state == newState)
+      {
+        matchTimeout = timeout;
+        matchState = state;
+
+        return;
+      }
+    }
+  }
+
+  float Scene::getMatchStateTimeout() const
+  {
+    float threshold = 0;
+
+    for (auto [state, duration] : matchStagesOrdered)
+    {
+      if (matchTimeout <= threshold + duration)
+        return matchTimeout - threshold;
+
+      threshold += duration;
+    }
+
+    return 0.0f;
+  }
+
+  bool Scene::isWaitingForPlayers() const
+  {
+    return cars.count() <= 1;
   }
 
 }

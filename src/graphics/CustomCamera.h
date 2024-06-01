@@ -24,7 +24,7 @@ namespace game
     float distanceFromFocus = 0;
     vec3 position = vec3::zero;
     vec3 direction = vec3::forward;
-    bool invertY = false;
+    bool invertY = true;
     Mode mode = Mode::Normal;
 
     CustomCamera(const Config& config);

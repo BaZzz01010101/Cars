@@ -33,6 +33,7 @@ namespace game
     Texture rockTexture {};
 
     bool drawWires = false;
+    bool drawDebugInfo = false;
     std::function<void()> injectionCallback {};
 
     Renderer(const Config& config, const CustomCamera& camera, const Scene& scene, const Hud& hud);

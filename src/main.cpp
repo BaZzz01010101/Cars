@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
       }
     });
 
-    while (client->pulse() && server->pulse())
+    while (server->pulse() && client->pulse())
     {
       if (IsKeyPressed(KEY_U))
         renderServerPlayers = !renderServerPlayers;

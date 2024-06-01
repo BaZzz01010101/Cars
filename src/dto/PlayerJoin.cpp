@@ -11,6 +11,8 @@ namespace dto
     stream.Read(name);
     stream.Read(position);
     stream.Read(rotation);
+    stream.Read(kills);
+    stream.Read(deaths);
   }
 
   void PlayerJoin::writeTo(BitStream& stream) const
@@ -21,6 +23,8 @@ namespace dto
     stream.Write(name);
     stream.Write(position);
     stream.Write(rotation);
+    stream.Write(kills);
+    stream.Write(deaths);
   }
 
 }

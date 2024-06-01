@@ -18,6 +18,7 @@ namespace dto
     vec3 angularVelocity {};
     float steeringAngle {};
     int health {};
+    float aliveStateTimeout {};
 
     WheelState frontLeftWheelState {};
     WheelState frontRightWheelState {};

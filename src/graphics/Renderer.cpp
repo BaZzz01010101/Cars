@@ -73,7 +73,8 @@ namespace game
     if (injectionCallback)
       injectionCallback();
 
-    drawDebug(lerpFactor);
+    if (drawDebugInfo)
+      drawDebug(lerpFactor);
 
     EndMode3D();
 
@@ -96,17 +97,19 @@ namespace game
   {
     std::optional<Material> overriddenMaterial = std::nullopt;
 
-    if (car.deathTimeout > 0.25f * Car::DEATH_TIMEOUT)
-      overriddenMaterial = destroyedCarMaterial;
-    else if (car.deathTimeout > 0)
+    if (car.aliveState == Car::Dead)
     {
-      constexpr float BLINKS_PER_SECOND = 5;
-      float blinkFactor = car.deathTimeout * BLINKS_PER_SECOND - int(car.deathTimeout * BLINKS_PER_SECOND);
-      overriddenMaterial = blinkFactor > 0.5f ? destroyedCarMaterial : destroyedCarMaterialTransparent;
+      if (car.getAliveStateTimeoutProgress() > 0.25f)
+        overriddenMaterial = destroyedCarMaterial;
+      else
+      {
+        constexpr float BLINKS_PER_SECOND = 5;
+        float blinkFactor = car.aliveStateTimeout * BLINKS_PER_SECOND - int(car.aliveStateTimeout * BLINKS_PER_SECOND);
+        overriddenMaterial = blinkFactor > 0.5f ? destroyedCarMaterial : destroyedCarMaterialTransparent;
+      }
     }
-    else if (car.respawnTimeout > 0 && car.guid != scene.localPlayerGuid)
+    else if (car.aliveState == Car::Countdown && car.guid != scene.localPlayerGuid)
       overriddenMaterial = destroyedCarMaterialTransparent;
-
 
     drawDynamicObject(car, carModel, lerpFactor, overriddenMaterial);
 

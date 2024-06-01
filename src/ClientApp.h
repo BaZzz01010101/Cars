@@ -29,6 +29,7 @@ namespace game
 
     float dtAccumulator = 0;
     bool paused = false;
+    bool drawDebugInfo = false;
 
     ClientApp(const Config& config, const WindowConfig& windowConfig, const ServerConfig& serverConfig);
 
@@ -50,6 +51,7 @@ namespace game
     virtual void onPlayerState(const PlayerState& playerState) override;
     virtual void onPlayerHit(const PlayerHit& playerHit) override;
     virtual void onPlayerKill(const PlayerKill& playerKill) override;
+    virtual void onMatchState(const MatchState& matchState) override;
   };
 
 }

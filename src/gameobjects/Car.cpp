@@ -97,7 +97,7 @@ namespace game
 
   void Car::update(float dt)
   {
-    updateTimeouts(dt);
+    updateAliveStateTimeout(dt);
 
     resetForces();
     applyGlobalForceAtCenterOfMass({ 0, -gravity * mass, 0 });
@@ -141,15 +141,15 @@ namespace game
 
     updateWheels(dt);
 
-    if (isDeadOrRespawning())
-    {
-      gun.updateLocked(dt, *this);
-      cannon.updateLocked(dt, *this);
-    }
-    else
+    if (aliveState == Alive)
     {
       gun.update(dt, *this);
       cannon.update(dt, *this);
+    }
+    else
+    {
+      gun.updateLocked(dt, *this);
+      cannon.updateLocked(dt, *this);
     }
   }
 
@@ -171,9 +171,11 @@ namespace game
     std::vector<Sphere> worldCarSpheres;
     worldCarSpheres.reserve(MAX_SPHERES);
 
-    if (!isRespawning())
+    // TODO: Consider moving update collisions to Scene to optimize from O(n^2) to O(log(n))
+    // by applying forces to both this and other car in each iteration
+    if (aliveState != Car::Countdown)
       for (int i = 0; i < scene.cars.capacity(); i++)
-        if (scene.cars.isAlive(i) && &scene.cars[i] != this && !scene.cars[i].isRespawning())
+        if (scene.cars.isAlive(i) && &scene.cars[i] != this && scene.cars[i].aliveState != Car::Countdown)
         {
           const Car& car = scene.cars[i];
 
@@ -317,6 +319,7 @@ namespace game
       .angularVelocity = angularVelocity,
       .steeringAngle = steeringAngle,
       .health = health,
+      .aliveStateTimeout = aliveStateTimeout,
       .frontLeftWheelState = frontLeftWheel.getState(),
       .frontRightWheelState = frontRightWheel.getState(),
       .rearLeftWheelState = rearLeftWheel.getState(),
@@ -331,9 +334,7 @@ namespace game
     bool isRespawn = health <= 0 && playerState.health > 0;
 
     if (isRespawn)
-    {
       resetToPosition(playerState.position, playerState.rotation);
-    }
 
     float relativeSyncFactor = isRespawn ? 1.0f : 0.1f * syncFactor;
     syncFactor = isRespawn ? 1.0f : syncFactor;
@@ -344,6 +345,8 @@ namespace game
     angularVelocity = vec3::lerp(angularVelocity, playerState.angularVelocity, syncFactor);
     steeringAngle = lerp(steeringAngle, playerState.steeringAngle, syncFactor);
     health = playerState.health;
+    aliveStateTimeout = playerState.aliveStateTimeout;
+    updateAliveState();
 
     const SteeringAngles steeringAngles = calcSteeringAngles();
     frontLeftWheel.syncState(playerState.frontLeftWheelState, syncFactor, steeringAngles.frontLeft, *this);
@@ -369,20 +372,6 @@ namespace game
       enginePower = moveTo(enginePower, expectedPower, (enginePowerDirection == 0 ? 3 : 1) * carConfig.enginePower * dt);
   }
 
-  void Car::updateTimeouts(float dt)
-  {
-    if (deathTimeout > 0)
-      deathTimeout = std::max(0.0f, deathTimeout - dt);
-    else if (respawnTimeout > 0)
-      respawnTimeout = std::max(0.0f, respawnTimeout - dt);
-  }
-
-  void Car::resetDeathTimeouts()
-  {
-    deathTimeout = DEATH_TIMEOUT;
-    respawnTimeout = RESPAWN_TIMEOUT;
-  }
-
   void Car::updateSteering(float dt)
   {
     if (steeringDirection == FLT_MAX)
@@ -390,7 +379,7 @@ namespace game
 
     float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0.25f * carConfig.maxForwardSpeed, 0.75f * carConfig.maxForwardSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
     //float maxSteeringSpeed = mapRangeClamped(velocity.length(), 0, carConfig.maxSpeed, carConfig.maxSteeringSpeed, carConfig.maxSteeringSpeed * 0.5f);
-    
+
     if (steeringDirection == 0.0f)
       steeringAngle = moveTo(steeringAngle, 0, carConfig.maxSteeringSpeed * dt);
     else
@@ -444,14 +433,78 @@ namespace game
     };
   }
 
-  bool Car::isDeadOrRespawning() const
+  void Car::updateAliveStateTimeout(float dt)
   {
-    return deathTimeout > 0 || respawnTimeout > 0;
+    if(aliveState != Alive)
+      aliveStateTimeout = std::max(0.0f, aliveStateTimeout - dt);
+
+    updateAliveState();
   }
 
-  bool Car::isRespawning() const
+  void Car::updateAliveState()
   {
-    return deathTimeout <= 0 && respawnTimeout > 0;
+    float threshold = 0;
+
+    for (auto [state, duration] : aliveStatesOrdered)
+    {
+      if (aliveStateTimeout <= threshold + duration)
+      {
+        aliveState = state;
+        return;
+      }
+
+      threshold += duration;
+    }
+
+    aliveState = AliveState::Unknown;
+  }
+
+  float Car::getAliveStateTimeout() const
+  {
+    float threshold = 0;
+
+    for (auto [state, duration] : aliveStatesOrdered)
+    {
+      if (aliveStateTimeout <= threshold + duration)
+        return aliveStateTimeout - threshold;
+
+      threshold += duration;
+    }
+
+    return 0.0f;
+  }
+
+  float Car::getAliveStateTimeoutProgress() const
+  {
+    float threshold = 0;
+
+    for (auto [state, duration] : aliveStatesOrdered)
+    {
+      if (aliveStateTimeout <= threshold + duration)
+        return duration > EPSILON ? (aliveStateTimeout - threshold) / duration : 0.0f;
+
+      threshold += duration;
+    }
+
+    return 0.0f;
+  }
+
+  void Car::switchToAliveState(AliveState newState)
+  {
+    float timeout = 0;
+
+    for (auto [state, duration] : aliveStatesOrdered)
+    {
+      timeout += duration;
+
+      if (state == newState)
+      {
+        aliveStateTimeout = timeout;
+        aliveState = state;
+
+        return;
+      }
+    }
   }
 
 }

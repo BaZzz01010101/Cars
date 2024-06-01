@@ -55,6 +55,11 @@ namespace game
     dtAccumulator += dt;
     static const float fixedDt = config.physics.fixedDt;
 
+    if (dt > fixedDt * 5)
+    {
+      printf("WARNING!!! High 'dt' detected: %i ms\n", int(dt * 1000));
+    }
+
     while (dtAccumulator > fixedDt)
     {
       // TODO: consider possible optimizations in physics calculations
@@ -63,7 +68,7 @@ namespace game
       dtAccumulator -= fixedDt;
     }
 
-    float lerpFactor = dtAccumulator / fixedDt;
+    float lerpFactor = scene.matchState == Scene::Scoreboard ? 1 : dtAccumulator / fixedDt;
     updateCamera(dt, lerpFactor);
     renderer.draw(lerpFactor);
 
@@ -134,6 +139,8 @@ namespace game
   {
     printf("CLIENT_APP: OnConnected, my guid: %" PRIu64 "\n", guid);
     scene.localPlayerGuid = guid;
+    scene.reset();
+    matchStats.clear();
   }
 
   void ClientApp::onDisconnected(uint64_t guid)
@@ -166,7 +173,7 @@ namespace game
       scene.localPlayerIndex = index;
     }
 
-    matchStats.addPlayer(playerJoin.guid, playerJoin.name);
+    matchStats.addPlayer(playerJoin.guid, playerJoin.kills, playerJoin.deaths);
   }
 
   void ClientApp::onPlayerLeave(const PlayerLeave& playerLeave)
@@ -199,6 +206,7 @@ namespace game
   void ClientApp::onPlayerHit(const PlayerHit& playerHit)
   {
     printf("CLIENT_APP: OnPlayerHit: %" PRIu64 " < %" PRIu64 "\n", playerHit.guid, playerHit.attakerGuid);
+    // TODO: Implement player hit effect
     //scene.syncPlayerHit(playerHit);
   }
 
@@ -210,9 +218,24 @@ namespace game
     {
       scene.createExplosion(config.graphics.carExplosionParticles, killedPlayer->position);
       killedPlayer->health = 0;
-      killedPlayer->resetDeathTimeouts();
+      killedPlayer->switchToAliveState(Car::Dead);
       matchStats.addKill(playerKill.killerGuid);
       matchStats.addDeath(playerKill.guid);
+    }
+  }
+
+  void ClientApp::onMatchState(const MatchState& matchState)
+  {
+    printf("CLIENT_APP: OnMatchState\n");
+
+    scene.matchTimeout = matchState.matchTimeout;
+    Scene::MatchState lastMatchState = scene.matchState;
+    scene.updateMatchState();
+    
+    if(matchState.shouldResetMatchStats)
+    {
+      scene.reset();
+      matchStats.reset();
     }
   }
 
@@ -233,12 +256,12 @@ namespace game
           camera.mode = CustomCamera::Zoom;
           break;
 
-          case CustomCamera::Zoom:
-            camera.mode = CustomCamera::Normal;
-            break;
+        case CustomCamera::Zoom:
+          camera.mode = CustomCamera::Normal;
+          break;
 
-          default:
-            break;
+        default:
+          break;
       }
 
     if (IsKeyPressed(KEY_P))
@@ -252,6 +275,13 @@ namespace game
 
     if (IsKeyPressed(KEY_T))
       renderer.drawWires = !renderer.drawWires;
+
+    if (IsKeyPressed(KEY_D) && IsKeyDown(KEY_LEFT_ALT))
+    {
+      drawDebugInfo = !drawDebugInfo;
+      renderer.drawDebugInfo = drawDebugInfo;
+      hud.drawDebugInfo = drawDebugInfo;
+    }
 
     if (IsKeyPressed(KEY_ZERO))
     {
@@ -272,7 +302,7 @@ namespace game
     }
 
     if (IsKeyPressed(KEY_F1))
-      scene.reset(vec3::zero, quat::identity);
+      scene.resetPlayer(vec3::zero, quat::identity);
 
     if (scene.localPlayerIndex < 0)
       return;
@@ -284,13 +314,13 @@ namespace game
 
     if (IsKeyPressed(KEY_F2))
     {
-      scene.reset({ 0, 0, 25 }, quat::identity);
+      scene.resetPlayer({ 0, 0, 25 }, quat::identity);
       scene.getLocalPlayer().rotation = quat::fromEuler(0, 0, 0.19f * PI);
     }
 
     if (IsKeyPressed(KEY_F3))
     {
-      scene.reset({ 0, 0, 25 }, quat::identity);
+      scene.resetPlayer({ 0, 0, 25 }, quat::identity);
       player.rotation = quat::fromEuler(0, 0, 0.18f * PI);
       player.rotation = player.rotation * quat::fromEuler(PI / 2, 0, 0);
       player.rotation = player.rotation * quat::fromEuler(0, 0, 0.02f * PI);

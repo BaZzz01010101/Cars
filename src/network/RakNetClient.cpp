@@ -198,6 +198,14 @@ namespace network
         }
         break;
 
+        case ID_MATCH_STATE:
+        {
+          MatchState matchState;
+          matchState.readFrom(stream);
+          messageHandler.onMatchState(matchState);
+          break;
+        }
+
         default:
           printf("CLIENT: Unknown message: %i\n", packet->data[0]);
           break;

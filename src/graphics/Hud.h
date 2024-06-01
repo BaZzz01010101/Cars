@@ -18,6 +18,7 @@ namespace game
     };
 
     static constexpr float CROSSHAIR_MOVEMENT_SHARPNESS = 0.3f;
+    static constexpr bool IS_VERTICAL_HEALTH_BAR = true;
     const Config& config {};
     const MatchStats& matchStats {};
 
@@ -26,6 +27,7 @@ namespace game
     mutable DebugGraphs debugGraphs {};
     bool crosshairsTextureLoaded = false;
     bool paused = false;
+    bool drawDebugInfo = false;
 
     mutable vec2 crossHairPositions[CROSS_HAIR_COUNT] = {
       vec2::zero,
@@ -79,6 +81,7 @@ namespace game
     void drawCountdown(const Scene& scene) const;
     void drawLocalPlayerHealth(const Scene& scene) const;
     void drawMatchStats(const Scene& scene) const;
+    void drawMatchTimer(const Scene& scene) const;
     void drawDebug(const Scene& scene) const;
   };
 

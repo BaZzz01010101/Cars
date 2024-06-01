@@ -113,6 +113,9 @@
       <Filter>gameplay</Filter>
     </ClCompile>
     <ClCompile Include="src\WindowConfig.cpp" />
+    <ClCompile Include="src\dto\MatchState.cpp">
+      <Filter>dto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ClientApp.h" />
@@ -254,6 +257,9 @@
       <Filter>gameplay</Filter>
     </ClInclude>
     <ClInclude Include="src\WindowConfig.h" />
+    <ClInclude Include="src\dto\MatchState.h">
+      <Filter>dto</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

@@ -6,6 +6,7 @@
 #include "Queue.hpp"
 #include "RakNetServer.h"
 #include "IServerMessageHandler.h"
+#include "MatchStats.h"
 
 namespace game
 {
@@ -36,6 +37,7 @@ namespace game
     high_resolution_clock clock {};
     nanoseconds maxSleep {};
     time_point<steady_clock> lastUpdateTime {};
+    MatchStats matchStats {};
 
     int maxPlayers = 0;
 
@@ -48,6 +50,9 @@ namespace game
     void sendPlayerStates();
     void sendPlayerHits();
     void sendPlayerKills();
+    void updateMatchRestart();
+    void sendMatchState(uint64_t guid, bool resetMatchStats);
+    void broadcastMatchState(bool resetMatchStats);
 
     PlayerName getRandomPlayerName();
 

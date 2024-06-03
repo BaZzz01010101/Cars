@@ -164,8 +164,7 @@ namespace game
 
     Car& car = scene.cars[index];
     car.name = playerJoin.name;
-    car.position = playerJoin.position;
-    car.rotation = playerJoin.rotation;
+    car.resetToPosition(playerJoin.position, playerJoin.rotation);
 
     if (playerJoin.guid == scene.localPlayerGuid)
     {

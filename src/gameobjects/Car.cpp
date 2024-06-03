@@ -331,7 +331,7 @@ namespace game
 
   void Car::syncState(const PlayerState& playerState, float syncFactor)
   {
-    bool isRespawn = health <= 0 && playerState.health > 0;
+    bool isRespawn = playerState.velocity.isZero() && !(playerState.position - position).isAlmostZero(0.01f) ;
 
     if (isRespawn)
       resetToPosition(playerState.position, playerState.rotation);

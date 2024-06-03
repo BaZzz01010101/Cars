@@ -210,9 +210,37 @@ namespace game
     Car& newPlayer = scene.cars[newPlayerIndex];
     newPlayer.name = getRandomPlayerName();
 
-    // TODO: The position and the aliveStateTimeout are not correct because respawn call is moved below
-    // As result the car is displayed underground at {0,0,0} position
-    // Need to find a way to hide the car on client who is currently joining with countdown
+    int playersCount = scene.cars.count();
+
+    if (playersCount == 1)
+    {
+      scene.reset();
+      scene.respawnPlayer(newPlayer, false);
+      scene.switchToMatchState(Scene::Running);
+      sendMatchState(guid, true);
+    }
+    else if (playersCount == 2)
+    {
+      if (scene.matchState == Scene::Scoreboard)
+      {
+        scene.respawnPlayer(newPlayer, false);
+        sendMatchState(guid, false);
+      }
+      else
+      {
+        scene.reset();
+        scene.respawnAllPlayers();
+        scene.switchToMatchState(Scene::Countdown);
+        broadcastMatchState(true);
+      }
+    }
+    else
+    {
+      scene.respawnPlayer(newPlayer, true);
+      sendMatchState(guid, false);
+    }
+
+    // TODO: Need to find a way to hide the car on client who is currently joining with countdown
     PlayerJoin playerJoin = {
       .physicalFrame = scene.localPhysicalFrame,
       .guid = guid,
@@ -249,36 +277,6 @@ namespace game
         playerJoin.writeTo(stream);
         network.send(stream, guid, true);
       }
-
-    int playersCount = scene.cars.count();
-
-    if (playersCount == 1)
-    {
-      scene.reset();
-      scene.respawnPlayer(newPlayer, false);
-      scene.switchToMatchState(Scene::Running);
-      sendMatchState(guid, true);
-    }
-    else if (playersCount == 2)
-    {
-      if (scene.matchState == Scene::Scoreboard)
-      {
-        scene.respawnPlayer(newPlayer, false);
-        sendMatchState(guid, false);
-      }
-      else
-      {
-        scene.reset();
-        scene.respawnAllPlayers();
-        scene.switchToMatchState(Scene::Countdown);
-        broadcastMatchState(true);
-      }
-    }
-    else
-    {
-      scene.respawnPlayer(newPlayer, true);
-      sendMatchState(guid, false);
-    }
 
     matchStats.addPlayer(newPlayer.guid, 0, 0);
   }

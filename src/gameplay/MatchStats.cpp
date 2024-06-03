@@ -12,14 +12,19 @@ namespace game
     {
       it->kills = kills;
       it->deaths = deaths;
+      updateOrder(it);
     }
     else
+    {
       playerStats.push_back({
         .guid = guid,
         .kills = kills,
         .deaths = deaths,
         .ping = 0
       });
+
+      updateOrder(playerStats.end() - 1);
+    }
   }
 
   void MatchStats::removePlayer(uint64_t playerGuid)

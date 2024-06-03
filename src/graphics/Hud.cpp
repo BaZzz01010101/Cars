@@ -26,6 +26,26 @@ namespace game
     lastFontSize = config.graphics.hud.fontSize;
   }
 
+  void Hud::update()
+  {
+    debugGraphs.updateControl();
+  }
+
+  void Hud::draw(const CustomCamera& camera, const Scene& scene, float lerpFactor) const
+  {
+    if (scene.localPlayerIndex < 0)
+      return;
+
+    drawCrossHairs(camera, scene, lerpFactor);
+    drawCountdown(scene);
+    drawLocalPlayerHealth(scene);
+    drawMatchStats(scene);
+    drawMatchTimer(scene);
+
+    if (drawDebugInfo)
+      drawDebug(scene);
+  }
+
   void Hud::print(const char* text) const
   {
     print(text, lastColor, lastPosX, lastPosY + lastFontSize, lastFontSize);
@@ -153,26 +173,6 @@ namespace game
 
     if (!paused)
       debugGraphs.logValue(title, color, f);
-  }
-
-  void Hud::update()
-  {
-    debugGraphs.updateControl();
-  }
-
-  void Hud::draw(const CustomCamera& camera, const Scene& scene, float lerpFactor) const
-  {
-    if (scene.localPlayerIndex < 0)
-      return;
-
-    drawCrossHairs(camera, scene, lerpFactor);
-    drawCountdown(scene);
-    drawLocalPlayerHealth(scene);
-    drawMatchStats(scene);
-    drawMatchTimer(scene);
-
-    if(drawDebugInfo)
-      drawDebug(scene);
   }
 
   void Hud::drawCrossHairs(const CustomCamera& camera, const Scene& scene, float lerpFactor) const

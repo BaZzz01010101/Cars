@@ -101,11 +101,10 @@ namespace game
 
     resetForces();
     applyGlobalForceAtCenterOfMass({ 0, -gravity * mass, 0 });
+    applyGlobalForceAtCenterOfMass({ 0, 2 * gravity * mass * thrustAxis, 0 });
 
     float aerodinamicForce = carConfig.aerodynamicKoef * velocity.sqLength();
     applyGlobalForceAtCenterOfMass(-aerodinamicForce * up());
-
-    applyGlobalForceAtCenterOfMass({ 0, verticalTrust, 0 });
 
     if (health > 0)
     {
@@ -288,24 +287,24 @@ namespace game
 
   void Car::updateControl(const PlayerControl& playerControl)
   {
-    verticalTrust = mass * 20 * playerControl.thrustAxis;
     handBreaked = playerControl.handBrake;
     gunFiring = playerControl.primaryFire;
     cannonFiring = playerControl.secondaryFire;
-    enginePowerDirection = playerControl.accelerationAxis;
-    steeringDirection = playerControl.steeringAxis;
+    accelerationAxis = playerControl.accelerationAxis;
+    steeringAxis = playerControl.steeringAxis;
+    thrustAxis = playerControl.thrustAxis;
     gun.expectedTarget = playerControl.target;
     cannon.expectedTarget = playerControl.target;
   }
 
   void Car::blockControl()
   {
-    verticalTrust = 0;
     handBreaked = true;
     gunFiring = false;
     cannonFiring = false;
-    enginePowerDirection = 0;
-    steeringDirection = FLT_MAX;
+    accelerationAxis = 0;
+    steeringAxis = FLT_MAX;
+    thrustAxis = 0;
     gun.expectedTarget = vec3::zero;
     cannon.expectedTarget = vec3::zero;
   }
@@ -364,28 +363,28 @@ namespace game
     float maxForwardEnginePower = mapRangeClamped(signedForwardSpeedSqr, 0, sqr(carConfig.maxForwardSpeed), carConfig.enginePower, 0);
     float maxBackwardEnginePower = mapRangeClamped(signedForwardSpeedSqr, -sqr(carConfig.maxBackwardSpeed), 0, 0, carConfig.enginePower);
 
-    float expectedPower = float(enginePowerDirection > 0) * maxForwardEnginePower - (enginePowerDirection < 0) * maxBackwardEnginePower;
+    float expectedPower = float(accelerationAxis > 0) * maxForwardEnginePower - (accelerationAxis < 0) * maxBackwardEnginePower;
 
-    if (sign(enginePowerDirection) == -sign(enginePower) || (enginePowerDirection == 0 && handBreaked))
+    if (sign(accelerationAxis) == -sign(enginePower) || (accelerationAxis == 0 && handBreaked))
       enginePower = 0;
     else
-      enginePower = moveTo(enginePower, expectedPower, (enginePowerDirection == 0 ? 3 : 1) * carConfig.enginePower * dt);
+      enginePower = moveTo(enginePower, expectedPower, (accelerationAxis == 0 ? 3 : 1) * carConfig.enginePower * dt);
   }
 
   void Car::updateSteering(float dt)
   {
-    if (steeringDirection == FLT_MAX)
+    if (steeringAxis == FLT_MAX)
       return;
 
     float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0.25f * carConfig.maxForwardSpeed, 0.75f * carConfig.maxForwardSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
     //float maxSteeringSpeed = mapRangeClamped(velocity.length(), 0, carConfig.maxSpeed, carConfig.maxSteeringSpeed, carConfig.maxSteeringSpeed * 0.5f);
 
-    if (steeringDirection == 0.0f)
+    if (steeringAxis == 0.0f)
       steeringAngle = moveTo(steeringAngle, 0, carConfig.maxSteeringSpeed * dt);
     else
     {
-      float steeringTarget = maxSteeringAngle * sign(steeringDirection);
-      float steeringSpeed = carConfig.maxSteeringSpeed * steeringDirection;
+      float steeringTarget = maxSteeringAngle * sign(steeringAxis);
+      float steeringSpeed = carConfig.maxSteeringSpeed * steeringAxis;
       steeringAngle = moveTo(steeringAngle, steeringTarget, steeringSpeed * dt);
     }
   }

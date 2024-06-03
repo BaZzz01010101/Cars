@@ -70,15 +70,9 @@ namespace game
     vec3 cannonRecoilForce = vec3::zero;
     vec3 hitForce = vec3::zero;
     vec3 hitMoment = vec3::zero;
-    
-    //TODO: rename to steeringAxis
-    float steeringDirection {};
-    
-    // TODO: rename to accelerationAxis
-    float enginePowerDirection {};
-
-    // TODO: rename to thrustAxis
-    float verticalTrust {};
+    float steeringAxis {};
+    float accelerationAxis {};
+    float thrustAxis {};
 
     float steeringAngle = 0;
     int health = 0;

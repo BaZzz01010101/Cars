@@ -258,12 +258,12 @@ namespace game
     return x == 0 && y == 0 && z == 0;
   }
 
-  bool vec3::isAlmostZero(float delta) const
+  bool vec3::isAlmostZero(float axisDelta) const
   {
     return
-      fabsf(x) < delta &&
-      fabsf(y) < delta &&
-      fabsf(z) < delta;
+      fabsf(x) < axisDelta &&
+      fabsf(y) < axisDelta &&
+      fabsf(z) < axisDelta;
   }
 
   bool vec3::isInBounds(vec3 min, vec3 max) const

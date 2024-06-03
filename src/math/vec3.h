@@ -53,7 +53,7 @@ namespace game
     float distanceTo(vec3 position) const;
     bool isNormalized() const;
     bool isZero() const;
-    bool isAlmostZero(float delta) const;
+    bool isAlmostZero(float axisDelta) const;
     bool isInBounds(vec3 min, vec3 max) const;
     vec3 reflected(vec3 normal) const;
     void reflect(vec3 normal);

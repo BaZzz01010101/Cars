@@ -19,7 +19,10 @@ namespace game
 
   void Hud::init()
   {
-    font = LoadFontEx(config.graphics.resources.fontPath, config.graphics.hud.fontSize, 0, 0);
+    font = LoadFontEx(config.graphics.resources.fontPath, int(100), 0, 0);
+    GenTextureMipmaps(&font.texture);
+    SetTextureFilter(font.texture, TEXTURE_FILTER_TRILINEAR);
+
     crosshairsTexture = LoadTexture(config.graphics.resources.crosshairsTexturePath);
     crosshairsTextureLoaded = true;
 

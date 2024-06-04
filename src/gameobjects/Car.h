@@ -106,6 +106,8 @@ namespace game
     float getAliveStateTimeout() const;
     float getAliveStateTimeoutProgress() const;
     void switchToAliveState(AliveState newState);
+    bool isLocal() const;
+    bool isRemote() const;
   };
 
 }

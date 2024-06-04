@@ -133,6 +133,7 @@ namespace game
     Car& car = scene.cars[index];
     car.name = playerJoin.name;
     car.resetToPosition(playerJoin.position, playerJoin.rotation);
+    car.switchToAliveState(Car::Countdown);
 
     if (playerJoin.guid == scene.localPlayerGuid)
     {

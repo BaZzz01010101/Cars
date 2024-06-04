@@ -507,5 +507,15 @@ namespace game
     }
   }
 
+  bool Car::isLocal() const
+  {
+    return scene.localPlayerGuid == guid;
+  }
+
+  bool Car::isRemote() const
+  {
+    return !isLocal();
+  }
+
 }
 

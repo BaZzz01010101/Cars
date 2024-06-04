@@ -53,7 +53,10 @@ namespace game
       if (scene.cars.isAlive(i))
       {
         const Car& car = scene.cars[i];
-        drawCar(car, lerpFactor);
+        bool isRemoteRespawningPlayer = car.isRemote() && car.aliveState == Car::Countdown;
+
+        if (!isRemoteRespawningPlayer)
+          drawCar(car, lerpFactor);
       }
 
     for (int i = 0; i < scene.projectiles.capacity(); i++)
@@ -85,7 +88,7 @@ namespace game
 
   void Renderer::drawDebug(float lerpFactor)
   {
-    if(const Car* player = scene.tryGetLocalPlayer())
+    if (const Car* player = scene.tryGetLocalPlayer())
       drawCarDebug(*player, lerpFactor);
   }
 
@@ -104,7 +107,7 @@ namespace game
         overriddenMaterial = blinkFactor > 0.5f ? destroyedCarMaterial : destroyedCarMaterialTransparent;
       }
     }
-    else if ((car.aliveState == Car::Countdown || car.aliveState == Car::Hidden) && car.guid != scene.localPlayerGuid)
+    else if (car.aliveState == Car::Hidden && car.guid != scene.localPlayerGuid)
       overriddenMaterial = destroyedCarMaterialTransparent;
 
     drawDynamicObject(car, carModel, lerpFactor, overriddenMaterial);

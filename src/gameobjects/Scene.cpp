@@ -39,7 +39,11 @@ namespace game
         // if (isServer && IsKeyDown(KEY_K))
         //   hits->add({ .tick = 0, .attackerIndex = 0, .damage = 100 });
 
-        updateGameObjects(dt);
+        updateProjectiles(dt);
+        updateCars(dt);
+
+        if (!isServer)
+          updateExplosionParticles(dt);
       }
 
       if (isServer && matchState == Running)
@@ -53,9 +57,8 @@ namespace game
     }
   }
 
-  void Scene::updateGameObjects(float dt)
+  void Scene::updateProjectiles(float dt)
   {
-    // TODO: Separate onto updateProjectiles, updateCars and updateParticles
     for (int i = 0; i < projectiles.capacity(); i++)
       if (projectiles.isAlive(i))
       {
@@ -93,7 +96,10 @@ namespace game
           }
         }
       }
+  }
 
+  void Scene::updateCars(float dt)
+  {
     for (int i = 0; i < cars.capacity(); i++)
       if (cars.isAlive(i))
       {
@@ -101,17 +107,19 @@ namespace game
         car.update(dt);
         updateFiring(i, dt);
       }
+  }
 
-    if (!isServer)
-      for (int i = 0; i < explosionParticles.capacity(); i++)
-        if (explosionParticles.isAlive(i))
-        {
-          ExplosionParticle& particle = explosionParticles[i];
-          particle.update(dt);
+  void Scene::updateExplosionParticles(float dt)
+  {
+    for (int i = 0; i < explosionParticles.capacity(); i++)
+      if (explosionParticles.isAlive(i))
+      {
+        ExplosionParticle& particle = explosionParticles[i];
+        particle.update(dt);
 
-          if (particle.lifeTime < 0)
-            explosionParticles.remove(i);
-        }
+        if (particle.lifeTime < 0)
+          explosionParticles.remove(i);
+      }
   }
 
   void Scene::updateFiring(int carIndex, float dt)

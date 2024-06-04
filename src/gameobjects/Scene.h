@@ -97,7 +97,9 @@ namespace game
     PlayerState getPlayerState(int index) const;
     std::vector<PlayerHit> getPlayerHits(int index) const;
     std::vector<PlayerKill> getPlayerKills() const;
-    void updateGameObjects(float dt);
+    void updateProjectiles(float dt);
+    void updateCars(float dt);
+    void updateExplosionParticles(float dt);
     void updateFiring(int carIndex, float dt);
     void updateRespawn();
     void createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position);

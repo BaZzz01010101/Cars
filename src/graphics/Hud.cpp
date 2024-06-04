@@ -241,7 +241,13 @@ namespace game
 
     if (const Car* player = scene.tryGetLocalPlayer())
     {
-      if (player->aliveState == Car::Countdown && scene.matchState == Scene::Running)
+      if(scene.matchState == Scene::Countdown && player->aliveState == Car::Countdown)
+      {
+        float timeout = std::max(player->getAliveStateTimeout(), scene.getMatchStateTimeout());
+        const char* text = TextFormat("%i", int(1 + timeout));
+        print(text, WHITE, x, y, fontSize);
+      }
+      else if (player->aliveState == Car::Countdown && scene.matchState == Scene::Running)
       {
         const char* text = TextFormat("%i", int(1 + player->getAliveStateTimeout()));
         print(text, WHITE, x, y, fontSize);

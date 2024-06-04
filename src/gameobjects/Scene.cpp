@@ -260,7 +260,7 @@ namespace game
       {
         const Car& car = cars[i];
 
-        if (car.aliveState != Car::Countdown && car.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestsHitDistance)
+        if (car.aliveState != Car::Countdown && car.aliveState != Car::Hidden && car.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestsHitDistance)
         {
           closestsHitPosition = currentHitPosition;
           closestsHitNormal = currentHitNormal;

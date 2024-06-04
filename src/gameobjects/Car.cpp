@@ -376,7 +376,7 @@ namespace game
     if (steeringAxis == FLT_MAX)
       return;
 
-    float maxSteeringAngle = mapRangeClamped(velocity * forward(), 0.25f * carConfig.maxForwardSpeed, 0.75f * carConfig.maxForwardSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
+    float maxSteeringAngle = mapRangeClamped(velocity.length() , 0.25f * carConfig.maxForwardSpeed, carConfig.maxForwardSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
     //float maxSteeringSpeed = mapRangeClamped(velocity.length(), 0, carConfig.maxSpeed, carConfig.maxSteeringSpeed, carConfig.maxSteeringSpeed * 0.5f);
 
     if (steeringAxis == 0.0f)

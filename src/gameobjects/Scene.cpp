@@ -382,60 +382,31 @@ namespace game
   void Scene::respawnPlayer(Car& car, bool withCountdown) const
   {
     static constexpr int ATTEMPT_COUNT = 100;
+    vec3 position;
+    quat rotation;
 
     for (int i = 0; i < ATTEMPT_COUNT; i++)
     {
-      static const Sphere carBoundingSphere = ([&]() {
-        Sphere boundingSphere {};
-        vec3 min = vec3::zero;
-        vec3 max = vec3::zero;
-
-        for (Sphere s : config.collisionGeometries.carSpheres)
-        {
-          min.x = std::min(min.x, s.center.x - s.radius);
-          min.y = std::min(min.y, s.center.y - s.radius);
-          min.z = std::min(min.z, s.center.z - s.radius);
-
-          max.x = std::max(max.x, s.center.x + s.radius);
-          max.y = std::max(max.y, s.center.y + s.radius);
-          max.z = std::max(max.z, s.center.z + s.radius);
-        }
-
-        return Sphere {
-          .center = 0.5f * (min + max),
-          .radius = std::max({max.x - min.x, max.y - min.y, max.z - min.z}),
-        };
-      })();
-
-      vec2 pos2d = vec2::randomInSquare(Terrain::TERRAIN_SIZE_2 - 2 * carBoundingSphere.radius);
+      static const Sphere carBoundingSphere = calcBoundingSphere(config.collisionGeometries.carSpheres);
+      vec2 pos2d = vec2::randomInSquare(Terrain::TERRAIN_SIZE_2 - carBoundingSphere.radius);
       static constexpr float DROP_HEIGHT = 0.25f;
       float bottomOffsetY = -config.physics.car.connectionPoints.wheels.frontLeft.y + config.physics.frontWheels.radius + DROP_HEIGHT;
-      car.position = pos2d.intoXZWithY(terrain.getHeight(pos2d) + bottomOffsetY);
-      car.rotation = quat::fromYAngle(randf(2.0f * PI));
-      Sphere carBoundingSphereWorld = carBoundingSphere;
-      carBoundingSphereWorld.center = carBoundingSphere.center.rotatedBy(car.rotation) + car.position;
+      position = pos2d.intoXZWithY(terrain.getHeight(pos2d) + bottomOffsetY);
+      rotation = quat::fromYAngle(randf(2.0f * PI));
+      Sphere boundingSphere = carBoundingSphere.transformedBy(position, rotation);
 
-      if (terrain.collideSphereWithObjects(carBoundingSphereWorld, nullptr, nullptr, nullptr))
-        goto next_attempt;
+      if (terrain.collideSphereWithObjects(boundingSphere, nullptr, nullptr, nullptr))
+        continue;
 
-      for (int i = 0; i < cars.capacity(); i++)
-        if (cars.isAlive(i))
-        {
-          const Car& otherCar = cars[i];
-
-          if (&car != &otherCar && car.position.distanceTo(otherCar.position) < 4 * carBoundingSphere.radius)
-            goto next_attempt;
-        }
+      if (isCollidingWithPlayer(boundingSphere, car.guid))
+        continue;
 
       break;
-
-    next_attempt:
-      continue;
     }
 
     car.health = config.physics.car.maxHealth;
     car.switchToAliveState(withCountdown ? Car::Countdown : Car::Alive);
-    car.resetToPosition(car.position, car.rotation);
+    car.resetToPosition(position, rotation);
   }
 
   void Scene::regenerateTerrain(Terrain::Mode mode)
@@ -666,6 +637,20 @@ namespace game
   bool Scene::isWaitingForPlayers() const
   {
     return cars.count() <= 1;
+  }
+
+  bool Scene::isCollidingWithPlayer(Sphere sphere, uint64_t excludePlayerGuid) const
+  {
+    for (int i = 0; i < cars.capacity(); i++)
+      if (cars.isAlive(i))
+      {
+        const Car& car = cars[i];
+
+        if (car.guid != excludePlayerGuid && sphere.center.distanceTo(car.position) < sphere.radius)
+          return true;
+      }
+
+    return false;
   }
 
 }

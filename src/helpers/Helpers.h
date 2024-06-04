@@ -111,4 +111,27 @@ namespace game
     DrawSphere(pos + vec, 0.1f, color);
   }
 
+  template <int N>
+  Sphere calcBoundingSphere(const Sphere(&spheres)[N])
+  {
+    vec3 min = vec3::zero;
+    vec3 max = vec3::zero;
+
+    for (Sphere s : spheres)
+    {
+      min.x = std::min(min.x, s.center.x - s.radius);
+      min.y = std::min(min.y, s.center.y - s.radius);
+      min.z = std::min(min.z, s.center.z - s.radius);
+
+      max.x = std::max(max.x, s.center.x + s.radius);
+      max.y = std::max(max.y, s.center.y + s.radius);
+      max.z = std::max(max.z, s.center.z + s.radius);
+    }
+
+    return Sphere {
+      .center = 0.5f * (min + max),
+      .radius = std::max({max.x - min.x, max.y - min.y, max.z - min.z}),
+    };
+  }
+
 }

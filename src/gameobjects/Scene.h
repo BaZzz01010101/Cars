@@ -67,6 +67,7 @@ namespace game
     bool slowMotion = false;
     vec3 gunRayHit = vec3::zero;
     vec3 cannonRayHit = vec3::zero;
+    // TODO: Consider getting rid of local player index in favor of guid
     int localPlayerIndex = -1;
     uint64_t localPlayerGuid = 0;
     int64_t localPhysicalFrame = 0;
@@ -114,6 +115,7 @@ namespace game
     void switchToMatchState(MatchState newState);
     float getMatchStateTimeout() const;
     bool isWaitingForPlayers() const;
+    bool isCollidingWithPlayer(Sphere sphere, uint64_t excludePlayerGuid) const;
   };
 
 }

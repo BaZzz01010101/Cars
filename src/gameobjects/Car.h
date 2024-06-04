@@ -20,9 +20,10 @@ namespace game
     enum AliveState
     {
       Unknown = 0,
+      Countdown,
       Alive,
       Dead,
-      Countdown,
+      Hidden,
     };
 
     struct SteeringAngles
@@ -35,11 +36,13 @@ namespace game
 
     typedef std::pair<AliveState, float> AliveStateRecord;
 
+    static constexpr float DUMMY_HIDE_DURATION = 10.0f;
     static constexpr float PLAYER_DEATH_DURATION = 10.0f;
     static constexpr float DUMMY_ALIVE_DURATION = 10.0f;
     static constexpr float PLAYER_RESPAWN_COUNTDOWN_DURATION = 5.0f;
 
-    static constexpr std::array<AliveStateRecord, 3> aliveStatesOrdered = {
+    static constexpr std::array<AliveStateRecord, 4> aliveStatesOrdered = {
+      AliveStateRecord { AliveState::Hidden, DUMMY_HIDE_DURATION },
       AliveStateRecord { AliveState::Dead, PLAYER_DEATH_DURATION },
       AliveStateRecord { AliveState::Alive, DUMMY_ALIVE_DURATION },
       AliveStateRecord { AliveState::Countdown, PLAYER_RESPAWN_COUNTDOWN_DURATION },

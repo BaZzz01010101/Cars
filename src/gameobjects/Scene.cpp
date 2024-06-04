@@ -208,7 +208,7 @@ namespace game
       {
         Car& car = cars[i];
 
-        if (car.aliveState == Car::Dead && car.getAliveStateTimeout() <= 0)
+        if (car.aliveState == Car::Hidden)
           respawnPlayer(car, true);
       }
   }
@@ -415,7 +415,7 @@ namespace game
         {
           const Car& otherCar = cars[i];
 
-          if(&car != &otherCar && car.position.distanceTo(otherCar.position) < 4 * carBoundingSphere.radius)
+          if (&car != &otherCar && car.position.distanceTo(otherCar.position) < 4 * carBoundingSphere.radius)
             goto next_attempt;
         }
 
@@ -499,12 +499,8 @@ namespace game
 
   void Scene::syncPlayerState(const PlayerState& playerState, float syncFactor)
   {
-    for (int i = 0; i < cars.capacity(); i++)
-      if (cars.isAlive(i) && cars[i].guid == playerState.guid)
-      {
-        cars[i].syncState(playerState, syncFactor);
-        return;
-      }
+    if (Car* player = tryGetPlayer(playerState.guid))
+      player->syncState(playerState, syncFactor);
   }
 
   PlayerState Scene::getPlayerState(int index) const

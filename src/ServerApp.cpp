@@ -131,6 +131,7 @@ namespace game
       }
 
       broadcastMatchState(true);
+      sendPlayerStates();
     }
   }
 
@@ -279,6 +280,7 @@ namespace game
       }
 
     matchStats.addPlayer(newPlayer.guid, 0, 0);
+    sendPlayerStates();
   }
 
   void ServerApp::onClientDisconnected(uint64_t guid)

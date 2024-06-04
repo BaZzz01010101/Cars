@@ -108,7 +108,7 @@ namespace game
         overriddenMaterial = blinkFactor > 0.5f ? destroyedCarMaterial : destroyedCarMaterialTransparent;
       }
     }
-    else if (car.aliveState == Car::Countdown && car.guid != scene.localPlayerGuid)
+    else if ((car.aliveState == Car::Countdown || car.aliveState == Car::Hidden) && car.guid != scene.localPlayerGuid)
       overriddenMaterial = destroyedCarMaterialTransparent;
 
     drawDynamicObject(car, carModel, lerpFactor, overriddenMaterial);

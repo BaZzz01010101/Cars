@@ -97,8 +97,6 @@ namespace game
 
   void Car::update(float dt)
   {
-    updateAliveStateTimeout(dt);
-
     resetForces();
     applyGlobalForceAtCenterOfMass({ 0, -gravity * mass, 0 });
     applyGlobalForceAtCenterOfMass({ 0, 2 * gravity * mass * thrustAxis, 0 });
@@ -150,6 +148,8 @@ namespace game
       gun.updateLocked(dt, *this);
       cannon.updateLocked(dt, *this);
     }
+
+    updateAliveStateTimeout(dt);
   }
 
   void Car::updateCollisions(float dt)
@@ -172,9 +172,9 @@ namespace game
 
     // TODO: Consider moving update collisions to Scene to optimize from O(n^2) to O(log(n))
     // by applying forces to both this and other car in each iteration
-    if (aliveState != Car::Countdown)
+    if (aliveState != Car::Countdown && aliveState != Car::Hidden)
       for (int i = 0; i < scene.cars.capacity(); i++)
-        if (scene.cars.isAlive(i) && &scene.cars[i] != this && scene.cars[i].aliveState != Car::Countdown)
+        if (scene.cars.isAlive(i) && &scene.cars[i] != this && scene.cars[i].aliveState != Car::Countdown && scene.cars[i].aliveState != Car::Hidden)
         {
           const Car& car = scene.cars[i];
 
@@ -434,10 +434,11 @@ namespace game
 
   void Car::updateAliveStateTimeout(float dt)
   {
-    if(aliveState != Alive)
+    if(aliveState != Alive && aliveState != Hidden)
+    {
       aliveStateTimeout = std::max(0.0f, aliveStateTimeout - dt);
-
-    updateAliveState();
+      updateAliveState();
+    }
   }
 
   void Car::updateAliveState()

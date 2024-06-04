@@ -108,7 +108,11 @@ namespace game
         .zoomFactor = 5,
       },
       .hud = {
-        .fontSize = 20,
+        .fontSize = 20.0f,
+        .topMessageFontSize = 30.0f,
+        .matchTimerFontSize = 60.0f,
+        .countdownFontSize = 200.0f,
+        .endMatchScoreboardFontSize = 40.0f,
         .screenMargins = 10,
       },
       .bulletExplosionParticles = {

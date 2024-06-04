@@ -20,6 +20,8 @@ namespace game
     static constexpr float CROSSHAIR_MOVEMENT_SHARPNESS = 0.3f;
     static constexpr bool IS_VERTICAL_HEALTH_BAR = true;
     const Config& config {};
+    const Config::Graphics::Screen& screenConfig {};
+    const Config::Graphics::Hud& hudConfig {};
     const MatchStats& matchStats {};
 
     Font font {};

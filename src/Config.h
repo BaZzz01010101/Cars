@@ -107,7 +107,11 @@ namespace game
 
       struct Hud
       {
-        int fontSize;
+        float fontSize;
+        float topMessageFontSize;
+        float matchTimerFontSize;
+        float countdownFontSize;
+        float endMatchScoreboardFontSize;
         int screenMargins;
       } hud;
 

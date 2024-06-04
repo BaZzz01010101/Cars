@@ -5,6 +5,8 @@ namespace game
 {
   Hud::Hud(const Config& config, const MatchStats& matchStats) :
     config(config),
+    screenConfig(config.graphics.screen),
+    hudConfig(config.graphics.hud),
     matchStats(matchStats)
   {
   }
@@ -20,10 +22,11 @@ namespace game
     font = LoadFontEx(config.graphics.resources.fontPath, config.graphics.hud.fontSize, 0, 0);
     crosshairsTexture = LoadTexture(config.graphics.resources.crosshairsTexturePath);
     crosshairsTextureLoaded = true;
+
     lastColor = WHITE;
-    lastPosX = float(config.graphics.hud.screenMargins);
-    lastPosY = float(config.graphics.hud.screenMargins);
-    lastFontSize = float(config.graphics.hud.fontSize);
+    lastPosX = float(hudConfig.screenMargins);
+    lastPosY = float(hudConfig.screenMargins);
+    lastFontSize = float(hudConfig.fontSize);
   }
 
   void Hud::update()
@@ -44,10 +47,10 @@ namespace game
     if (drawDebugInfo)
     {
       drawDebug(scene);
-      static constexpr float width = 500;
-      static constexpr float height = 100;
-      static const float left = config.graphics.screen.width - width - 10;
-      static const float top = config.graphics.screen.height - height - 10;
+      static const float width = float(screenConfig.width / 2 - screenConfig.height / 4);
+      static const float height = float(screenConfig.height / 5);
+      static const float left = screenConfig.width - width - hudConfig.screenMargins;
+      static const float top = screenConfig.height - height - hudConfig.screenMargins;
       debugGraphs.draw(font, left, top, width, height);
     }
   }
@@ -182,8 +185,8 @@ namespace game
 
   void Hud::drawCrossHairs(const CustomCamera& camera, const Scene& scene, float lerpFactor) const
   {
-    float screenWidth = float(config.graphics.screen.width);
-    float screenHeight = float(config.graphics.screen.height);
+    float screenWidth = float(screenConfig.width);
+    float screenHeight = float(screenConfig.height);
     float minScreenSize = std::min(screenWidth, screenHeight);
     float size = (camera.mode == CustomCamera::Zoom) ? (minScreenSize / 6) : (minScreenSize / 12);
     Color color = { 255, 255, 255, 196 };
@@ -230,11 +233,10 @@ namespace game
 
   void Hud::drawCountdown(const Scene& scene) const
   {
-    static const Config::Graphics::Screen& screen = config.graphics.screen;
-    static const int fontSize = 200;
+    static const float fontSize = hudConfig.countdownFontSize;
     static const vec2 charSize = MeasureTextEx(font, "0", fontSize, 0);
-    static const float x = (screen.width - charSize.x) / 2;
-    static const float y = (screen.height - charSize.y) / 4;
+    static const float x = (screenConfig.width - charSize.x) / 2;
+    static const float y = (screenConfig.height - charSize.y) / 4;
 
     const Car& car = scene.getLocalPlayer();
 
@@ -252,16 +254,14 @@ namespace game
 
   void Hud::drawLocalPlayerHealth(const Scene& scene) const
   {
-    static const Config::Graphics::Screen& screen = config.graphics.screen;
     const Car& car = scene.getLocalPlayer();
 
     if (IS_VERTICAL_HEALTH_BAR)
     {
-      static const int width = std::min(screen.width, screen.height) / 30;
-      static const int height = screen.height / 3;
-      // TODO: use hud margins from config
-      static const int left = 20;
-      static const int top = screen.height - height - 20;
+      static const int width = std::min(screenConfig.width, screenConfig.height) / 30;
+      static const int height = screenConfig.height / 3;
+      static const int left = hudConfig.screenMargins;
+      static const int top = screenConfig.height - height - hudConfig.screenMargins;
       int hpHeight = height * car.health / config.physics.car.maxHealth;
 
       DrawRectangle(left, top, width, height - hpHeight, DARKGRAY);
@@ -269,11 +269,10 @@ namespace game
     }
     else
     {
-      static const int width = screen.width / 4;
-      static const int height = std::min(screen.width, screen.height) / 30;
-      // TODO: use hud margins from config
-      static const int left = 20;
-      static const int top = screen.height - height - 20;
+      static const int width = screenConfig.width / 4;
+      static const int height = std::min(screenConfig.width, screenConfig.height) / 30;
+      static const int left = hudConfig.screenMargins;
+      static const int top = screenConfig.height - height - hudConfig.screenMargins;
       int hpWidth = width * car.health / config.physics.car.maxHealth;
 
       DrawRectangle(left, top, hpWidth, height, RED);
@@ -283,7 +282,6 @@ namespace game
 
   void Hud::drawMatchStats(const Scene& scene) const
   {
-    static const Config::Graphics::Screen& screen = config.graphics.screen;
     static constexpr int BUF_SIZE = 256;
     static char title[BUF_SIZE];
     static int dummy = snprintf(title, BUF_SIZE, "%-24s %-6s %-7s %-4s", "Name", "Kills", "Deaths", "Ping");
@@ -291,19 +289,17 @@ namespace game
 
     if (scene.matchState == Scene::Scoreboard)
     {
-      fontSize = 40;
+      fontSize = hudConfig.endMatchScoreboardFontSize;
       static const float textWidth = MeasureTextEx(font, title, fontSize, 0).x;
-      // TODO: use hud margins from config
-      x = std::max(20.0f, (screen.width - textWidth) / 2);
-      y = screen.height / 4.0f;
+      x = std::max(float(hudConfig.screenMargins), (screenConfig.width - textWidth) / 2);
+      y = screenConfig.height / 4.0f;
     }
     else
     {
-      fontSize = 20;
+      fontSize = hudConfig.fontSize;
       static const float textWidth = MeasureTextEx(font, title, fontSize, 0).x;
-      // TODO: use hud margins from config
-      x = screen.width - textWidth - 20;
-      y = 20;
+      x = screenConfig.width - textWidth - hudConfig.screenMargins;
+      y = float(hudConfig.screenMargins);
     }
 
     print(title, LIGHTGRAY, x, y, fontSize);
@@ -322,9 +318,7 @@ namespace game
 
   void Hud::drawMatchTimer(const Scene& scene) const
   {
-    static const Config::Graphics::Screen& screen = config.graphics.screen;
-    // TODO: use hud margins from config
-    static const int y = 20;
+    static const float y = float(hudConfig.screenMargins);
 
     if (scene.matchState == Scene::Scoreboard)
     {
@@ -332,17 +326,17 @@ namespace game
       int mins = int(matchStateTimeout / 60);
       int secs = int(matchStateTimeout - mins * 60);
       const char* text = TextFormat("Time To next match: %02i:%02i", mins, secs);
-      static const float fontSize = 30;
+      static const float fontSize = hudConfig.topMessageFontSize;
       static const float textWidth = MeasureTextEx(font, text, fontSize, 0).x;
-      static const float x = (screen.width - textWidth) / 2.0f;
+      static const float x = (screenConfig.width - textWidth) / 2.0f;
       print(text, WHITE, x, y, fontSize);
     }
     else if (scene.isWaitingForPlayers())
     {
       static const char* text = "Waiting for players";
-      static const float fontSize = 30;
+      static const float fontSize = hudConfig.topMessageFontSize;
       static const float textWidth = MeasureTextEx(font, text, fontSize, 0).x;
-      static const float x = (screen.width - textWidth) / 2;
+      static const float x = (screenConfig.width - textWidth) / 2;
       print(text, WHITE, x, y, fontSize);
     }
     else if(scene.matchState == Scene::Running)
@@ -351,26 +345,25 @@ namespace game
       int mins = int(matchStateTimeout / 60);
       int secs = int(matchStateTimeout - mins * 60);
       const char* text = TextFormat("%02i:%02i", mins, secs);
-      static const float fontSize = 60;
+      static const float fontSize = hudConfig.matchTimerFontSize;
       static const float textWidth = MeasureTextEx(font, text, fontSize, 0).x;
-      static const float x = (screen.width - textWidth) / 2;
+      static const float x = (screenConfig.width - textWidth) / 2;
       print(text, WHITE, x, y, fontSize);
     }
   }
 
   void Hud::drawDebug(const Scene& scene) const
   {
-    lastFontSize = 20;
+    lastFontSize = hudConfig.fontSize;
+    static const float screenMargins = float(hudConfig.screenMargins);
 
     if (paused)
-      // TODO: use hud margins from config
-      print("Paused", YELLOW, 10, 10);
+      print("Paused", YELLOW, screenMargins, screenMargins);
     else
-      DrawFPS(10, 10);
+      DrawFPS(int(screenMargins), int(screenMargins));
 
     const Car& player = scene.getLocalPlayer();
-    // TODO: use hud margins from config
-    print("Position", player.position, LIGHTGRAY, 10, 30);
+    print("Position", player.position, LIGHTGRAY, screenMargins, screenMargins + lastFontSize);
     vec3 rotation;
     player.rotation.toEuler(&rotation.y, &rotation.z, &rotation.x);
     print("Rotation", rotation, GRAY);

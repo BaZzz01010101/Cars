@@ -212,7 +212,7 @@ namespace game
       float distanceToTarget = barrelBack.distanceTo(turret.expectedTarget);
       vec3 target;
 
-      if (!scene.traceRay(barrelBack, turret.forward(), FLT_MAX, scene.localPlayerIndex, &target, nullptr, nullptr, nullptr))
+      if (!scene.traceRay(barrelBack, turret.forward(), FLT_MAX, scene.localPlayerGuid, &target, nullptr, nullptr, nullptr))
         target = barrelBack + turret.forward() * distanceToTarget;
 
       vec2 position = GetWorldToScreen(target, camera);

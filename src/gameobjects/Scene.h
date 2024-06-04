@@ -28,7 +28,7 @@ namespace game
     struct Hit
     {
       uint64_t tick {};
-      int attackerIndex {};
+      uint64_t attackerGuid{};
       int damage {};
     };
 
@@ -102,7 +102,7 @@ namespace game
     void updateFiring(int carIndex, float dt);
     void updateRespawn();
     void createExplosion(const Config::Graphics::ExplosionParticles& config, vec3 position);
-    bool traceRay(vec3 origin, vec3 directionNormalized, float distance, int excludePlayerIndex, vec3* hitPosition, vec3* hitNormal, float* hitDistance, int* hitCarIndex) const;
+    bool traceRay(vec3 origin, vec3 directionNormalized, float distance, uint64_t excludePlayerGuid, vec3* hitPosition, vec3* hitNormal, float* hitDistance, int* hitCarIndex) const;
     void clearKills();
     void clearHits();
     void addHit(int carIndex, Hit hit);

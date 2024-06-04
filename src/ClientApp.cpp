@@ -337,11 +337,10 @@ namespace game
       // So we penetrating the surface of the object by some distance to make sure that the target point is traceble from other direction
       const float targetPenetration = 0.5f;
 
-      if (scene.traceRay(camera.position, camera.direction, FLT_MAX, scene.localPlayerIndex, nullptr, nullptr, &targetDistance, nullptr))
+      if (scene.traceRay(camera.position, camera.direction, FLT_MAX, scene.localPlayerGuid, nullptr, nullptr, &targetDistance, nullptr))
         targetDistance += targetPenetration;
 
       target = camera.position + camera.direction * targetDistance - player->position;
-
 
       PlayerControl playerControl = {
         .physicalFrame = scene.localPhysicalFrame,

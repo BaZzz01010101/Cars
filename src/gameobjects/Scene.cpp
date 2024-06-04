@@ -73,7 +73,7 @@ namespace game
 
         if (projectile.lifeTime < 0)
           projectiles.remove(i);
-        else if (traceRay(projectile.lastPosition, direction, distance, projectile.ownerIndex, &hitPosition, &normal, &hitDistance, &hitCarIndex))
+        else if (traceRay(projectile.lastPosition, direction, distance, projectile.ownerGuid, &hitPosition, &normal, &hitDistance, &hitCarIndex))
         {
           projectiles.remove(i);
 
@@ -92,7 +92,7 @@ namespace game
             hitCar.hitForce += direction * hitCar.mass * float(projectile.baseDamage) * 0.1f;
             hitCar.hitMoment += ((hitPosition - hitCar.position) % hitCar.hitForce).rotatedBy(hitCar.rotation.inverted());
             uint64_t hitTick = localPhysicalFrame * 100 + int(100 * hitDistance / distance);
-            addHit(hitCarIndex, { hitTick, projectile.ownerIndex, projectile.baseDamage });
+            addHit(hitCarIndex, { hitTick, projectile.ownerGuid, projectile.baseDamage });
           }
         }
       }
@@ -140,7 +140,6 @@ namespace game
         vec3 position2 = bulletPosition - barrelOffset;
         vec3 velocity = car.velocity + gun.forward() * gunConfig.projectileSpeed;
 
-        // TODO: Replace carIndex with guid to avoid issues when index is reused by new connected player
         projectiles.tryAdd(Projectile {
           .lastPosition = position1,
           .lastVelocity = velocity,
@@ -149,7 +148,7 @@ namespace game
           .gravity = config.physics.gravity,
           .lifeTime = gunConfig.projectileLifeTime,
           .size = 0.05f,
-          .ownerIndex = carIndex,
+          .ownerGuid = car.guid,
           .baseDamage = gunConfig.baseDamage,
           .type = Projectile::Type::Bullet,
           });
@@ -162,7 +161,7 @@ namespace game
           .gravity = config.physics.gravity,
           .lifeTime = gunConfig.projectileLifeTime,
           .size = 0.05f,
-          .ownerIndex = carIndex,
+          .ownerGuid = car.guid,
           .baseDamage = gunConfig.baseDamage,
           .type = Projectile::Type::Bullet,
           });
@@ -189,7 +188,7 @@ namespace game
           .gravity = config.physics.gravity,
           .lifeTime = cannonConfig.projectileLifeTime,
           .size = 0.2f,
-          .ownerIndex = carIndex,
+          .ownerGuid = car.guid,
           .baseDamage = cannonConfig.baseDamage,
           .type = Projectile::Type::Shell,
           });
@@ -238,7 +237,7 @@ namespace game
       ));
   }
 
-  bool Scene::traceRay(vec3 origin, vec3 directionNormalized, float distance, int excludePlayerIndex, vec3* hitPosition, vec3* hitNormal, float* hitDistance, int* hitCarIndex) const
+  bool Scene::traceRay(vec3 origin, vec3 directionNormalized, float distance, uint64_t excludePlayerGuid, vec3* hitPosition, vec3* hitNormal, float* hitDistance, int* hitCarIndex) const
   {
     vec3 closestsHitPosition = vec3::zero;
     vec3 closestsHitNormal = vec3::zero;
@@ -248,7 +247,8 @@ namespace game
     vec3 currentHitNormal = vec3::zero;
     float currentHitDistance = FLT_MAX;
 
-    if (terrain.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestsHitDistance)
+    if (terrain.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) &&
+      currentHitDistance < closestsHitDistance)
     {
       closestsHitPosition = currentHitPosition;
       closestsHitNormal = currentHitNormal;
@@ -256,11 +256,15 @@ namespace game
     }
 
     for (int i = 0; i < cars.capacity(); i++)
-      if (cars.isAlive(i) && i != excludePlayerIndex)
+      if (cars.isAlive(i))
       {
         const Car& car = cars[i];
 
-        if (car.aliveState != Car::Countdown && car.aliveState != Car::Hidden && car.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) && currentHitDistance < closestsHitDistance)
+        if (car.guid != excludePlayerGuid &&
+          car.aliveState != Car::Countdown &&
+          car.aliveState != Car::Hidden &&
+          car.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance) &&
+          currentHitDistance < closestsHitDistance)
         {
           closestsHitPosition = currentHitPosition;
           closestsHitNormal = currentHitNormal;
@@ -355,8 +359,7 @@ namespace game
 
           if (player.health <= 0)
           {
-            Car& attacker = cars[hit.attackerIndex];
-            kills.add({ player.guid, attacker.guid });
+            kills.add({ player.guid, hit.attackerGuid });
 
             break;
           }
@@ -436,11 +439,11 @@ namespace game
 
   void Scene::resetPlayer(vec3 playerPosition, quat playerRotation)
   {
-    float terrainY = terrain.getHeight(playerPosition.x, playerPosition.z);
-    playerPosition.y = terrainY + 2;
+      float terrainY = terrain.getHeight(playerPosition.x, playerPosition.z);
+      playerPosition.y = terrainY + 2;
     Car& player = cars[localPlayerIndex];
     player.resetToPosition(playerPosition, playerRotation);
-  }
+    }
 
   const Car* Scene::tryGetLocalPlayer() const
   {
@@ -517,30 +520,27 @@ namespace game
     {
       const Hit& hit = playerHits[i];
 
-      if (!cars.isAlive(hit.attackerIndex))
-        continue;
+      if (const Car* attacker = tryGetPlayer(hit.attackerGuid))
+      {
+        bool isNewHit = true;
 
-      // TODO: Consider replacing with guid to avoid issues when index is reused by new connected player
-      const Car& attacker = cars[hit.attackerIndex];
+        for (int j = 0; j < result.size(); j++)
+          if (attacker->guid == result[j].attakerGuid)
+          {
+            result[j].damage += hit.damage;
+            isNewHit = false;
 
-      bool isNewHit = true;
+            break;
+          }
 
-      for (int j = 0; j < result.size(); j++)
-        if (attacker.guid == result[j].attakerGuid)
-        {
-          result[j].damage += hit.damage;
-          isNewHit = false;
-
-          break;
-        }
-
-      if (isNewHit)
-        result.push_back(PlayerHit {
-          .physicalFrame = localPhysicalFrame,
-          .guid = player.guid,
-          .attakerGuid = attacker.guid,
-          .damage = hit.damage
-        });
+        if (isNewHit)
+          result.push_back(PlayerHit {
+            .physicalFrame = localPhysicalFrame,
+            .guid = player.guid,
+            .attakerGuid = attacker->guid,
+            .damage = hit.damage
+          });
+      }
     }
 
     return result;

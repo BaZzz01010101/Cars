@@ -35,7 +35,9 @@ namespace game
     bool get(const char* name, DebugGraph** graph);
     void selectNext();
     void selectPrev();
-    void updateControl();
+    void addSelected();
+    void removeSelected();
+    void removeAll();
     void reset();
   };
 

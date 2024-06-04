@@ -28,7 +28,6 @@ namespace game
 
   void Hud::update()
   {
-    debugGraphs.updateControl();
   }
 
   void Hud::draw(const CustomCamera& camera, const Scene& scene, float lerpFactor) const

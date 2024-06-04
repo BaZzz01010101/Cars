@@ -154,47 +154,34 @@ namespace game
     selectedIndex = int((selectedIndex - 1 + graphs.size()) % graphs.size());
   }
 
-  void DebugGraphs::updateControl()
+  void DebugGraphs::addSelected()
   {
-    // TODO: Fix potential incorrect controls
-    // getting key state inside update can lead to incorrect calculations due to the multiple
-    // accounting of the same key press in recurcive update calls in App::update because RayLib
-    // seems updating input state once per frame
-    if (IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB))
-    {
-      if ((IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)))
-        selectPrev();
-      else
-        selectNext();
-    }
+    bool containsSelected = false;
 
-    if (IsKeyPressed(KEY_EQUAL))
-    {
-      bool containsSelected = false;
+    for (int i : drawingIndexes)
+      if (i == selectedIndex)
+      {
+        containsSelected = true;
+        break;
+      }
 
-      for (int i : drawingIndexes)
-        if (i == selectedIndex)
-        {
-          containsSelected = true;
-          break;
-        }
+    if (!containsSelected)
+      drawingIndexes.push_back(selectedIndex);
+  }
 
-      if (!containsSelected)
-        drawingIndexes.push_back(selectedIndex);
-    }
+  void DebugGraphs::removeSelected()
+  {
+    for (int i = 0; i < drawingIndexes.size(); i++)
+      if (drawingIndexes[i] == selectedIndex)
+      {
+        drawingIndexes.erase(drawingIndexes.begin() + i);
+        break;
+      }
+  }
 
-    if (IsKeyPressed(KEY_MINUS))
-    {
-      for (int i = 0; i < drawingIndexes.size(); i++)
-        if (drawingIndexes[i] == selectedIndex)
-        {
-          drawingIndexes.erase(drawingIndexes.begin() + i);
-          break;
-        }
-    }
-
-    if (IsKeyPressed(KEY_BACKSPACE))
-      drawingIndexes.clear();
+  void DebugGraphs::removeAll()
+  {
+    drawingIndexes.clear();
   }
 
   void DebugGraphs::reset()

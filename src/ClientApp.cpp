@@ -340,6 +340,23 @@ namespace game
 
       player.syncState(playerState, 1.0f);
     }
+
+    if (IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB))
+    {
+      if ((IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)))
+        hud.debugGraphs.selectPrev();
+      else
+        hud.debugGraphs.selectNext();
+    }
+
+    if (IsKeyPressed(KEY_EQUAL))
+      hud.debugGraphs.addSelected();
+
+    if (IsKeyPressed(KEY_MINUS))
+      hud.debugGraphs.removeSelected();
+
+    if (IsKeyPressed(KEY_BACKSPACE))
+      hud.debugGraphs.removeAll();
   }
 
   void ClientApp::sendPlayerControl(const PlayerControl& playerControl)

@@ -36,9 +36,9 @@ namespace game
     };
 
     mutable Color lastColor = WHITE;
-    mutable int lastPosX = 0;
-    mutable int lastPosY = 0;
-    mutable int lastFontSize = 10;
+    mutable float lastPosX = 0;
+    mutable float lastPosY = 0;
+    mutable float lastFontSize = 10;
 
     Hud(const Config& config, const MatchStats& matchStats);
     ~Hud();
@@ -51,27 +51,27 @@ namespace game
 
     void print(const char* text) const;
     void print(const char* text, Color color) const;
-    void print(const char* text, Color color, int posX) const;
-    void print(const char* text, Color color, int posX, int posY) const;
-    void print(const char* text, Color color, int posX, int posY, int fontSize) const;
+    void print(const char* text, Color color, float posX) const;
+    void print(const char* text, Color color, float posX, float posY) const;
+    void print(const char* text, Color color, float posX, float posY, float fontSize) const;
 
     void printIf(bool condition, const char* text) const;
     void printIf(bool condition, const char* text, Color color) const;
-    void printIf(bool condition, const char* text, Color color, int posX) const;
-    void printIf(bool condition, const char* text, Color color, int posX, int posY) const;
-    void printIf(bool condition, const char* text, Color color, int posX, int posY, int fontSize) const;
+    void printIf(bool condition, const char* text, Color color, float posX) const;
+    void printIf(bool condition, const char* text, Color color, float posX, float posY) const;
+    void printIf(bool condition, const char* text, Color color, float posX, float posY, float fontSize) const;
 
     void print(const char* title, vec3 v) const;
     void print(const char* title, vec3 v, Color color) const;
-    void print(const char* title, vec3 v, Color color, int posX) const;
-    void print(const char* title, vec3 v, Color color, int posX, int posY) const;
-    void print(const char* title, vec3 v, Color color, int posX, int posY, int fontSize) const;
+    void print(const char* title, vec3 v, Color color, float posX) const;
+    void print(const char* title, vec3 v, Color color, float posX, float posY) const;
+    void print(const char* title, vec3 v, Color color, float posX, float posY, float fontSize) const;
 
     void print(const char* title, float f) const;
     void print(const char* title, float f, Color color) const;
-    void print(const char* title, float f, Color color, int posX) const;
-    void print(const char* title, float f, Color color, int posX, int posY) const;
-    void print(const char* title, float f, Color color, int posX, int posY, int fontSize) const;
+    void print(const char* title, float f, Color color, float posX) const;
+    void print(const char* title, float f, Color color, float posX, float posY) const;
+    void print(const char* title, float f, Color color, float posX, float posY, float fontSize) const;
 
     void update();
     void draw(const CustomCamera& camera, const Scene& scene, float lerpFactor) const;

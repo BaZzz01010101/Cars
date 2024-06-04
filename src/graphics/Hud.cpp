@@ -21,9 +21,9 @@ namespace game
     crosshairsTexture = LoadTexture(config.graphics.resources.crosshairsTexturePath);
     crosshairsTextureLoaded = true;
     lastColor = WHITE;
-    lastPosX = config.graphics.hud.screenMargins;
-    lastPosY = config.graphics.hud.screenMargins;
-    lastFontSize = config.graphics.hud.fontSize;
+    lastPosX = float(config.graphics.hud.screenMargins);
+    lastPosY = float(config.graphics.hud.screenMargins);
+    lastFontSize = float(config.graphics.hud.fontSize);
   }
 
   void Hud::update()
@@ -62,24 +62,23 @@ namespace game
     print(text, color, lastPosX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* text, Color color, int posX) const
+  void Hud::print(const char* text, Color color, float posX) const
   {
     print(text, lastColor, posX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* text, Color color, int posX, int posY) const
+  void Hud::print(const char* text, Color color, float posX, float posY) const
   {
     print(text, color, posX, posY, lastFontSize);
   }
 
-  // TODO: change type of x, y, and fontSize to float
-  void Hud::print(const char* text, Color color, int posX, int posY, int fontSize) const
+  void Hud::print(const char* text, Color color, float posX, float posY, float fontSize) const
   {
-    DrawTextEx(font, text, { (float)posX - 1, (float)posY - 1 }, (float)fontSize, 0, BLACK);
-    DrawTextEx(font, text, { (float)posX + 1, (float)posY - 1 }, (float)fontSize, 0, BLACK);
-    DrawTextEx(font, text, { (float)posX - 1, (float)posY + 1 }, (float)fontSize, 0, BLACK);
-    DrawTextEx(font, text, { (float)posX + 1, (float)posY + 1 }, (float)fontSize, 0, BLACK);
-    DrawTextEx(font, text, { (float)posX, (float)posY }, (float)fontSize, 0, color);
+    DrawTextEx(font, text, { posX - 1, posY - 1 }, fontSize, 0, BLACK);
+    DrawTextEx(font, text, { posX + 1, posY - 1 }, fontSize, 0, BLACK);
+    DrawTextEx(font, text, { posX - 1, posY + 1 }, fontSize, 0, BLACK);
+    DrawTextEx(font, text, { posX + 1, posY + 1 }, fontSize, 0, BLACK);
+    DrawTextEx(font, text, { posX, posY }, fontSize, 0, color);
 
     lastColor = color;
     lastPosX = posX;
@@ -97,17 +96,17 @@ namespace game
     printIf(condition, text, color, lastPosX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::printIf(bool condition, const char* text, Color color, int posX) const
+  void Hud::printIf(bool condition, const char* text, Color color, float posX) const
   {
     printIf(condition, text, color, posX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::printIf(bool condition, const char* text, Color color, int posX, int posY) const
+  void Hud::printIf(bool condition, const char* text, Color color, float posX, float posY) const
   {
     printIf(condition, text, color, posX, posY, lastFontSize);
   }
 
-  void Hud::printIf(bool condition, const char* text, Color color, int posX, int posY, int fontSize) const
+  void Hud::printIf(bool condition, const char* text, Color color, float posX, float posY, float fontSize) const
   {
     if (condition)
       print(text, color, posX, posY, fontSize);
@@ -130,17 +129,17 @@ namespace game
     print(title, v, color, lastPosX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* title, vec3 v, Color color, int posX) const
+  void Hud::print(const char* title, vec3 v, Color color, float posX) const
   {
     print(title, v, color, posX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* title, vec3 v, Color color, int posX, int posY) const
+  void Hud::print(const char* title, vec3 v, Color color, float posX, float posY) const
   {
     print(title, v, color, posX, posY, lastFontSize);
   }
 
-  void Hud::print(const char* title, vec3 v, Color color, int posX, int posY, int fontSize) const
+  void Hud::print(const char* title, vec3 v, Color color, float posX, float posY, float fontSize) const
   {
     print(TextFormat("%-10s: %5.1f |%5.1f |%5.1f :%5.1f", title, v.x, v.y, v.z, v.length()), color, posX, posY, fontSize);
 
@@ -163,17 +162,17 @@ namespace game
     print(title, f, color, lastPosX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* title, float f, Color color, int posX) const
+  void Hud::print(const char* title, float f, Color color, float posX) const
   {
     print(title, f, color, posX, lastPosY + lastFontSize, lastFontSize);
   }
 
-  void Hud::print(const char* title, float f, Color color, int posX, int posY) const
+  void Hud::print(const char* title, float f, Color color, float posX, float posY) const
   {
     print(title, f, color, posX, posY, lastFontSize);
   }
 
-  void Hud::print(const char* title, float f, Color color, int posX, int posY, int fontSize) const
+  void Hud::print(const char* title, float f, Color color, float posX, float posY, float fontSize) const
   {
     print(TextFormat("%-10s: %5.1f", title, f), color, posX, posY, fontSize);
 
@@ -183,13 +182,13 @@ namespace game
 
   void Hud::drawCrossHairs(const CustomCamera& camera, const Scene& scene, float lerpFactor) const
   {
-    int screenWidth = config.graphics.screen.width;
-    int screenHeight = config.graphics.screen.height;
-    float minScreenSize = float(std::min(screenWidth, screenHeight));
+    float screenWidth = float(config.graphics.screen.width);
+    float screenHeight = float(config.graphics.screen.height);
+    float minScreenSize = std::min(screenWidth, screenHeight);
     float size = (camera.mode == CustomCamera::Zoom) ? (minScreenSize / 6) : (minScreenSize / 12);
     Color color = { 255, 255, 255, 196 };
 
-    vec2 center = { float(screenWidth / 2), float(screenHeight / 2) };
+    vec2 center = { screenWidth / 2, screenHeight / 2 };
     drawCrossHair(center, CrossHairIndex::Camera, size, color);
 
     const Car& player = scene.getLocalPlayer();
@@ -224,9 +223,9 @@ namespace game
 
   void Hud::drawCrossHair(vec2 position, CrossHairIndex crosshairIndex, float size, Color color) const
   {
-    float textureSize = (float)crosshairsTexture.height;
-    float textureLeft = textureSize * (float)crosshairIndex;
-    DrawTexturePro(crosshairsTexture, { textureLeft, 0, textureSize, textureSize }, { float(position.x - 0.5f * size), float(position.y - 0.5f * size), size, size }, { 0, 0 }, 0, color);
+    float textureSize = float(crosshairsTexture.height);
+    float textureLeft = textureSize * float(crosshairIndex);
+    DrawTexturePro(crosshairsTexture, { textureLeft, 0, textureSize, textureSize }, { position.x - 0.5f * size, position.y - 0.5f * size, size, size }, { 0, 0 }, 0, color);
   }
 
   void Hud::drawCountdown(const Scene& scene) const
@@ -234,8 +233,8 @@ namespace game
     static const Config::Graphics::Screen& screen = config.graphics.screen;
     static const int fontSize = 200;
     static const vec2 charSize = MeasureTextEx(font, "0", fontSize, 0);
-    static const int x = (screen.width - (int)charSize.x) / 2;
-    static const int y = (screen.height - (int)charSize.y) / 4;
+    static const float x = (screen.width - charSize.x) / 2;
+    static const float y = (screen.height - charSize.y) / 4;
 
     const Car& car = scene.getLocalPlayer();
 
@@ -288,20 +287,20 @@ namespace game
     static constexpr int BUF_SIZE = 256;
     static char title[BUF_SIZE];
     static int dummy = snprintf(title, BUF_SIZE, "%-24s %-6s %-7s %-4s", "Name", "Kills", "Deaths", "Ping");
-    int x, y, fontSize;
+    float x, y, fontSize;
 
     if (scene.matchState == Scene::Scoreboard)
     {
       fontSize = 40;
-      static const int textWidth = (int)MeasureTextEx(font, title, (float)fontSize, 0).x;
+      static const float textWidth = MeasureTextEx(font, title, fontSize, 0).x;
       // TODO: use hud margins from config
-      x = std::max(20, (screen.width - textWidth) / 2);
-      y = screen.height / 4;
+      x = std::max(20.0f, (screen.width - textWidth) / 2);
+      y = screen.height / 4.0f;
     }
     else
     {
       fontSize = 20;
-      static const int textWidth = (int)MeasureTextEx(font, title, (float)fontSize, 0).x;
+      static const float textWidth = MeasureTextEx(font, title, fontSize, 0).x;
       // TODO: use hud margins from config
       x = screen.width - textWidth - 20;
       y = 20;
@@ -333,17 +332,17 @@ namespace game
       int mins = int(matchStateTimeout / 60);
       int secs = int(matchStateTimeout - mins * 60);
       const char* text = TextFormat("Time To next match: %02i:%02i", mins, secs);
-      static const int fontSize = 30;
-      static const int textWidth = (int)MeasureTextEx(font, text, fontSize, 0).x;
-      static const int x = (screen.width - textWidth) / 2;
+      static const float fontSize = 30;
+      static const float textWidth = MeasureTextEx(font, text, fontSize, 0).x;
+      static const float x = (screen.width - textWidth) / 2.0f;
       print(text, WHITE, x, y, fontSize);
     }
     else if (scene.isWaitingForPlayers())
     {
       static const char* text = "Waiting for players";
-      static const int fontSize = 30;
-      static const int textWidth = (int)MeasureTextEx(font, text, fontSize, 0).x;
-      static const int x = (screen.width - textWidth) / 2;
+      static const float fontSize = 30;
+      static const float textWidth = MeasureTextEx(font, text, fontSize, 0).x;
+      static const float x = (screen.width - textWidth) / 2;
       print(text, WHITE, x, y, fontSize);
     }
     else if(scene.matchState == Scene::Running)
@@ -352,9 +351,9 @@ namespace game
       int mins = int(matchStateTimeout / 60);
       int secs = int(matchStateTimeout - mins * 60);
       const char* text = TextFormat("%02i:%02i", mins, secs);
-      static const int fontSize = 60;
-      static const int textWidth = (int)MeasureTextEx(font, text, fontSize, 0).x;
-      static const int x = (screen.width - textWidth) / 2;
+      static const float fontSize = 60;
+      static const float textWidth = MeasureTextEx(font, text, fontSize, 0).x;
+      static const float x = (screen.width - textWidth) / 2;
       print(text, WHITE, x, y, fontSize);
     }
   }

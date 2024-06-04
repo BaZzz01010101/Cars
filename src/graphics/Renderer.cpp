@@ -88,9 +88,8 @@ namespace game
     if (scene.localPlayerIndex < 0)
       return;
 
-    const Car& player = scene.getLocalPlayer();
-
-    drawCarDebug(player, lerpFactor);
+    if(const Car* player = scene.tryGetLocalPlayer())
+      drawCarDebug(*player, lerpFactor);
   }
 
   void Renderer::drawCar(const Car& car, float lerpFactor)

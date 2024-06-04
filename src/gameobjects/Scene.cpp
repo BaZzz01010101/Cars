@@ -471,6 +471,16 @@ namespace game
     player.resetToPosition(playerPosition, playerRotation);
   }
 
+  const Car* Scene::tryGetLocalPlayer() const
+  {
+    return tryGetPlayer(localPlayerGuid);
+  }
+
+  Car* Scene::tryGetLocalPlayer()
+  {
+    return tryGetPlayer(localPlayerGuid);
+  }
+
   const Car* Scene::tryGetPlayer(uint64_t guid) const
   {
     for (int i = 0; i < MAX_CARS; i++)

@@ -46,8 +46,7 @@ namespace game
       return !exit && !WindowShouldClose();
     }
 
-    PlayerControl localPlayerControl = getLocalPlayerControl();
-    sendPlayerControl(localPlayerControl);
+    sendLocalPlayerControl();
 
     network.update();
 
@@ -102,37 +101,6 @@ namespace game
     paused = !paused;
     scene.paused = paused;
     hud.paused = paused;
-  }
-
-  PlayerControl ClientApp::getLocalPlayerControl()
-  {
-    const Car& player = scene.getLocalPlayer();
-
-    vec3 target = vec3::zero;
-    float targetDistance = 100;
-
-    // Fixes issue with crosshair twitching when targeting edge of terrain object at close/middle distance
-    // In some conditions the same target point that hit by tracing from camera eye, did not hit when traced from turret barrel
-    // So we penetrating the surface of the object by some distance to make sure that the target point is traceble from other direction
-    const float targetPenetration = 0.5f;
-
-    if (scene.traceRay(camera.position, camera.direction, FLT_MAX, scene.localPlayerIndex, nullptr, nullptr, &targetDistance, nullptr))
-      targetDistance += targetPenetration;
-
-    target = camera.position + camera.direction * targetDistance - player.position;
-
-
-    return PlayerControl {
-      .physicalFrame = scene.localPhysicalFrame,
-      .guid = player.guid,
-      .steeringAxis = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D)),
-      .accelerationAxis = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S)),
-      .thrustAxis = float(IsKeyDown(KEY_LEFT_SHIFT)),
-      .target = target,
-      .primaryFire = IsMouseButtonDown(MOUSE_LEFT_BUTTON),
-      .secondaryFire = IsMouseButtonDown(MOUSE_RIGHT_BUTTON),
-      .handBrake = IsKeyDown(KEY_SPACE),
-    };
   }
 
   void ClientApp::onConnected(uint64_t guid)
@@ -303,44 +271,6 @@ namespace game
     if (IsKeyPressed(KEY_F1))
       scene.resetPlayer(vec3::zero, quat::identity);
 
-    if (scene.localPlayerIndex < 0)
-      return;
-
-    Car& player = scene.getLocalPlayer();
-
-    if (IsKeyPressed(KEY_R))
-      player.rotation = player.rotation * quat::fromEuler(PI / 2, 0, 0);
-
-    if (IsKeyPressed(KEY_F2))
-    {
-      scene.resetPlayer({ 0, 0, 25 }, quat::identity);
-      scene.getLocalPlayer().rotation = quat::fromEuler(0, 0, 0.19f * PI);
-    }
-
-    if (IsKeyPressed(KEY_F3))
-    {
-      scene.resetPlayer({ 0, 0, 25 }, quat::identity);
-      player.rotation = quat::fromEuler(0, 0, 0.18f * PI);
-      player.rotation = player.rotation * quat::fromEuler(PI / 2, 0, 0);
-      player.rotation = player.rotation * quat::fromEuler(0, 0, 0.02f * PI);
-    }
-
-    if (IsKeyPressed(KEY_F4))
-    {
-      PlayerState playerState = {
-        .physicalFrame = scene.localPhysicalFrame,
-        .guid = scene.getLocalPlayer().guid,
-        .position = {-1, 7, 0},
-        .rotation = quat::identity.rotatedByYAngle(PI / 2),
-        .velocity = {randf(20, 50) * sign(randf(-1, 1)), 0, randf(20, 50) * sign(randf(-1, 1))},
-        .angularVelocity = {0, 0, 0},
-      };
-
-      playerState.position.y = 2 + scene.terrain.getHeight(playerState.position.x, playerState.position.z, nullptr);
-
-      player.syncState(playerState, 1.0f);
-    }
-
     if (IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB))
     {
       if ((IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)))
@@ -357,20 +287,87 @@ namespace game
 
     if (IsKeyPressed(KEY_BACKSPACE))
       hud.debugGraphs.removeAll();
+
+    if (Car* player = scene.tryGetLocalPlayer())
+    {
+      if (IsKeyPressed(KEY_R))
+        player->rotation = player->rotation * quat::fromEuler(PI / 2, 0, 0);
+
+      if (IsKeyPressed(KEY_F2))
+      {
+        scene.resetPlayer({ 0, 0, 25 }, quat::identity);
+        player->rotation = quat::fromEuler(0, 0, 0.19f * PI);
+      }
+
+      if (IsKeyPressed(KEY_F3))
+      {
+        scene.resetPlayer({ 0, 0, 25 }, quat::identity);
+        player->rotation = quat::fromEuler(0, 0, 0.18f * PI);
+        player->rotation = player->rotation * quat::fromEuler(PI / 2, 0, 0);
+        player->rotation = player->rotation * quat::fromEuler(0, 0, 0.02f * PI);
+      }
+
+      if (IsKeyPressed(KEY_F4))
+      {
+        PlayerState playerState = {
+          .physicalFrame = scene.localPhysicalFrame,
+          .guid = scene.localPlayerGuid,
+          .position = {-1, 7, 0},
+          .rotation = quat::identity.rotatedByYAngle(PI / 2),
+          .velocity = {randf(20, 50) * sign(randf(-1, 1)), 0, randf(20, 50) * sign(randf(-1, 1))},
+          .angularVelocity = {0, 0, 0},
+        };
+
+        playerState.position.y = 2 + scene.terrain.getHeight(playerState.position.x, playerState.position.z, nullptr);
+
+        player->syncState(playerState, 1.0f);
+      }
+    }
   }
 
-  void ClientApp::sendPlayerControl(const PlayerControl& playerControl)
+  void ClientApp::sendLocalPlayerControl()
   {
-    BitStream stream;
-    playerControl.writeTo(stream);
-    network.send(stream);
+    if (const Car* player = scene.tryGetLocalPlayer())
+    {
+      vec3 target = vec3::zero;
+      float targetDistance = 100;
+
+      // Fixes issue with crosshair twitching when targeting edge of terrain object at close/middle distance
+      // In some conditions the same target point that hit by tracing from camera eye, did not hit when traced from turret barrel
+      // So we penetrating the surface of the object by some distance to make sure that the target point is traceble from other direction
+      const float targetPenetration = 0.5f;
+
+      if (scene.traceRay(camera.position, camera.direction, FLT_MAX, scene.localPlayerIndex, nullptr, nullptr, &targetDistance, nullptr))
+        targetDistance += targetPenetration;
+
+      target = camera.position + camera.direction * targetDistance - player->position;
+
+
+      PlayerControl playerControl = {
+        .physicalFrame = scene.localPhysicalFrame,
+        .guid = player->guid,
+        .steeringAxis = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D)),
+        .accelerationAxis = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S)),
+        .thrustAxis = float(IsKeyDown(KEY_LEFT_SHIFT)),
+        .target = target,
+        .primaryFire = IsMouseButtonDown(MOUSE_LEFT_BUTTON),
+        .secondaryFire = IsMouseButtonDown(MOUSE_RIGHT_BUTTON),
+        .handBrake = IsKeyDown(KEY_SPACE),
+      };
+
+      BitStream stream;
+      playerControl.writeTo(stream);
+      network.send(stream);
+    }
   }
 
   void ClientApp::updateCamera(float dt, float lerpFactor)
   {
-    const Car& player = scene.getLocalPlayer();
-    vec3 playerPosition = vec3::lerp(player.lastPosition, player.position, lerpFactor);
-    camera.update(dt, scene.terrain, playerPosition);
+    if (const Car* player = scene.tryGetLocalPlayer())
+    {
+      vec3 playerPosition = vec3::lerp(player->lastPosition, player->position, lerpFactor);
+      camera.update(dt, scene.terrain, playerPosition);
+    }
   }
 
 }

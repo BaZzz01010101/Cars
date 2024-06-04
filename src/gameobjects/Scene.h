@@ -86,10 +86,8 @@ namespace game
     void reset();
     void resetPlayer(vec3 playerPosition, quat playerRotation);
 
-    // TODO: Replace with tryGelLocalPlayer
-    inline const Car& getLocalPlayer() const { return cars[localPlayerIndex]; }
-    inline Car& getLocalPlayer() { return cars[localPlayerIndex]; }
-
+    const Car* tryGetLocalPlayer() const;
+    Car* tryGetLocalPlayer();
     const Car* tryGetPlayer(uint64_t guid) const;
     Car* tryGetPlayer(uint64_t guid);
     void updatePlayerControl(const PlayerControl& playerControl);

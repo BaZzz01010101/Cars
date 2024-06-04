@@ -39,9 +39,8 @@ namespace game
     void togglePaused();
     void update(float dt);
     void updateShortcuts();
-    void sendPlayerControl(const PlayerControl& playerControl);
+    void sendLocalPlayerControl();
     void updateCamera(float dt, float lerpFactor);
-    PlayerControl getLocalPlayerControl();
 
     virtual void onConnected(uint64_t guid) override;
     virtual void onDisconnected(uint64_t guid) override;

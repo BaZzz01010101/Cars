@@ -197,10 +197,11 @@ namespace game
     vec2 center = { screenWidth / 2, screenHeight / 2 };
     drawCrossHair(center, CrossHairIndex::Camera, size, color);
 
-    const Car& player = scene.getLocalPlayer();
-
-    drawTurretCrossHair(camera, scene, player.cannon, CrossHairIndex::Cannon, size, color, lerpFactor);
-    drawTurretCrossHair(camera, scene, player.gun, CrossHairIndex::Gun, size, color, lerpFactor);
+    if (const Car* player = scene.tryGetLocalPlayer())
+    {
+      drawTurretCrossHair(camera, scene, player->cannon, CrossHairIndex::Cannon, size, color, lerpFactor);
+      drawTurretCrossHair(camera, scene, player->gun, CrossHairIndex::Gun, size, color, lerpFactor);
+    }
   }
 
   void Hud::drawTurretCrossHair(const CustomCamera& camera, const Scene& scene, const Turret& turret, CrossHairIndex crosshairIndex, float size, Color color, float lerpFactor) const
@@ -241,45 +242,47 @@ namespace game
     static const float x = (screenConfig.width - charSize.x) / 2;
     static const float y = (screenConfig.height - charSize.y) / 4;
 
-    const Car& car = scene.getLocalPlayer();
-
-    if (car.aliveState == Car::Countdown && scene.matchState == Scene::Running)
+    if (const Car* player = scene.tryGetLocalPlayer())
     {
-      const char* text = TextFormat("%i", int(1 + car.getAliveStateTimeout()));
-      print(text, WHITE, x, y, fontSize);
-    }
-    else if (scene.matchState == Scene::Countdown)
-    {
-      const char* text = TextFormat("%i", int(1 + scene.getMatchStateTimeout()));
-      print(text, WHITE, x, y, fontSize);
+      if (player->aliveState == Car::Countdown && scene.matchState == Scene::Running)
+      {
+        const char* text = TextFormat("%i", int(1 + player->getAliveStateTimeout()));
+        print(text, WHITE, x, y, fontSize);
+      }
+      else if (scene.matchState == Scene::Countdown)
+      {
+        const char* text = TextFormat("%i", int(1 + scene.getMatchStateTimeout()));
+        print(text, WHITE, x, y, fontSize);
+      }
     }
   }
 
   void Hud::drawLocalPlayerHealth(const Scene& scene) const
   {
-    const Car& car = scene.getLocalPlayer();
-
-    if (IS_VERTICAL_HEALTH_BAR)
+    if (const Car* player = scene.tryGetLocalPlayer())
     {
-      static const int width = std::min(screenConfig.width, screenConfig.height) / 30;
-      static const int height = screenConfig.height / 3;
-      static const int left = hudConfig.screenMargins;
-      static const int top = screenConfig.height - height - hudConfig.screenMargins;
-      int hpHeight = height * car.health / config.physics.car.maxHealth;
+      if (IS_VERTICAL_HEALTH_BAR)
+      {
+        static const int width = std::min(screenConfig.width, screenConfig.height) / 30;
+        static const int height = screenConfig.height / 3;
+        static const int left = hudConfig.screenMargins;
+        static const int top = screenConfig.height - height - hudConfig.screenMargins;
+        int hpHeight = height * player->health / config.physics.car.maxHealth;
 
-      DrawRectangle(left, top, width, height - hpHeight, DARKGRAY);
-      DrawRectangle(left, top + height - hpHeight, width, hpHeight, RED);
-    }
-    else
-    {
-      static const int width = screenConfig.width / 4;
-      static const int height = std::min(screenConfig.width, screenConfig.height) / 30;
-      static const int left = hudConfig.screenMargins;
-      static const int top = screenConfig.height - height - hudConfig.screenMargins;
-      int hpWidth = width * car.health / config.physics.car.maxHealth;
+        DrawRectangle(left, top, width, height - hpHeight, DARKGRAY);
+        DrawRectangle(left, top + height - hpHeight, width, hpHeight, RED);
+      }
+      else
+      {
+        static const int width = screenConfig.width / 4;
+        static const int height = std::min(screenConfig.width, screenConfig.height) / 30;
+        static const int left = hudConfig.screenMargins;
+        static const int top = screenConfig.height - height - hudConfig.screenMargins;
+        int hpWidth = width * player->health / config.physics.car.maxHealth;
 
-      DrawRectangle(left, top, hpWidth, height, RED);
-      DrawRectangle(left + hpWidth, top, width - hpWidth, height, DARKGRAY);
+        DrawRectangle(left, top, hpWidth, height, RED);
+        DrawRectangle(left + hpWidth, top, width - hpWidth, height, DARKGRAY);
+      }
     }
   }
 
@@ -342,7 +345,7 @@ namespace game
       static const float x = (screenConfig.width - textWidth) / 2;
       print(text, WHITE, x, y, fontSize);
     }
-    else if(scene.matchState == Scene::Running)
+    else if (scene.matchState == Scene::Running)
     {
       float matchStateTimeout = scene.getMatchStateTimeout();
       int mins = int(matchStateTimeout / 60);
@@ -365,29 +368,30 @@ namespace game
     else
       DrawFPS(int(screenMargins), int(screenMargins));
 
-    const Car& player = scene.getLocalPlayer();
-    print("Position", player.position, LIGHTGRAY, screenMargins, screenMargins + lastFontSize);
-    vec3 rotation;
-    player.rotation.toEuler(&rotation.y, &rotation.z, &rotation.x);
-    print("Rotation", rotation, GRAY);
-    print("Force", player.force, RED);
-    print("Moment", player.moment, BLUE);
-    print("Velocity", player.velocity, GREEN);
-    print("Engine Pow.", player.enginePower, YELLOW);
+    if (const Car* player = scene.tryGetLocalPlayer())
+    {
+      print("Position", player->position, LIGHTGRAY, screenMargins, screenMargins + lastFontSize);
+      vec3 rotation;
+      player->rotation.toEuler(&rotation.y, &rotation.z, &rotation.x);
+      print("Rotation", rotation, GRAY);
+      print("Force", player->force, RED);
+      print("Moment", player->moment, BLUE);
+      print("Velocity", player->velocity, GREEN);
+      print("Engine Pow.", player->enginePower, YELLOW);
 
-    print("Angular velocity", player.angularVelocity, BLUE);
-    print("Wheel 1 fr.force", player.frontLeftWheel.frictionForce.length(), LIGHTGRAY);
-    print("Wheel 2 fr.force", player.frontRightWheel.frictionForce.length(), LIGHTGRAY);
-    print("Wheel 3 fr.force", player.rearLeftWheel.frictionForce.length(), LIGHTGRAY);
-    print("Wheel 4 fr.force", player.rearRightWheel.frictionForce.length(), LIGHTGRAY);
+      print("Angular velocity", player->angularVelocity, BLUE);
+      print("Wheel 1 fr.force", player->frontLeftWheel.frictionForce.length(), LIGHTGRAY);
+      print("Wheel 2 fr.force", player->frontRightWheel.frictionForce.length(), LIGHTGRAY);
+      print("Wheel 3 fr.force", player->rearLeftWheel.frictionForce.length(), LIGHTGRAY);
+      print("Wheel 4 fr.force", player->rearRightWheel.frictionForce.length(), LIGHTGRAY);
 
-    print("Cars: ", (float)scene.cars.count(), GREEN);
-    print("Projectiles: ", (float)scene.projectiles.count(), GREEN);
-    print("Explosion particles: ", (float)scene.explosionParticles.count(), GREEN);
+      print("Cars: ", (float)scene.cars.count(), GREEN);
+      print("Projectiles: ", (float)scene.projectiles.count(), GREEN);
+      print("Explosion particles: ", (float)scene.explosionParticles.count(), GREEN);
 
-    print("Trace count:", (float)scene.terrain.traceCount, WHITE);
-    print("Players", (float)scene.cars.count(), LIGHTGRAY);
-    print("Physical Frame Offset", (float)scene.localPhysicalFrame - scene.serverPhysicalFrame, LIGHTGRAY);
-
+      print("Trace count:", (float)scene.terrain.traceCount, WHITE);
+      print("Players", (float)scene.cars.count(), LIGHTGRAY);
+      print("Physical Frame Offset", (float)scene.localPhysicalFrame - scene.serverPhysicalFrame, LIGHTGRAY);
+    }
   }
 }

@@ -43,7 +43,14 @@ namespace game
     drawMatchTimer(scene);
 
     if (drawDebugInfo)
+    {
       drawDebug(scene);
+      static constexpr int width = 500;
+      static constexpr int height = 100;
+      static const int left = config.graphics.screen.width - width - 10;
+      static const int top = config.graphics.screen.height - height - 10;
+      debugGraphs.draw(font, left, top, width, height);
+    }
   }
 
   void Hud::print(const char* text) const

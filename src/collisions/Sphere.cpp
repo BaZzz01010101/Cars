@@ -83,4 +83,18 @@ namespace game
     return true;
   }
 
+  void Sphere::transformBy(vec3 position, quat rotation)
+  {
+    center.rotateBy(rotation);
+    center += position;
+  }
+
+  Sphere Sphere::transformedBy(vec3 position, quat rotation) const
+  {
+    return {
+      .center = center.rotatedBy(rotation) + position,
+      .radius = radius,
+    };
+  }
+
 }

@@ -45,10 +45,10 @@ namespace game
     if (drawDebugInfo)
     {
       drawDebug(scene);
-      static constexpr int width = 500;
-      static constexpr int height = 100;
-      static const int left = config.graphics.screen.width - width - 10;
-      static const int top = config.graphics.screen.height - height - 10;
+      static constexpr float width = 500;
+      static constexpr float height = 100;
+      static const float left = config.graphics.screen.width - width - 10;
+      static const float top = config.graphics.screen.height - height - 10;
       debugGraphs.draw(font, left, top, width, height);
     }
   }

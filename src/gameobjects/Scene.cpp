@@ -415,8 +415,9 @@ namespace game
   void Scene::regenerateTerrain(Terrain::Mode mode)
   {
     terrain.generate(mode);
-    Car& player = cars[localPlayerIndex];
-    resetPlayer(player.position, player.rotation);
+
+    if (Car* player = tryGetLocalPlayer())
+      resetPlayer(player->position, player->rotation);
   }
 
   void Scene::reset()
@@ -439,11 +440,13 @@ namespace game
 
   void Scene::resetPlayer(vec3 playerPosition, quat playerRotation)
   {
+    if (Car* player = tryGetLocalPlayer())
+    {
       float terrainY = terrain.getHeight(playerPosition.x, playerPosition.z);
       playerPosition.y = terrainY + 2;
-    Car& player = cars[localPlayerIndex];
-    player.resetToPosition(playerPosition, playerRotation);
+      player->resetToPosition(playerPosition, playerRotation);
     }
+  }
 
   const Car* Scene::tryGetLocalPlayer() const
   {
@@ -452,7 +455,7 @@ namespace game
 
   Car* Scene::tryGetLocalPlayer()
   {
-    return tryGetPlayer(localPlayerGuid);
+    return localPlayerIndex >= 0 ? &cars[localPlayerIndex] : nullptr;
   }
 
   const Car* Scene::tryGetPlayer(uint64_t guid) const

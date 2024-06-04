@@ -38,9 +38,6 @@ namespace game
 
   void Hud::draw(const CustomCamera& camera, const Scene& scene, float lerpFactor) const
   {
-    if (scene.localPlayerIndex < 0)
-      return;
-
     drawCrossHairs(camera, scene, lerpFactor);
     drawCountdown(scene);
     drawLocalPlayerHealth(scene);

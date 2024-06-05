@@ -16,9 +16,13 @@ namespace game
 
   void Renderer::init(const WindowConfig& windowConfig)
   {
-    SetConfigFlags(FLAG_VSYNC_HINT);
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
-    //SetConfigFlags(FLAG_FULLSCREEN_MODE);
+    int flags =
+      //FLAG_VSYNC_HINT |
+      FLAG_MSAA_4X_HINT |
+      //FLAG_FULLSCREEN_MODE |
+      0;
+
+    SetConfigFlags(flags);
     InitWindow(config.graphics.screen.width, config.graphics.screen.height, config.graphics.screen.title);
     vec2 currentPosition = GetWindowPosition();
     int left = windowConfig.left == WindowConfig::DEFAULT.left ? (int)currentPosition.x : windowConfig.left;

@@ -92,8 +92,8 @@ namespace game
     .graphics = {
       .screen = {
         .title = "Mad Max",
-        .width = 1280,
-        .height = 500,
+        .width = 2500,
+        .height = 1000,
       },
       .camera = {
         .focusElevation = 4,

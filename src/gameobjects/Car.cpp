@@ -170,8 +170,7 @@ namespace game
     std::vector<Sphere> worldCarSpheres;
     worldCarSpheres.reserve(MAX_SPHERES);
 
-    // TODO: Consider moving update collisions to Scene to optimize from O(n^2) to O(log(n))
-    // by applying forces to both this and other car in each iteration
+    // TODO: Consider moving update collisions to Scene to reduce number of pairs by half
     if (aliveState != Car::Countdown && aliveState != Car::Hidden)
       for (int i = 0; i < scene.cars.capacity(); i++)
         if (scene.cars.isAlive(i) && &scene.cars[i] != this && scene.cars[i].aliveState != Car::Countdown && scene.cars[i].aliveState != Car::Hidden)

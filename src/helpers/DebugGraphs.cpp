@@ -146,11 +146,17 @@ namespace game
 
   void DebugGraphs::selectNext()
   {
+    if(graphs.empty())
+      return;
+
     selectedIndex = (selectedIndex + 1) % graphs.size();
   }
 
   void DebugGraphs::selectPrev()
   {
+    if(graphs.empty())
+      return;
+
     selectedIndex = int((selectedIndex - 1 + graphs.size()) % graphs.size());
   }
 

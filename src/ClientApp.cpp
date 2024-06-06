@@ -107,8 +107,9 @@ namespace game
   void ClientApp::onConnected(uint64_t guid)
   {
     printf("CLIENT_APP: OnConnected, my guid: %" PRIu64 "\n", guid);
+    scene.localPlayerIndex = -1;
     scene.localPlayerGuid = guid;
-    scene.reset();
+    scene.clear();
     matchStats.clear();
   }
 
@@ -119,7 +120,6 @@ namespace game
       printf("CLIENT_APP: Server version mismatch! Client: %s, Server: %s\n", VERSION.toString().c_str(), serverVersion.version.toString().c_str());
       exit = true;
       network.disconnect();
-      return;
     }
   }
 
@@ -132,6 +132,12 @@ namespace game
   void ClientApp::onPlayerJoin(const PlayerJoin& playerJoin)
   {
     printf("CLIENT_APP: OnPlayerJoin: %" PRIu64 "\n", playerJoin.guid);
+
+    if (scene.tryGetPlayer(playerJoin.guid))
+    {
+      printf("CLIENT_APP: WARNING!!! Player already exists.\n");
+      return;
+    }
 
     int index = scene.cars.tryAdd(playerJoin.guid, config, scene);
 
@@ -223,8 +229,6 @@ namespace game
   {
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_ALT) && IsKeyPressed(KEY_SPACE))
     {
-      scene.localPlayerIndex = -1;
-      scene.cars.clear();
       network.disconnect();
       network.connect();
     }

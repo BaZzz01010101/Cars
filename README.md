@@ -39,10 +39,10 @@ It's a good idea to increase the version in the **version.hpp** file every time 
 ## Controls
 Use WSAD + Mouse to control the car and weapon.
 Most of the hotkeys can be found in **ClientApp.cpp** in the **updateShortcuts** method. Here is the list of them:
-- `W` - accelerate
-- `S` - brake / reverse
-- `A` - turn left
-- `D` - turn right
+- `W` / `UP` - accelerate
+- `S` / `DOWN` - brake / reverse
+- `A` / `LEFT` - turn left
+- `D` / `RIGHT` - turn right
 - `SPACE` - handbrake
 - `LEFT MOUSE BUTTON` - primary fire (machine gun)
 - `RIGHT MOUSE BUTTON` - secondary fire (cannon)

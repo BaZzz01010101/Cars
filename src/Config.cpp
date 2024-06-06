@@ -161,7 +161,7 @@ namespace game
         .tree1ModelPath = "resources/models/tree1.gltf",
         .tree2ModelPath = "resources/models/tree2.gltf",
         .rockModelPath = "resources/models/rock.gltf",
-        .crosshairsTexturePath = "resources/textures/crosshairs_white.png",
+        .crosshairsTexturePath = "resources/textures/crosshairs.png",
       },
     },
     .collisionGeometries = {

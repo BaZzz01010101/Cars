@@ -64,9 +64,11 @@ namespace game
     {
       // TODO: consider possible optimizations in physics calculations
       // by getting rid of 'dt' parameter in 'update' methods and by using fixed 'dt' from config
-      update(fixedDt);
+      scene.update(fixedDt);
       dtAccumulator -= fixedDt;
     }
+
+    hud.update();
 
     float lerpFactor = scene.matchState == Scene::Scoreboard ? 1 : dtAccumulator / fixedDt;
     updateCamera(dt, lerpFactor);
@@ -81,20 +83,6 @@ namespace game
   {
     renderer.shutdown();
     network.disconnect();
-  }
-
-  void ClientApp::update(float dt)
-  {
-    if (dt > config.physics.fixedDt)
-    {
-      update(0.5f * dt);
-      update(0.5f * dt);
-
-      return;
-    }
-
-    scene.update(dt);
-    hud.update();
   }
 
   void ClientApp::onConnected(uint64_t guid)

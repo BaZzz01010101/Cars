@@ -35,7 +35,6 @@ namespace game
     void initialize();
     bool pulse();
     void shutdown();
-    void update(float dt);
     void updateShortcuts();
     void sendLocalPlayerControl();
     void updateCamera(float dt, float lerpFactor);

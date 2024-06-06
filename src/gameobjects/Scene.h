@@ -63,8 +63,6 @@ namespace game
     SemiVector<Kill, MAX_CARS> kills {};
 
     bool isServer = false;
-    bool paused = false;
-    bool slowMotion = false;
     vec3 gunRayHit = vec3::zero;
     vec3 cannonRayHit = vec3::zero;
     // TODO: Consider getting rid of local player index in favor of guid

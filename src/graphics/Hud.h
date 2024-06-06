@@ -28,7 +28,6 @@ namespace game
     Texture crosshairsTexture {};
     mutable DebugGraphs debugGraphs {};
     bool crosshairsTextureLoaded = false;
-    bool paused = false;
     bool drawDebugInfo = false;
     bool showNetworkIssuesWarning = false;
 

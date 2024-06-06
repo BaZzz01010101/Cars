@@ -21,40 +21,33 @@ namespace game
     localPhysicalFrame++;
     terrain.traceCount = 0;
 
-    thread_local int slowMoCounter = 0;
-    const int slowMoCounterMax = 40;
-    slowMoCounter = (slowMoCounter + 1) % slowMoCounterMax;
-
-    if (!paused && (!slowMotion || slowMoCounter == 0))
+    if (isServer)
     {
-      if (isServer)
-      {
-        clearHits();
-        clearKills();
-      }
-
-      if (matchState != Scoreboard)
-      {
-        //// Kills 1st player for debug purposes
-        // if (isServer && IsKeyDown(KEY_K))
-        //   hits->add({ .tick = 0, .attackerIndex = 0, .damage = 100 });
-
-        updateProjectiles(dt);
-        updateCars(dt);
-
-        if (!isServer)
-          updateExplosionParticles(dt);
-      }
-
-      if (isServer && matchState == Running)
-      {
-        applyHits();
-        applyKills();
-        updateRespawn();
-      }
-
-      updateMatchTimeout(dt);
+      clearHits();
+      clearKills();
     }
+
+    if (matchState != Scoreboard)
+    {
+      //// Kills 1st player for debug purposes
+      // if (isServer && IsKeyDown(KEY_K))
+      //   hits->add({ .tick = 0, .attackerIndex = 0, .damage = 100 });
+
+      updateProjectiles(dt);
+      updateCars(dt);
+
+      if (!isServer)
+        updateExplosionParticles(dt);
+    }
+
+    if (isServer && matchState == Running)
+    {
+      applyHits();
+      applyKills();
+      updateRespawn();
+    }
+
+    updateMatchTimeout(dt);
   }
 
   void Scene::updateProjectiles(float dt)
@@ -343,9 +336,6 @@ namespace game
       if (cars.isAlive(i))
       {
         Car& player = cars[i];
-
-        if (IsKeyPressed(KEY_F7))
-          player.velocity = vec2::randomInRing(10, 10).intoXZWithY(randf(5, 10));
 
         if (player.health <= 0)
           continue;

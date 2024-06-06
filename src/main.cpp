@@ -31,7 +31,7 @@ void runBoth(const Args& args, const Config& config)
 {
   ServerApp* server = new ServerApp(config, args.serverConfig);
   ClientApp* client = new ClientApp(config, args.windowConfig, args.serverConfig);
-  bool renderServerPlayers = true;
+  bool renderServerPlayers = false;
   high_resolution_clock clock {};
   const uint64_t fixedDt = uint64_t(nanoseconds::period::den * config.physics.fixedDt);
 

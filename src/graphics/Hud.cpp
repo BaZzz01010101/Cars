@@ -149,13 +149,10 @@ namespace game
   {
     print(TextFormat("%-10s: %5.1f |%5.1f |%5.1f :%5.1f", title, v.x, v.y, v.z, v.length()), color, posX, posY, fontSize);
 
-    if (!paused)
-    {
-      debugGraphs.logValue(std::string(title) + ".x", color, v.x);
-      debugGraphs.logValue(std::string(title) + ".y", color, v.y);
-      debugGraphs.logValue(std::string(title) + ".z", color, v.z);
-      debugGraphs.logValue(std::string(title) + ".len", color, v.length());
-    }
+    debugGraphs.logValue(std::string(title) + ".x", color, v.x);
+    debugGraphs.logValue(std::string(title) + ".y", color, v.y);
+    debugGraphs.logValue(std::string(title) + ".z", color, v.z);
+    debugGraphs.logValue(std::string(title) + ".len", color, v.length());
   }
 
   void Hud::print(const char* title, float f) const
@@ -181,9 +178,7 @@ namespace game
   void Hud::print(const char* title, float f, Color color, float posX, float posY, float fontSize) const
   {
     print(TextFormat("%-10s: %5.1f", title, f), color, posX, posY, fontSize);
-
-    if (!paused)
-      debugGraphs.logValue(title, color, f);
+    debugGraphs.logValue(title, color, f);
   }
 
   void Hud::drawCrossHairs(const CustomCamera& camera, const Scene& scene, float lerpFactor) const
@@ -379,10 +374,7 @@ namespace game
     lastFontSize = hudConfig.fontSize;
     static const float screenMargins = float(hudConfig.screenMargins);
 
-    if (paused)
-      print("Paused", YELLOW, screenMargins, screenMargins);
-    else
-      DrawFPS(int(screenMargins), int(screenMargins));
+    DrawFPS(int(screenMargins), int(screenMargins));
 
     if (const Car* player = scene.tryGetLocalPlayer())
     {

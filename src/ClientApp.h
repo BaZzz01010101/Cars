@@ -28,7 +28,6 @@ namespace game
     MatchStats matchStats {};
 
     float dtAccumulator = 0;
-    bool paused = false;
     bool drawDebugInfo = false;
 
     ClientApp(const Config& config, const WindowConfig& windowConfig, const ServerConfig& serverConfig);
@@ -36,7 +35,6 @@ namespace game
     void initialize();
     bool pulse();
     void shutdown();
-    void togglePaused();
     void update(float dt);
     void updateShortcuts();
     void sendLocalPlayerControl();

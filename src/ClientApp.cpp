@@ -28,7 +28,6 @@ namespace game
     hud.init();
     renderer.updateTerrainModel();
     dtAccumulator = 0;
-    paused = false;
   }
 
   bool ClientApp::pulse()
@@ -96,13 +95,6 @@ namespace game
 
     scene.update(dt);
     hud.update();
-  }
-
-  void ClientApp::togglePaused()
-  {
-    paused = !paused;
-    scene.paused = paused;
-    hud.paused = paused;
   }
 
   void ClientApp::onConnected(uint64_t guid)
@@ -249,14 +241,8 @@ namespace game
           break;
       }
 
-    if (IsKeyPressed(KEY_P))
-      togglePaused();
-
     if (IsKeyPressed(KEY_Y))
       camera.invertY = !camera.invertY;
-
-    if (IsKeyPressed(KEY_O))
-      scene.slowMotion = !scene.slowMotion;
 
     if (IsKeyPressed(KEY_T))
       renderer.drawWires = !renderer.drawWires;
@@ -267,27 +253,6 @@ namespace game
       renderer.drawDebugInfo = drawDebugInfo;
       hud.drawDebugInfo = drawDebugInfo;
     }
-
-    if (IsKeyPressed(KEY_ZERO))
-    {
-      scene.regenerateTerrain(Terrain::Normal);
-      renderer.updateTerrainModel();
-    }
-
-    if (IsKeyPressed(KEY_ONE))
-    {
-      scene.regenerateTerrain(Terrain::Debug1);
-      renderer.updateTerrainModel();
-    }
-
-    if (IsKeyPressed(KEY_TWO))
-    {
-      scene.regenerateTerrain(Terrain::Debug2);
-      renderer.updateTerrainModel();
-    }
-
-    if (IsKeyPressed(KEY_F1))
-      scene.resetPlayer(vec3::zero, quat::identity);
 
     if (IsKeyPressed(KEY_TAB) || IsKeyPressedRepeat(KEY_TAB))
     {
@@ -305,42 +270,6 @@ namespace game
 
     if (IsKeyPressed(KEY_BACKSPACE))
       hud.debugGraphs.removeAll();
-
-    if (Car* player = scene.tryGetLocalPlayer())
-    {
-      if (IsKeyPressed(KEY_R))
-        player->rotation = player->rotation * quat::fromEuler(PI / 2, 0, 0);
-
-      if (IsKeyPressed(KEY_F2))
-      {
-        scene.resetPlayer({ 0, 0, 25 }, quat::identity);
-        player->rotation = quat::fromEuler(0, 0, 0.19f * PI);
-      }
-
-      if (IsKeyPressed(KEY_F3))
-      {
-        scene.resetPlayer({ 0, 0, 25 }, quat::identity);
-        player->rotation = quat::fromEuler(0, 0, 0.18f * PI);
-        player->rotation = player->rotation * quat::fromEuler(PI / 2, 0, 0);
-        player->rotation = player->rotation * quat::fromEuler(0, 0, 0.02f * PI);
-      }
-
-      if (IsKeyPressed(KEY_F4))
-      {
-        PlayerState playerState = {
-          .physicalFrame = scene.localPhysicalFrame,
-          .guid = scene.localPlayerGuid,
-          .position = {-1, 7, 0},
-          .rotation = quat::identity.rotatedByYAngle(PI / 2),
-          .velocity = {randf(20, 50) * sign(randf(-1, 1)), 0, randf(20, 50) * sign(randf(-1, 1))},
-          .angularVelocity = {0, 0, 0},
-        };
-
-        playerState.position.y = 2 + scene.terrain.getHeight(playerState.position.x, playerState.position.z, nullptr);
-
-        player->syncState(playerState, 1.0f);
-      }
-    }
   }
 
   void ClientApp::sendLocalPlayerControl()

@@ -16,6 +16,7 @@
     <ProjectGuid>{1931600c-4fb4-4491-92b0-8689726be2a5}</ProjectGuid>
     <RootNamespace>madmax</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>cars</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">

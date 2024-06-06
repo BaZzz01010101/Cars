@@ -292,8 +292,8 @@ namespace game
       PlayerControl playerControl = {
         .physicalFrame = scene.localPhysicalFrame,
         .guid = player->guid,
-        .steeringAxis = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D)),
-        .accelerationAxis = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S)),
+        .steeringAxis = float(IsKeyDown(KEY_A) - IsKeyDown(KEY_D) + IsKeyDown(KEY_LEFT) - IsKeyDown(KEY_RIGHT)),
+        .accelerationAxis = float(IsKeyDown(KEY_W) - IsKeyDown(KEY_S) + IsKeyDown(KEY_UP) - IsKeyDown(KEY_DOWN)),
         .thrustAxis = float(IsKeyDown(KEY_LEFT_SHIFT)),
         .target = target,
         .primaryFire = IsMouseButtonDown(MOUSE_LEFT_BUTTON),

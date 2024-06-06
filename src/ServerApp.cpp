@@ -52,10 +52,10 @@ namespace game
       if (scene.cars.count() > 0)
       {
         scene.update(config.physics.fixedDt);
+        updateMatchRestart();
         sendPlayerStates();
         sendPlayerHits();
         sendPlayerKills();
-        updateMatchRestart();
       }
 
       network.update();
@@ -131,7 +131,6 @@ namespace game
       }
 
       broadcastMatchState(true);
-      sendPlayerStates();
     }
   }
 

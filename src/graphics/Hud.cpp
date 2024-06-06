@@ -44,6 +44,9 @@ namespace game
     drawMatchStats(scene);
     drawMatchTimer(scene);
 
+    if (showNetworkIssuesWarning)
+      drawNetworkIssuesWarning(scene);
+
     if (drawDebugInfo)
     {
       drawDebug(scene);
@@ -359,6 +362,16 @@ namespace game
       static const float x = (screenConfig.width - textWidth) / 2;
       print(text, WHITE, x, y, fontSize);
     }
+  }
+
+  void Hud::drawNetworkIssuesWarning(const Scene& scene) const
+  {
+    static const char* text = "Connection is unstable!";
+    static const float fontSize = hudConfig.matchTimerFontSize;
+    static const vec2 textSize = MeasureTextEx(font, text, fontSize, 0);
+    static const float x = (screenConfig.width - textSize.x) / 2;
+    static const float y = screenConfig.height - textSize.y - hudConfig.screenMargins;
+    print(text, WHITE, x, y, fontSize);
   }
 
   void Hud::drawDebug(const Scene& scene) const

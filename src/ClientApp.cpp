@@ -50,6 +50,7 @@ namespace game
     sendLocalPlayerControl();
 
     network.update();
+    hud.showNetworkIssuesWarning = network.isNetworkIssues();
 
     float dt = GetFrameTime();
     dtAccumulator += dt;

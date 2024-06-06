@@ -30,6 +30,7 @@ namespace game
     bool crosshairsTextureLoaded = false;
     bool paused = false;
     bool drawDebugInfo = false;
+    bool showNetworkIssuesWarning = false;
 
     mutable vec2 crossHairPositions[CROSS_HAIR_COUNT] = {
       vec2::zero,
@@ -84,6 +85,7 @@ namespace game
     void drawLocalPlayerHealth(const Scene& scene) const;
     void drawMatchStats(const Scene& scene) const;
     void drawMatchTimer(const Scene& scene) const;
+    void drawNetworkIssuesWarning(const Scene& scene) const;
     void drawDebug(const Scene& scene) const;
   };
 

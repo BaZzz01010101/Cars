@@ -36,6 +36,7 @@ namespace network
 
     SocketDescriptor sd;
     peer->Startup(1, &sd, 1);
+    resetTimeouts();
 
     ConnectionAttemptResult result = peer->Connect(serverAddress, serverPort, password, (int)strlen(password));
 
@@ -137,9 +138,11 @@ namespace network
   void RakNetClient::update()
   {
     MessageID type;
+    updateNetworkIssuesTimeout();
 
     while (Packet* packet = peer->Receive())
     {
+      networkIssuesTimeout = NETWORK_ISSUES_TIMEOUT;
       BitStream stream(packet->data, packet->length, false);
       stream.Read(type);
       //printf("CLIENT: Receive packet type: %i\n", (int)type);
@@ -223,6 +226,28 @@ namespace network
       if(isConnected())
         peer->DeallocatePacket(packet);
     }
+  }
+
+  void RakNetClient::resetTimeouts()
+  {
+    networkIssuesTimeout = NETWORK_ISSUES_TIMEOUT;
+    networkIssuesCooldown = 0;
+  }
+
+  void RakNetClient::updateNetworkIssuesTimeout()
+  {
+    static std::chrono::steady_clock clock;
+    static time_point lastTime = clock.now();
+
+    time_point currentTime = clock.now();
+    float elapsed = duration_cast<microseconds>(clock.now() - lastTime).count() / 1000000.0f;
+    lastTime = currentTime;
+
+    networkIssuesTimeout = std::max(0.0f, networkIssuesTimeout - elapsed);
+    networkIssuesCooldown = std::max(0.0f, networkIssuesCooldown - elapsed);
+
+    if(networkIssuesTimeout == 0)
+      networkIssuesCooldown = NETWORK_ISSUES_COOLDOWN;
   }
 
 }

@@ -107,7 +107,7 @@ namespace game
 
 #ifdef _DEBUG
     // This is for debugging puposes only and allows to view types objects in the debugger.
-    Type (&objects)[BUF_SIZE / sizeof(Type)] = reinterpret_cast<Type(&)[BUF_SIZE / sizeof(Type)]>(buf);
+    Type(&objects)[BUF_SIZE / sizeof(Type)] = reinterpret_cast<Type(&)[BUF_SIZE / sizeof(Type)]>(buf);
 #endif
 
     BoolArray<Capacity> alive { false };

@@ -223,7 +223,7 @@ namespace network
           break;
       }
 
-      if(isConnected())
+      if (isConnected())
         peer->DeallocatePacket(packet);
     }
   }
@@ -246,7 +246,7 @@ namespace network
     networkIssuesTimeout = std::max(0.0f, networkIssuesTimeout - elapsed);
     networkIssuesCooldown = std::max(0.0f, networkIssuesCooldown - elapsed);
 
-    if(networkIssuesTimeout == 0)
+    if (networkIssuesTimeout == 0)
       networkIssuesCooldown = NETWORK_ISSUES_COOLDOWN;
   }
 

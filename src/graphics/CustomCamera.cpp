@@ -15,7 +15,7 @@ namespace game
     static const Config::Graphics::Camera& cameraConfig = config.graphics.camera;
     Vector2 mouseDelta {};
 
-    if(IsWindowFocused())
+    if (IsWindowFocused())
     {
       mouseDelta = GetMouseDelta();
       HideCursor();
@@ -25,7 +25,7 @@ namespace game
       ShowCursor();
 
     float sensitivityModifier = 0.001f;
-    
+
     if (mode == Mode::Zoom)
       sensitivityModifier /= config.graphics.camera.zoomFactor;
 
@@ -54,7 +54,7 @@ namespace game
     else
       distanceFromFocus = moveTo(distanceFromFocus, cameraConfig.maxDistanceFromFocus, cameraConfig.pursuitSharpness * dt);
 
-    if(mode == Mode::Normal)
+    if (mode == Mode::Normal)
       camera.fovy = moveTo(camera.fovy, 90, ZOOM_SPEED * dt);
     else if (mode == Mode::Zoom)
       camera.fovy = moveTo(camera.fovy, 90 / config.graphics.camera.zoomFactor, ZOOM_SPEED * dt);

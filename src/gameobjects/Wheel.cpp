@@ -93,7 +93,7 @@ namespace game
 
     suspensionOffset = clamp(suspensionOffset, -wheelConfig.maxSuspensionOffset, wheelConfig.maxSuspensionOffset);
     wheelRotation.rotateByXAngle(wheelRotationSpeed * dt);
-    
+
     position.y += suspensionOffset;
     rotation = rotation * wheelRotation;
   }

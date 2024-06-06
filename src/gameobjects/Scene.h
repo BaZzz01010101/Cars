@@ -28,7 +28,7 @@ namespace game
     struct Hit
     {
       uint64_t tick {};
-      uint64_t attackerGuid{};
+      uint64_t attackerGuid {};
       int damage {};
     };
 

@@ -198,8 +198,8 @@ namespace game
     scene.matchTimeout = matchState.matchTimeout;
     Scene::MatchState lastMatchState = scene.matchState;
     scene.updateMatchState();
-    
-    if(matchState.shouldResetMatchStats)
+
+    if (matchState.shouldResetMatchStats)
     {
       scene.reset();
       matchStats.reset();

@@ -66,13 +66,13 @@ namespace game
     for (int i = 0; i < spheres.size(); i++)
       if (spheres[i].collideWith(sphere, collisionPoint, collisionNormal, penetration))
       {
-        if(collisionPoint)
+        if (collisionPoint)
           avgCollisionPosition += *collisionPoint;
-        
-        if(collisionNormal)
+
+        if (collisionNormal)
           avgCollisionNormal += *collisionNormal;
 
-        if(penetration)
+        if (penetration)
           avgPenetration += *penetration;
 
         collisionCount++;

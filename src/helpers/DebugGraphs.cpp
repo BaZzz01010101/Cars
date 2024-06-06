@@ -7,7 +7,8 @@ namespace game
 
   DebugGraph::DebugGraph(std::string name, Color color)
     : name(name), color(color), graph(GRAPH_SIZE, 0)
-  {}
+  {
+  }
 
   void DebugGraph::logValue(float value)
   {
@@ -112,7 +113,8 @@ namespace game
   }
 
   DebugGraphs::DebugGraphs()
-  {}
+  {
+  }
 
   void DebugGraphs::draw(Font font, float posX, float posY, float width, float height)
   {
@@ -146,7 +148,7 @@ namespace game
 
   void DebugGraphs::selectNext()
   {
-    if(graphs.empty())
+    if (graphs.empty())
       return;
 
     selectedIndex = (selectedIndex + 1) % graphs.size();
@@ -154,7 +156,7 @@ namespace game
 
   void DebugGraphs::selectPrev()
   {
-    if(graphs.empty())
+    if (graphs.empty())
       return;
 
     selectedIndex = int((selectedIndex - 1 + graphs.size()) % graphs.size());

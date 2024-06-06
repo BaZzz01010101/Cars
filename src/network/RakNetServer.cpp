@@ -27,7 +27,7 @@ namespace network
     peer->SetMaximumIncomingConnections(maxConnections);
     peer->SetIncomingPassword(config.password, (int)strlen(config.password));
 
-    if(config.host[0])
+    if (config.host[0])
       printf("SERVER: Started. Waiting for connections on %s:%i\n", config.host, config.port);
     else
       printf("SERVER: Started. Waiting for connections on port %i (all interfaces)\n", config.port);
@@ -131,7 +131,7 @@ namespace network
   {
     auto it = lastMessageTimes.begin();
 
-    while(it != lastMessageTimes.end())
+    while (it != lastMessageTimes.end())
     {
       auto [guid, time] = *it;
 

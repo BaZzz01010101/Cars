@@ -319,7 +319,7 @@ namespace game
         scene.switchToMatchState(Scene::Scoreboard);
         broadcastMatchState(false);
       }
-      else if(scene.matchState == Scene::Countdown)
+      else if (scene.matchState == Scene::Countdown)
       {
         scene.reset();
         scene.switchToMatchState(Scene::Running);

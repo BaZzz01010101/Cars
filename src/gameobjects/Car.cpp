@@ -329,7 +329,7 @@ namespace game
 
   void Car::syncState(const PlayerState& playerState, float syncFactor)
   {
-    bool isRespawn = playerState.velocity.isZero() && !(playerState.position - position).isAlmostZero(0.01f) ;
+    bool isRespawn = playerState.velocity.isZero() && !(playerState.position - position).isAlmostZero(0.01f);
 
     if (isRespawn)
       resetToPosition(playerState.position, playerState.rotation);
@@ -375,7 +375,7 @@ namespace game
     if (steeringAxis == FLT_MAX)
       return;
 
-    float maxSteeringAngle = mapRangeClamped(velocity.length() , 0.25f * carConfig.maxForwardSpeed, carConfig.maxForwardSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
+    float maxSteeringAngle = mapRangeClamped(velocity.length(), 0.25f * carConfig.maxForwardSpeed, carConfig.maxForwardSpeed, carConfig.maxSteeringAngle, carConfig.minSteeringAngle);
     //float maxSteeringSpeed = mapRangeClamped(velocity.length(), 0, carConfig.maxSpeed, carConfig.maxSteeringSpeed, carConfig.maxSteeringSpeed * 0.5f);
 
     if (steeringAxis == 0.0f)
@@ -433,7 +433,7 @@ namespace game
 
   void Car::updateAliveStateTimeout(float dt)
   {
-    if(aliveState != Alive && aliveState != Hidden)
+    if (aliveState != Alive && aliveState != Hidden)
     {
       aliveStateTimeout = std::max(0.0f, aliveStateTimeout - dt);
       updateAliveState();

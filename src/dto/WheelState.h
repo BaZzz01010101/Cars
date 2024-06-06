@@ -2,7 +2,7 @@
 
 namespace dto
 {
- 
+
   struct WheelState
   {
     float suspensionOffset {};

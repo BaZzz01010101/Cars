@@ -60,10 +60,12 @@ namespace game
   }
 
   quat::quat(Quaternion q) : Quaternion { q }
-  {}
+  {
+  }
 
   quat::quat(float x, float y, float z, float w) : Quaternion { x, y, z, w }
-  {}
+  {
+  }
 
   quat quat::operator*(quat q) const
   {
@@ -77,7 +79,7 @@ namespace game
 
   bool quat::operator!=(quat q) const
   {
-      return !(*this == q);
+    return !(*this == q);
   }
 
   quat quat::inverted() const

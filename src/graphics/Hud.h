@@ -12,7 +12,7 @@ namespace game
     enum CrossHairIndex : int
     {
       Camera = 0,
-      Cannon, 
+      Cannon,
       Gun,
       CROSS_HAIR_COUNT
     };

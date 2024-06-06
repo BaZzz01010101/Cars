@@ -7,6 +7,7 @@
 #include "PlayerHit.h"
 #include "PlayerKill.h"
 #include "MatchState.h"
+#include "ServerVersion.h"
 
 namespace network
 {
@@ -16,6 +17,7 @@ namespace network
   {
   public:
     virtual void onConnected(uint64_t guid) = 0;
+    virtual void onServerVersion(const ServerVersion& serverVersion) = 0;
     virtual void onDisconnected(uint64_t guid) = 0;
     virtual void onPlayerJoin(const PlayerJoin& playerJoin) = 0;
     virtual void onPlayerLeave(const PlayerLeave& playerLeave) = 0;

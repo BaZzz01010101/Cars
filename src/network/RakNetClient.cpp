@@ -206,12 +206,21 @@ namespace network
           break;
         }
 
+        case ID_SERVER_VERSION:
+        {
+          ServerVersion serverVersion;
+          serverVersion.readFrom(stream);
+          messageHandler.onServerVersion(serverVersion);
+          break;
+        }
+
         default:
           printf("CLIENT: Unknown message: %i\n", packet->data[0]);
           break;
       }
 
-      peer->DeallocatePacket(packet);
+      if(isConnected())
+        peer->DeallocatePacket(packet);
     }
   }
 

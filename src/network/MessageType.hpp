@@ -13,6 +13,7 @@ namespace game
     ID_PLAYER_JOIN,
     ID_PLAYER_LEAVE,
     ID_MATCH_STATE,
+    ID_SERVER_VERSION,
   };
 
 }

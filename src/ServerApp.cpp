@@ -6,6 +6,7 @@
 #include "PlayerHit.h"
 #include "PlayerKill.h"
 #include "MatchState.h"
+#include "ServerVersion.h"
 
 namespace game
 {
@@ -20,7 +21,7 @@ namespace game
 
   void ServerApp::initialize()
   {
-    printf("Server started:\n");
+    printf("Server Version: %s\n", VERSION.toString().c_str());
     scene.init();
     network.start();
     maxSleep = nanoseconds(0);
@@ -240,6 +241,10 @@ namespace game
       sendMatchState(guid, false);
     }
 
+    BitStream stream;
+    ServerVersion { VERSION }.writeTo(stream);
+    network.send(stream, guid, true);
+
     // TODO: Need to find a way to hide the car on client who is currently joining with countdown
     PlayerJoin playerJoin = {
       .physicalFrame = scene.localPhysicalFrame,
@@ -251,7 +256,7 @@ namespace game
       .deaths = 0,
     };
 
-    BitStream stream;
+    stream.Reset();
     playerJoin.writeTo(stream);
     network.broadcastExcept(stream, guid, true);
 
@@ -273,7 +278,7 @@ namespace game
           .deaths = playerDeaths,
         };
 
-        BitStream stream;
+        stream.Reset();
         playerJoin.writeTo(stream);
         network.send(stream, guid, true);
       }

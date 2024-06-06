@@ -19,6 +19,7 @@
 #include <chrono>
 #include <cinttypes>
 #include <numeric>
+#include <format>
 
 #include "raylib.h"
 #include "raymath.h"

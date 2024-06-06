@@ -22,6 +22,7 @@ namespace game
 
   void ClientApp::initialize()
   {
+    printf("Client Version: %s\n", VERSION.toString().c_str());
     renderer.init(windowConfig);
     scene.init();
     hud.init();
@@ -109,6 +110,17 @@ namespace game
     scene.localPlayerGuid = guid;
     scene.reset();
     matchStats.clear();
+  }
+
+  void ClientApp::onServerVersion(const ServerVersion& serverVersion)
+  {
+    if (serverVersion.version != VERSION)
+    {
+      printf("CLIENT_APP: Server version mismatch! Client: %s, Server: %s\n", VERSION.toString().c_str(), serverVersion.version.toString().c_str());
+      exit = true;
+      network.disconnect();
+      return;
+    }
   }
 
   void ClientApp::onDisconnected(uint64_t guid)

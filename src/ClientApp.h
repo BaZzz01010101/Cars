@@ -43,6 +43,7 @@ namespace game
     void updateCamera(float dt, float lerpFactor);
 
     virtual void onConnected(uint64_t guid) override;
+    virtual void onServerVersion(const ServerVersion& serverVersion) override;
     virtual void onDisconnected(uint64_t guid) override;
     virtual void onPlayerJoin(const PlayerJoin& playerJoin) override;
     virtual void onPlayerLeave(const PlayerLeave& playerLeave) override;

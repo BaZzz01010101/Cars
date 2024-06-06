@@ -116,6 +116,9 @@
     <ClCompile Include="src\dto\MatchState.cpp">
       <Filter>dto</Filter>
     </ClCompile>
+    <ClCompile Include="src\dto\ServerVersion.cpp">
+      <Filter>dto</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ClientApp.h" />
@@ -260,6 +263,10 @@
     <ClInclude Include="src\dto\MatchState.h">
       <Filter>dto</Filter>
     </ClInclude>
+    <ClInclude Include="src\dto\ServerVersion.h">
+      <Filter>dto</Filter>
+    </ClInclude>
+    <ClInclude Include="src\version.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

@@ -84,6 +84,7 @@ namespace game
     void init();
     void update(float dt);
     void regenerateTerrain(Terrain::Mode mode);
+    void clear();
     void reset();
     void resetPlayer(vec3 playerPosition, quat playerRotation);
 

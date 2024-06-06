@@ -420,6 +420,16 @@ namespace game
       resetPlayer(player->position, player->rotation);
   }
 
+  void Scene::clear()
+  {
+    cars.clear();
+    projectiles.clear();
+    explosionParticles.clear();
+
+    clearHits();
+    clearKills();
+  }
+
   void Scene::reset()
   {
     for (int i = 0; i < MAX_CARS; i++)

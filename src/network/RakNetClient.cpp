@@ -136,11 +136,12 @@ namespace network
 
   void RakNetClient::update()
   {
+    MessageID type;
+
     while (Packet* packet = peer->Receive())
     {
-      MessageID type = packet->data[0];
       BitStream stream(packet->data, packet->length, false);
-      stream.IgnoreBits(CHAR_BIT);
+      stream.Read(type);
       //printf("CLIENT: Receive packet type: %i\n", (int)type);
 
       switch (type)
@@ -215,7 +216,7 @@ namespace network
         }
 
         default:
-          printf("CLIENT: Unknown message: %i\n", packet->data[0]);
+          printf("CLIENT: Unknown message: %i\n", type);
           break;
       }
 

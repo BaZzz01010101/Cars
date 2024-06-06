@@ -358,7 +358,7 @@ namespace game_tests
     static inline const float MIN_XZ = -Terrain::TERRAIN_SIZE / 2 + 0.01f;
     static inline const float MAX_XZ = Terrain::TERRAIN_SIZE / 2 - 0.01f;
     static inline const float MIN_Y = -Terrain::TERRAIN_HEIGHT - 1;
-    static inline const float MAX_Y = Terrain::TERRAIN_HEIGHT + 1;
+    static inline const float MAX_Y = Terrain::TERRAIN_HEIGHT * 2 + 1;
 
     typedef function<bool(const Terrain& terrain, Line line)> TraceWorkerCallback;
     typedef function<Line()> LineCreatorCallback;
@@ -579,9 +579,9 @@ namespace game_tests
         };
 
         vec3 end = {
-          begin.x + Terrain::TERRAIN_SIZE,
+          begin.x + Terrain::TERRAIN_SIZE / 2,
           MIN_Y,
-          begin.z + Terrain::TERRAIN_SIZE,
+          begin.z + Terrain::TERRAIN_SIZE / 2,
         };
 
         return Line { begin, end };

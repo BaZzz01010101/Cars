@@ -215,8 +215,6 @@ namespace game
       vec3 carPointGlobal = carPoint + position;
       vec3 normal;
 
-      const float MAX_PENETRATION = 0.1f;
-
       float terrainY = scene.terrain.getHeight(carPointGlobal.x, carPointGlobal.z, &normal);
       float penetration = std::max(terrainY - carPointGlobal.y, 0.0f);
 
@@ -232,8 +230,6 @@ namespace game
     for (auto [point, normal, penetration] : hits)
     {
       vec3 ptLocal = point.rotatedBy(rotation.inverted());
-      const float MAX_PENETRATION = 0.1f;
-
       vec3 ptRotationfVelocityGlobal = (angularVelocity % ptLocal).rotatedBy(rotation);
       vec3 ptVelocityGlobal = velocity + ptRotationfVelocityGlobal;
 

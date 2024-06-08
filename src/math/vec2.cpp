@@ -14,7 +14,6 @@ namespace game
       return vec2::zero;
 
     vec2 v;
-    const float RAND_MAX_2 = RAND_MAX / 2.0f;
 
     do
     {

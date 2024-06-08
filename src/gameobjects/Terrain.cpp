@@ -330,13 +330,9 @@ namespace game
     float h10 = heightMap[y10 * HEIGHT_MAP_SIZE + x10];
     float h11 = heightMap[y11 * HEIGHT_MAP_SIZE + x11];
 
-    float h;
-
     // Triangles: (0,0) (1,0) (1,1) and (0,0) (0,1) (1,1)
     if (dx > dy)
     {
-      h = (h00 * (1 - dx) + h10 * dx) * (1 - dy / dx) + (h00 * (1 - dx) + h11 * dx) * dy / dx;
-
       return {
         { x00 * CELL_SIZE - TERRAIN_SIZE_2, h00 * TERRAIN_HEIGHT, y00 * CELL_SIZE - TERRAIN_SIZE_2 },
         { x11 * CELL_SIZE - TERRAIN_SIZE_2, h11 * TERRAIN_HEIGHT, y11 * CELL_SIZE - TERRAIN_SIZE_2 },
@@ -345,8 +341,6 @@ namespace game
     }
     else
     {
-      h = (h00 * (1 - dy) + h01 * dy) * (1 - dx / dy) + (h00 * (1 - dy) + h11 * dy) * dx / dy;
-
       return {
         { x00 * CELL_SIZE - TERRAIN_SIZE_2, h00 * TERRAIN_HEIGHT, y00 * CELL_SIZE - TERRAIN_SIZE_2 },
         { x01 * CELL_SIZE - TERRAIN_SIZE_2, h01 * TERRAIN_HEIGHT, y01 * CELL_SIZE - TERRAIN_SIZE_2 },

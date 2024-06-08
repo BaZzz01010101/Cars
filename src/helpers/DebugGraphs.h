@@ -14,11 +14,11 @@ namespace game
     float maxValue = 0;
     float avgValue = 0;
 
-    DebugGraph(std::string name, Color color);
+    DebugGraph(const std::string& name, Color color);
 
     void logValue(float value);
     float getValue(int i);
-    void draw(Font font, float posX, float posY, float width, float height, bool pureGraph, const char* title = nullptr);
+    void draw(const Font& font, float posX, float posY, float width, float height, bool pureGraph, const char* title = nullptr);
     void reset();
   };
 
@@ -30,8 +30,8 @@ namespace game
 
     DebugGraphs();
 
-    void logValue(std::string name, Color color, float value);
-    void draw(Font font, float posX, float posY, float width, float height);
+    void logValue(const std::string& name, Color color, float value);
+    void draw(const Font& font, float posX, float posY, float width, float height);
     bool get(const char* name, DebugGraph** graph);
     void selectNext();
     void selectPrev();

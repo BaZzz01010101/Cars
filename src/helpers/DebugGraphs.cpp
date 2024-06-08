@@ -5,7 +5,7 @@
 namespace game
 {
 
-  DebugGraph::DebugGraph(std::string name, Color color)
+  DebugGraph::DebugGraph(const std::string& name, Color color)
     : name(name), color(color), graph(GRAPH_SIZE, 0)
   {
   }
@@ -23,7 +23,7 @@ namespace game
     return graph[(graphPos + i) % GRAPH_SIZE];
   }
 
-  void DebugGraph::draw(Font font, float posX, float posY, float width, float height, bool pureGraph, const char* title)
+  void DebugGraph::draw(const Font& font, float posX, float posY, float width, float height, bool pureGraph, const char* title)
   {
     if (!pureGraph)
       DrawRectangle(int(posX), int(posY), int(width), int(height), Fade(BLACK, 0.5f));
@@ -94,7 +94,7 @@ namespace game
     avgValue = 0;
   }
 
-  void DebugGraphs::logValue(std::string name, Color color, float value)
+  void DebugGraphs::logValue(const std::string& name, Color color, float value)
   {
     DebugGraph* graph = nullptr;
 
@@ -116,7 +116,7 @@ namespace game
   {
   }
 
-  void DebugGraphs::draw(Font font, float posX, float posY, float width, float height)
+  void DebugGraphs::draw(const Font& font, float posX, float posY, float width, float height)
   {
     std::string selectedGraphTitle = graphs[selectedIndex].name;
 

@@ -196,7 +196,6 @@ namespace game
     printf("CLIENT_APP: OnMatchState\n");
 
     scene.matchTimeout = matchState.matchTimeout;
-    Scene::MatchState lastMatchState = scene.matchState;
     scene.updateMatchState();
 
     if (matchState.shouldResetMatchStats)
@@ -264,7 +263,6 @@ namespace game
   {
     if (const Car* player = scene.tryGetLocalPlayer())
     {
-      vec3 target = vec3::zero;
       float targetDistance = 100;
 
       // Fixes issue with crosshair twitching when targeting edge of terrain object at close/middle distance
@@ -275,7 +273,7 @@ namespace game
       if (scene.traceRay(camera.position, camera.direction, FLT_MAX, scene.localPlayerGuid, nullptr, nullptr, &targetDistance, nullptr))
         targetDistance += targetPenetration;
 
-      target = camera.position + camera.direction * targetDistance - player->position;
+      vec3 target = camera.position + camera.direction * targetDistance - player->position;
 
       PlayerControl playerControl = {
         .physicalFrame = scene.localPhysicalFrame,

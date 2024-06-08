@@ -19,6 +19,7 @@ namespace game
     int flags =
       //FLAG_VSYNC_HINT |
       FLAG_MSAA_4X_HINT |
+      FLAG_WINDOW_ALWAYS_RUN |
       //FLAG_FULLSCREEN_MODE |
       0;
 

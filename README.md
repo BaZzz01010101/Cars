@@ -17,17 +17,17 @@ In order to build this project you need Visual Studio 2022. All dependencies are
 - Run `cars.exe -test`
 
 ## Command Line
+When the game starts without CLI options it will run only the game client that will try to connect using the default host:port (`127.0.0.1:60000`).
 The executable supports the following CLI options:
 - `-server` - run dedicated server
-- `-test` - run both server and game client at the context of the same process
-- `-host 213.23.45.116` - uses provided IP for connection/listening (default host: 127.0.0.1, for server use ```-host ""``` to listen on all interfaces)
-- `-port 61000` - uses provided port for listening (default port: 60000)
-- `-password 12345` - set the password for connection
-- `-players 2` - set the limit for players
-- `-wx 250` - set the X position for the game window (for testing)
-- `-wy 120` - set the Y position for the game window (for testing)
+- `-test` - run both server and client as single process
+- `-host 213.23.45.116` - uses provided IP for connecting/listening (default host: 127.0.0.1, for server use ```-host ""``` to listen on all interfaces)
+- `-port 61000` - uses provided port for connecting/listening (default port: 60000)
+- `-password 12345` - set the password for server or client connection
+- `-players 2` - set max number of players limit for server (default value: 4, the max value can't be higher than Scene::MAX_CARS constant)
+- `-wx 250` - set the X position for the client window (for testing)
+- `-wy 120` - set the Y position for the client window (for testing)
 
-When the game starts without CLI options it will run only the game client that will try to connect to ```127.0.0.1:60000```.
 The most simple way to start the game locally is to run ```cars.exe -test```.
 If you want to play with friends, you need a server in a cloud or an external IP on your PC. In this case you should start the server by ```cars.exe -server -host ""``` and then connect to it by ```cars.exe -host SERVER_IP```.
 

@@ -42,9 +42,9 @@ namespace game
 
     const Config& config {};
 
-    static constexpr int MAX_CARS = 4;
-    static constexpr int MAX_PROJECTILES = 1000;
-    static constexpr int MAX_EXPLOSION_PARTICLES = 10000;
+    static constexpr int MAX_CARS = 64;
+    static constexpr int MAX_PROJECTILES = MAX_CARS * 200;
+    static constexpr int MAX_EXPLOSION_PARTICLES = MAX_CARS * 2000;
     static constexpr float MATCH_COUNTDOWN_DURATION = 9;
     static constexpr float MATCH_RUNNING_DURATION = 5 * 60;
     static constexpr float MATCH_SCOREBOARD_DURATION = 30;

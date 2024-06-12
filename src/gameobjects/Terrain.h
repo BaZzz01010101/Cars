@@ -57,7 +57,7 @@ namespace game
     static constexpr int EXPECTED_OBJECTS_PER_CG_GRID_CELL = (OBJECT_COUNT / (CG_GRID_SIZE * CG_GRID_SIZE) + 1) * 2;
     static constexpr int COLLISION_GEOMETRY_STATIC_SIZE = 10;
 
-    typedef SemiVector<int, EXPECTED_OBJECTS_PER_CG_GRID_CELL> CGGridCell;
+    typedef HybridVector<int, EXPECTED_OBJECTS_PER_CG_GRID_CELL> CGGridCell;
     typedef Pool<TerrainObject, OBJECT_COUNT> ObjectsPool;
     typedef std::vector<float> HeightMap;
     typedef CollisionGeometry<COLLISION_GEOMETRY_STATIC_SIZE> CollisionGeometry;

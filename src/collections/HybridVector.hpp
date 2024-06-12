@@ -4,7 +4,7 @@ namespace game
 {
 
   template <typename T, int N>
-  class SemiVector
+  class HybridVector
   {
   public:
     int add(T value)

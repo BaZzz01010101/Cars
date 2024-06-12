@@ -1,5 +1,5 @@
 #pragma once
-#include "SemiVector.hpp"
+#include "HybridVector.hpp"
 
 namespace game
 {
@@ -7,7 +7,7 @@ namespace game
   template <int StaticSize>
   struct CollisionGeometry
   {
-    SemiVector<Sphere, StaticSize> spheres;
+    HybridVector<Sphere, StaticSize> spheres;
 
     void add(vec3 position, float radius);
     bool traceRay(vec3 origin, vec3 directionNormalized, float distance, vec3* hitPosition, vec3* hitNormal, float* hitDistance) const;

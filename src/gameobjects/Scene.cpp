@@ -298,7 +298,7 @@ namespace game
 
   void Scene::addHit(int carIndex, Hit hit)
   {
-    SemiVector<Hit, MAX_CARS>& carHits = hits[carIndex];
+    HybridVector<Hit, MAX_CARS>& carHits = hits[carIndex];
 
     if (carHits.isEmpty())
     {
@@ -340,7 +340,7 @@ namespace game
         if (player.health <= 0)
           continue;
 
-        SemiVector<Hit, MAX_CARS>& carHits = hits[i];
+        HybridVector<Hit, MAX_CARS>& carHits = hits[i];
 
         for (int j = 0; j < carHits.size(); j++)
         {
@@ -517,7 +517,7 @@ namespace game
       return result;
 
     const Car& player = cars[index];
-    const SemiVector<Hit, MAX_CARS>& playerHits = hits[index];
+    const HybridVector<Hit, MAX_CARS>& playerHits = hits[index];
 
     for (int i = 0; i < playerHits.size(); i++)
     {

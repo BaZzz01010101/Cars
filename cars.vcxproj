@@ -148,7 +148,7 @@
     <ClInclude Include="src\collections\Pool.hpp" />
     <ClInclude Include="src\collections\Queue.hpp" />
     <ClInclude Include="src\collections\Ring.hpp" />
-    <ClInclude Include="src\collections\SemiVector.hpp" />
+    <ClInclude Include="src\collections\HybridVector.hpp" />
     <ClInclude Include="src\collisions\CollisionGeometry.hpp" />
     <ClInclude Include="src\collisions\Sphere.h" />
     <ClInclude Include="src\dto\MatchState.h" />

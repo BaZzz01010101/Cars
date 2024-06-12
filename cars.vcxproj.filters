@@ -179,7 +179,7 @@
     <ClInclude Include="src\collections\Queue.hpp">
       <Filter>collections</Filter>
     </ClInclude>
-    <ClInclude Include="src\collections\SemiVector.hpp">
+    <ClInclude Include="src\collections\HybridVector.hpp">
       <Filter>collections</Filter>
     </ClInclude>
     <ClInclude Include="src\collisions\CollisionGeometry.hpp">

@@ -2,7 +2,7 @@
 #include "CppUnitTest.h"
 #include "Terrain.h"
 #include "Helpers.h"
-#include "SemiVector.hpp"
+#include "HybridVector.hpp"
 #include "Ring.hpp"
 #include "PlayerControl.h"
 #include "PlayerState.h"
@@ -134,7 +134,7 @@ namespace game_tests
   public:
     TEST_METHOD(add_read)
     {
-      SemiVector<int, 3> sv;
+      HybridVector<int, 3> sv;
       sv.add(0);
       sv.add(1);
       sv.add(2);
@@ -153,7 +153,7 @@ namespace game_tests
 
     TEST_METHOD(add_clear_add)
     {
-      SemiVector<int, 3> sv;
+      HybridVector<int, 3> sv;
       sv.add(0);
       sv.add(1);
       sv.add(2);
@@ -183,7 +183,7 @@ namespace game_tests
 
     TEST_METHOD(remove_arr_first)
     {
-      SemiVector<int, 3> sv;
+      HybridVector<int, 3> sv;
       sv.add(0);
       sv.add(1);
       sv.add(2);
@@ -202,7 +202,7 @@ namespace game_tests
 
     TEST_METHOD(remove_arr_middle)
     {
-      SemiVector<int, 3> sv;
+      HybridVector<int, 3> sv;
       sv.add(0);
       sv.add(1);
       sv.add(2);
@@ -221,7 +221,7 @@ namespace game_tests
 
     TEST_METHOD(remove_arr_last)
     {
-      SemiVector<int, 3> sv;
+      HybridVector<int, 3> sv;
       sv.add(0);
       sv.add(1);
       sv.add(2);
@@ -240,7 +240,7 @@ namespace game_tests
 
     TEST_METHOD(remove_vec_first)
     {
-      SemiVector<int, 3> sv;
+      HybridVector<int, 3> sv;
       sv.add(0);
       sv.add(1);
       sv.add(2);
@@ -259,7 +259,7 @@ namespace game_tests
 
     TEST_METHOD(remove_vec_middle)
     {
-      SemiVector<int, 3> sv;
+      HybridVector<int, 3> sv;
       sv.add(0);
       sv.add(1);
       sv.add(2);
@@ -278,7 +278,7 @@ namespace game_tests
 
     TEST_METHOD(remove_vec_last)
     {
-      SemiVector<int, 3> sv;
+      HybridVector<int, 3> sv;
       sv.add(0);
       sv.add(1);
       sv.add(2);
@@ -297,7 +297,7 @@ namespace game_tests
 
     TEST_METHOD(remove_vec_add)
     {
-      SemiVector<int, 3> sv;
+      HybridVector<int, 3> sv;
       sv.add(0);
       sv.add(1);
       sv.add(2);

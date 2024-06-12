@@ -59,8 +59,8 @@ namespace game
     Pool<Car, MAX_CARS> cars {};
     Pool<Projectile, MAX_PROJECTILES> projectiles {};
     Pool<ExplosionParticle, MAX_EXPLOSION_PARTICLES> explosionParticles {};
-    SemiVector<Hit, MAX_CARS> hits[MAX_CARS] {};
-    SemiVector<Kill, MAX_CARS> kills {};
+    HybridVector<Hit, MAX_CARS> hits[MAX_CARS] {};
+    HybridVector<Kill, MAX_CARS> kills {};
 
     bool isServer = false;
     vec3 gunRayHit = vec3::zero;

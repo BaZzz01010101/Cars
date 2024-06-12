@@ -3,7 +3,7 @@
 #include "Terrain.h"
 #include "Helpers.h"
 #include "HybridVector.hpp"
-#include "Ring.hpp"
+#include "RingBuffer.hpp"
 #include "PlayerControl.h"
 #include "PlayerState.h"
 #include "PlayerJoin.h"
@@ -323,7 +323,7 @@ namespace game_tests
   public:
     TEST_METHOD(push_read)
     {
-      Ring<int, 5> sv(0);
+      RingBuffer<int, 5> sv(0);
       sv.push(1);
       sv.push(2);
       sv.push(3);

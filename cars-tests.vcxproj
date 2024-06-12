@@ -118,7 +118,7 @@
     <ClCompile Include="src\tests\tests.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\collections\Ring.hpp" />
+    <ClInclude Include="src\collections\RingBuffer.hpp" />
     <ClInclude Include="src\collisions\CollisionGeometry.hpp" />
     <ClInclude Include="src\collisions\Sphere.h" />
     <ClInclude Include="src\Config.h" />

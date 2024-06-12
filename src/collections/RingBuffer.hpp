@@ -4,17 +4,17 @@ namespace game
 {
 
   template <typename Type, int Size>
-  class Ring
+  class RingBuffer
   {
   public:
     int head = 0;
 
-    Ring()
+    RingBuffer()
     {
       assert(Size > 0);
     }
 
-    Ring(Type& value)
+    RingBuffer(Type& value)
     {
       assert(Size > 0);
 
@@ -22,7 +22,7 @@ namespace game
         push(value);
     }
 
-    Ring(Type&& value)
+    RingBuffer(Type&& value)
     {
       assert(Size > 0);
 

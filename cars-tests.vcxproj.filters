@@ -97,12 +97,10 @@
     <ClInclude Include="src\dto\WheelState.h">
       <Filter>dto</Filter>
     </ClInclude>
-    <ClInclude Include="src\collections\Ring.hpp">
-      <Filter>collections</Filter>
-    </ClInclude>
     <ClInclude Include="src\dto\TurretState.h">
       <Filter>dto</Filter>
     </ClInclude>
+    <ClInclude Include="src\collections\RingBuffer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="math">

@@ -239,7 +239,7 @@
     <ClInclude Include="src\dto\WheelState.h">
       <Filter>dto</Filter>
     </ClInclude>
-    <ClInclude Include="src\collections\Ring.hpp">
+    <ClInclude Include="src\collections\RingBuffer.hpp">
       <Filter>collections</Filter>
     </ClInclude>
     <ClInclude Include="src\Args.h" />

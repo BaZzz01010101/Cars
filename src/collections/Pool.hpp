@@ -33,7 +33,7 @@ namespace game
     template <typename... Args>
     int tryAdd(int index, Args&&... args)
     {
-      if (!alive[index])
+      if (index < Capacity && !alive[index])
       {
         new (&object(index)) Type(std::forward<Args>(args)...);
         alive[index] = true;

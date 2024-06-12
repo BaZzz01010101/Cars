@@ -56,7 +56,7 @@ namespace game
     drawTerrain();
 
     for (int i = 0; i < scene.cars.capacity(); i++)
-      if (scene.cars.isAlive(i))
+      if (scene.cars.exists(i))
       {
         const Car& car = scene.cars[i];
         bool isRemoteRespawningPlayer = car.isRemote() && car.aliveState == Car::Countdown;
@@ -66,14 +66,14 @@ namespace game
       }
 
     for (int i = 0; i < scene.projectiles.capacity(); i++)
-      if (scene.projectiles.isAlive(i))
+      if (scene.projectiles.exists(i))
       {
         const Projectile& projectile = scene.projectiles[i];
         drawProjectile(projectile, lerpFactor);
       }
 
     for (int i = 0; i < scene.explosionParticles.capacity(); i++)
-      if (scene.explosionParticles.isAlive(i))
+      if (scene.explosionParticles.exists(i))
       {
         const ExplosionParticle& explosionParticle = scene.explosionParticles[i];
         drawExplosionParticle(explosionParticle, lerpFactor);
@@ -226,7 +226,7 @@ namespace game
     const Terrain::ObjectsPool& terrainObjects = scene.terrain.objects;
 
     for (int i = 0; i < terrainObjects.capacity(); i++)
-      if (terrainObjects.isAlive(i))
+      if (terrainObjects.exists(i))
         drawTerrainObject(terrainObjects[i]);
   }
 
@@ -256,7 +256,7 @@ namespace game
   void Renderer::drawTerrainDebug()
   {
     //for (int i = 0; i < scene.terrain.objectCollisionGeometries.capacity(); i++)
-    //  if (scene.terrain.objectCollisionGeometries.isAlive(i))
+    //  if (scene.terrain.objectCollisionGeometries.exists(i))
     //    scene.terrain.objectCollisionGeometries.get(i).drawDebug();
 
     //std::vector<std::pair<vec3, vec3>> lines =

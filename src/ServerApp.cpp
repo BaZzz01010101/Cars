@@ -75,7 +75,7 @@ namespace game
   void ServerApp::sendPlayerStates()
   {
     for (int i = 0; i < scene.cars.capacity(); i++)
-      if (scene.cars.isAlive(i))
+      if (scene.cars.exists(i))
       {
         BitStream stream;
         PlayerState playerState = scene.getPlayerState(i);
@@ -94,7 +94,7 @@ namespace game
   void ServerApp::sendPlayerHits()
   {
     for (int i = 0; i < scene.cars.capacity(); i++)
-      if (scene.cars.isAlive(i))
+      if (scene.cars.exists(i))
         for (const PlayerHit& playerHit : scene.getPlayerHits(i))
         {
           BitStream stream;
@@ -172,7 +172,7 @@ namespace game
       name = PLAYER_NAMES[i];
 
       for (int j = 0; j < scene.cars.capacity(); j++)
-        if (scene.cars.isAlive(j) && scene.cars[j].name == name)
+        if (scene.cars.exists(j) && scene.cars[j].name == name)
           goto name_exists;
 
       if (skipCount-- == 0)
@@ -261,7 +261,7 @@ namespace game
     network.broadcastExcept(stream, guid, true);
 
     for (int i = 0; i < scene.cars.capacity(); i++)
-      if (scene.cars.isAlive(i))
+      if (scene.cars.exists(i))
       {
         Car& player = scene.cars[i];
         PlayerStats* playerStats = matchStats.tryGetStats(player.guid);
@@ -292,7 +292,7 @@ namespace game
     printf("SERVER_APP: OnClientDisconnected: %" PRIu64 "\n", guid);
 
     for (int i = 0; i < scene.cars.capacity(); i++)
-      if (scene.cars.isAlive(i) && scene.cars[i].guid == guid)
+      if (scene.cars.exists(i) && scene.cars[i].guid == guid)
       {
         scene.cars.remove(i);
         break;

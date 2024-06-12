@@ -148,7 +148,7 @@ namespace game
     printf("CLIENT_APP: OnPlayerLeave: %" PRIu64 "\n", playerLeave.guid);
 
     for (int i = 0; i < scene.cars.capacity(); i++)
-      if (scene.cars.isAlive(i) && scene.cars[i].guid == playerLeave.guid)
+      if (scene.cars.exists(i) && scene.cars[i].guid == playerLeave.guid)
       {
         scene.cars.remove(i);
         break;

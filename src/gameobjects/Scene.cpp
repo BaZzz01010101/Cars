@@ -53,7 +53,7 @@ namespace game
   void Scene::updateProjectiles(float dt)
   {
     for (int i = 0; i < projectiles.capacity(); i++)
-      if (projectiles.isAlive(i))
+      if (projectiles.exists(i))
       {
         Projectile& projectile = projectiles[i];
         projectile.update(dt);
@@ -94,7 +94,7 @@ namespace game
   void Scene::updateCars(float dt)
   {
     for (int i = 0; i < cars.capacity(); i++)
-      if (cars.isAlive(i))
+      if (cars.exists(i))
       {
         Car& car = cars[i];
         car.update(dt);
@@ -105,7 +105,7 @@ namespace game
   void Scene::updateExplosionParticles(float dt)
   {
     for (int i = 0; i < explosionParticles.capacity(); i++)
-      if (explosionParticles.isAlive(i))
+      if (explosionParticles.exists(i))
       {
         ExplosionParticle& particle = explosionParticles[i];
         particle.update(dt);
@@ -204,7 +204,7 @@ namespace game
   void Scene::updateRespawn()
   {
     for (int i = 0; i < cars.capacity(); i++)
-      if (cars.isAlive(i))
+      if (cars.exists(i))
       {
         Car& car = cars[i];
 
@@ -249,7 +249,7 @@ namespace game
     }
 
     for (int i = 0; i < cars.capacity(); i++)
-      if (cars.isAlive(i))
+      if (cars.exists(i))
       {
         const Car& car = cars[i];
 
@@ -333,7 +333,7 @@ namespace game
   void Scene::applyHits()
   {
     for (int i = 0; i < MAX_CARS; i++)
-      if (cars.isAlive(i))
+      if (cars.exists(i))
       {
         Car& player = cars[i];
 
@@ -423,7 +423,7 @@ namespace game
   void Scene::reset()
   {
     for (int i = 0; i < MAX_CARS; i++)
-      if (cars.isAlive(i))
+      if (cars.exists(i))
       {
         Car& car = cars[i];
         car.health = config.physics.car.maxHealth;
@@ -461,7 +461,7 @@ namespace game
   const Car* Scene::tryGetPlayer(uint64_t guid) const
   {
     for (int i = 0; i < MAX_CARS; i++)
-      if (cars.isAlive(i) && cars[i].guid == guid)
+      if (cars.exists(i) && cars[i].guid == guid)
         return &cars[i];
 
     return nullptr;
@@ -470,7 +470,7 @@ namespace game
   Car* Scene::tryGetPlayer(uint64_t guid)
   {
     for (int i = 0; i < MAX_CARS; i++)
-      if (cars.isAlive(i) && cars[i].guid == guid)
+      if (cars.exists(i) && cars[i].guid == guid)
         return &cars[i];
 
     return nullptr;
@@ -479,7 +479,7 @@ namespace game
   void Scene::updatePlayerControl(const PlayerControl& playerControl)
   {
     for (int i = 0; i < cars.capacity(); i++)
-      if (cars.isAlive(i) && cars[i].guid == playerControl.guid)
+      if (cars.exists(i) && cars[i].guid == playerControl.guid)
       {
         Car& car = cars[i];
 
@@ -513,7 +513,7 @@ namespace game
   {
     std::vector<PlayerHit> result;
 
-    if (!cars.isAlive(index))
+    if (!cars.exists(index))
       return result;
 
     const Car& player = cars[index];
@@ -597,7 +597,7 @@ namespace game
   void Scene::respawnAllPlayers()
   {
     for (int i = 0; i < cars.capacity(); i++)
-      if (cars.isAlive(i))
+      if (cars.exists(i))
       {
         Car& car = cars[i];
         respawnPlayer(car, false);
@@ -645,7 +645,7 @@ namespace game
   bool Scene::isCollidingWithPlayer(Sphere sphere, uint64_t excludePlayerGuid) const
   {
     for (int i = 0; i < cars.capacity(); i++)
-      if (cars.isAlive(i))
+      if (cars.exists(i))
       {
         const Car& car = cars[i];
 

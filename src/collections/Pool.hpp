@@ -16,13 +16,13 @@ namespace game
     template <typename... Args>
     int tryAdd(Args&&... args)
     {
-      if (aliveCount < Capacity)
+      if (existsCount < Capacity)
         for (int i = 0; i < Capacity; i++)
-          if (!alive[i])
+          if (!existence[i])
           {
             new (&object(i)) Type(std::forward<Args>(args)...);
-            alive[i] = true;
-            aliveCount++;
+            existence[i] = true;
+            existsCount++;
 
             return i;
           }
@@ -33,11 +33,11 @@ namespace game
     template <typename... Args>
     int tryAdd(int index, Args&&... args)
     {
-      if (index < Capacity && !alive[index])
+      if (index < Capacity && !existence[index])
       {
         new (&object(index)) Type(std::forward<Args>(args)...);
-        alive[index] = true;
-        aliveCount++;
+        existence[index] = true;
+        existsCount++;
 
         return index;
       }
@@ -48,17 +48,17 @@ namespace game
     void remove(int index)
     {
       _ASSERT(index >= 0 && index < Capacity);
-      _ASSERT(alive[index]);
+      _ASSERT(existence[index]);
 
       object(index).~Type();
-      alive[index] = false;
-      aliveCount--;
+      existence[index] = false;
+      existsCount--;
     }
 
     Type& operator[](int index)
     {
       _ASSERT(index >= 0 && index < Capacity);
-      _ASSERT(alive[index]);
+      _ASSERT(existence[index]);
 
       return object(index);
     }
@@ -66,16 +66,16 @@ namespace game
     const Type& operator[](int index) const
     {
       _ASSERT(index >= 0 && index < Capacity);
-      _ASSERT(alive[index]);
+      _ASSERT(existence[index]);
 
       return const_cast<const Type&>(object(index));
     }
 
-    bool isAlive(int index) const
+    bool exists(int index) const
     {
       _ASSERT(index >= 0 && index < Capacity);
 
-      return alive[index];
+      return existence[index];
     }
 
     int capacity() const
@@ -85,19 +85,19 @@ namespace game
 
     int count() const
     {
-      return aliveCount;
+      return existsCount;
     }
 
     void clear()
     {
       for (int i = 0; i < Capacity; i++)
-        if (alive[i])
+        if (existence[i])
         {
           object(i).~Type();
-          alive[i] = false;
+          existence[i] = false;
         }
 
-      aliveCount = 0;
+      existsCount = 0;
     }
 
   private:
@@ -110,8 +110,8 @@ namespace game
     Type(&objects)[BUF_SIZE / sizeof(Type)] = reinterpret_cast<Type(&)[BUF_SIZE / sizeof(Type)]>(buf);
 #endif
 
-    BoolArray<Capacity> alive { false };
-    int aliveCount = 0;
+    BoolArray<Capacity> existence { false };
+    int existsCount = 0;
 
     const Type& object(int index) const
     {

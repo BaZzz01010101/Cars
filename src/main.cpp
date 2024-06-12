@@ -48,7 +48,7 @@ void runBoth(const Args& args, const Config& config)
       client->renderer.drawWires = true;
 
       for (int i = 0; i < server->scene.cars.capacity(); i++)
-        if (server->scene.cars.isAlive(i))
+        if (server->scene.cars.exists(i))
         {
           const Car& car = server->scene.cars[i];
           client->renderer.drawCar(car, lerpFactor);

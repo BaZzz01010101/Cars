@@ -173,7 +173,7 @@ namespace game
     // TODO: Consider moving update collisions to Scene to reduce number of pairs by half
     if (aliveState != Car::Countdown && aliveState != Car::Hidden)
       for (int i = 0; i < scene.cars.capacity(); i++)
-        if (scene.cars.isAlive(i) && &scene.cars[i] != this && scene.cars[i].aliveState != Car::Countdown && scene.cars[i].aliveState != Car::Hidden)
+        if (scene.cars.exists(i) && &scene.cars[i] != this && scene.cars[i].aliveState != Car::Countdown && scene.cars[i].aliveState != Car::Hidden)
         {
           const Car& car = scene.cars[i];
 

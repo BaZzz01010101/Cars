@@ -189,7 +189,7 @@ namespace game
         const CGGridCell& cgGridCell = cgGrid[y][x];
 
         for (int i = 0; i < cgGridCell.size(); i++)
-          if (objectCollisionGeometries.isAlive(cgGridCell[i]))
+          if (objectCollisionGeometries.exists(cgGridCell[i]))
           {
             const CollisionGeometry& geometry = objectCollisionGeometries[cgGridCell[i]];
 
@@ -233,7 +233,7 @@ namespace game
     float closestHitDistance = FLT_MAX;
 
     for (int i = 0; i < objectCollisionGeometries.capacity(); i++)
-      if (objectCollisionGeometries.isAlive(i))
+      if (objectCollisionGeometries.exists(i))
       {
         const CollisionGeometry& geometry = objectCollisionGeometries[i];
         bool hitObject = geometry.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance);
@@ -274,7 +274,7 @@ namespace game
 
     for (int i = 0; i < cgGridCell.size(); i++)
     {
-      if (objectCollisionGeometries.isAlive(cgGridCell[i]))
+      if (objectCollisionGeometries.exists(cgGridCell[i]))
       {
         const CollisionGeometry& geometry = objectCollisionGeometries[cgGridCell[i]];
         bool hitObject = geometry.traceRay(origin, directionNormalized, distance, &currentHitPosition, &currentHitNormal, &currentHitDistance);

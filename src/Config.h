@@ -143,6 +143,8 @@ namespace game
         const char* tree2ModelPath;
         const char* rockModelPath;
         const char* crosshairsTexturePath;
+        const char* lightingVertexShaderPath;
+        const char* lightingFragmentShaderPath;
       } resources;
     } graphics;
 

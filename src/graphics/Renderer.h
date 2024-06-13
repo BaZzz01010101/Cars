@@ -32,6 +32,8 @@ namespace game
     Texture tree2Texture {};
     Texture rockTexture {};
 
+    Shader lightingShader {};
+
     bool drawWires = false;
     bool drawDebugInfo = false;
     std::function<void()> injectionCallback {};
@@ -64,6 +66,7 @@ namespace game
     void unloadResources();
     void updateTerrainModel();
     void visualizeTerrainRayTracing(vec3 origin, vec3 directionNormalized, float distance) const;
+    static void setShader(Model& model, Shader shader);
   };
 
 }

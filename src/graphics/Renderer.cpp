@@ -188,9 +188,9 @@ namespace game
       if (!drawWires)
         DrawMesh(model.meshes[i], material, transform);
 
-      rlEnableWireMode();
-      DrawMesh(model.meshes[i], wiresMaterial, transform);
-      rlDisableWireMode();
+      //rlEnableWireMode();
+      //DrawMesh(model.meshes[i], wiresMaterial, transform);
+      //rlDisableWireMode();
     }
   }
 
@@ -356,6 +356,16 @@ namespace game
 
     for (int i = 0; i < rockModel.materialCount; i++)
       rockModel.materials[i].maps[MATERIAL_MAP_DIFFUSE].texture = rockTexture;
+
+    lightingShader = LoadShader(config.graphics.resources.lightingVertexShaderPath, config.graphics.resources.lightingFragmentShaderPath);
+
+    setShader(carModel, lightingShader);
+    setShader(wheelModel, lightingShader);
+    setShader(gunModel, lightingShader);
+    setShader(cannonModel, lightingShader);
+    setShader(tree1Model, lightingShader);
+    setShader(tree2Model, lightingShader);
+    setShader(rockModel, lightingShader);
   }
 
   void Renderer::unloadResources()
@@ -377,6 +387,8 @@ namespace game
     UnloadTexture(tree1Texture);
     UnloadTexture(tree2Texture);
     UnloadTexture(rockTexture);
+
+    UnloadShader(lightingShader);
   }
 
   void Renderer::updateTerrainModel()
@@ -506,6 +518,8 @@ namespace game
     UnloadModel(terrainModel);
     terrainModel = LoadModelFromMesh(mesh);
     terrainModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = terrainTexture;
+
+    setShader(terrainModel, lightingShader);
   }
 
   void Renderer::visualizeTerrainRayTracing(vec3 origin, vec3 directionNormalized, float distance) const
@@ -551,6 +565,12 @@ namespace game
 
       return false;
     });
+  }
+
+  void Renderer::setShader(Model& model, Shader shader)
+  {
+    for (int i = 0; i < model.materialCount; i++)
+      model.materials[i].shader = shader;
   }
 
 }

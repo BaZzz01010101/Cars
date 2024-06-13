@@ -13,15 +13,18 @@ namespace game
     if (radius < EPSILON)
       return vec2::zero;
 
-    vec2 v;
-
-    do
+    for (int i = 0; i < 16; i++)
     {
-      v.x = randf(-radius, radius);
-      v.y = randf(-radius, radius);
-    } while (v.sqLength() >= radius * radius);
+      vec2 v {
+        randf(-radius, radius),
+        randf(-radius, radius)
+      };
 
-    return v;
+      if (v.sqLength() <= radius * radius)
+        return v;
+    }
+
+    return vec2::zero;
   }
 
   vec2 vec2::randomOnCircleSurface(float radius)
@@ -44,15 +47,10 @@ namespace game
     if (thickness < EPSILON)
       return vec2::randomOnCircleSurface(innerRadius);
 
-    vec2 v;
+    vec2 v = randomOnCircleSurface(innerRadius);
+    float k = 1.0f + powf(randf(1.0f), float(M_SQRT1_2)) * thickness / innerRadius;
 
-    do
-    {
-      v.x = randf(-thickness, thickness);
-      v.y = randf(-thickness, thickness);
-    } while (v.sqLength() >= thickness * thickness);
-
-    return v + innerRadius;
+    return v * k;
   }
 
   vec2 vec2::randomInSquare(float halfSize)

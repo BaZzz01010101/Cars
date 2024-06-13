@@ -97,12 +97,7 @@ namespace game
 
   inline float normalizeAngle(float a)
   {
-    while (a > PI)
-      a -= 2 * PI;
-    while (a < -PI)
-      a += 2 * PI;
-
-    return a;
+    return a - 2 * PI * floor((a + PI) / (2 * PI));
   }
 
   inline void drawVector(vec3 pos, vec3 vec, Color color)

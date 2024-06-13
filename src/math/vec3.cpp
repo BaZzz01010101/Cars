@@ -21,16 +21,19 @@ namespace game
     if (radius < EPSILON)
       return vec3::zero;
 
-    vec3 v;
-
-    do
+    for (int i = 0; i < 16; i++)
     {
-      v.x = randf(-radius, radius);
-      v.y = randf(-radius, radius);
-      v.z = randf(-radius, radius);
-    } while (v.sqLength() >= radius * radius);
+      vec3 v {
+        randf(-radius, radius),
+        randf(-radius, radius), 
+        randf(-radius, radius)
+      };
 
-    return v;
+      if (v.sqLength() <= radius * radius)
+        return v;
+    }
+
+    return vec3::zero;
   }
 
   vec3 vec3::randomOnSphereSurface(float radius)
@@ -51,11 +54,10 @@ namespace game
     if (thickness < EPSILON)
       return vec3::randomOnSphereSurface(innerRadius);
 
-    vec3 v;
-    do v = vec3::randomInSphere(thickness);
-    while (v.sqLength() >= thickness * thickness);
+    vec3 v = randomOnSphereSurface(innerRadius);
+    float k = 1.0f + powf(randf(1.0f), float(M_SQRT1_2 / M_SQRT1_2)) * thickness / innerRadius;
 
-    return v + v.normalized() * innerRadius;
+    return v * k;
   }
 
   vec3 vec3::randomInCube(float halfSize)

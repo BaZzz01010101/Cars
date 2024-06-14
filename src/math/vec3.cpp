@@ -38,7 +38,7 @@ namespace game
 
   vec3 vec3::randomOnSphereSurface(float radius)
   {
-    return vec3::forward.rotatedBy(quat::random()) * radius;
+    return radius * vec3::randomInSphere(1).normalized();
   }
 
   vec3 vec3::randomInHollowSphere(float innerRadius, float outerRadius)

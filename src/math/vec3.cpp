@@ -23,11 +23,7 @@ namespace game
 
     for (int i = 0; i < 16; i++)
     {
-      vec3 v {
-        randf(-radius, radius),
-        randf(-radius, radius), 
-        randf(-radius, radius)
-      };
+      vec3 v = vec3::randomInCube(radius);
 
       if (v.sqLength() <= radius * radius)
         return v;

@@ -55,7 +55,7 @@ namespace game
       return vec3::randomOnSphereSurface(innerRadius);
 
     vec3 v = randomOnSphereSurface(innerRadius);
-    float k = 1.0f + powf(randf(1.0f), float(M_SQRT1_2 / M_SQRT1_2)) * thickness / innerRadius;
+    float k = 1.0f + powf(randf(1.0f), float(M_SQRT1_2)) * thickness / innerRadius;
 
     return v * k;
   }
